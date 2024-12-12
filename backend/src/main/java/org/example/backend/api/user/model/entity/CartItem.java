@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="Cartitem")
+@Table(name="cartitem")
 public class CartItem {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
