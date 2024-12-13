@@ -24,6 +24,7 @@ public class TradeRequest {
   private Long postId;
   private Long proposerId;
   private TaskStatus tradeTaskStatus;
+
   @Column(nullable = false)
   @NotNull
   private LocalDateTime requestCreatedDate;

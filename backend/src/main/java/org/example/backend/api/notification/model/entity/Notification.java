@@ -18,22 +18,28 @@ public class Notification {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long notificationId;
+
   @Column(nullable = false)
   @NotNull
   private Long userId;
+
   @Enumerated(EnumType.STRING) // Java 레벨
   @Column(nullable = false)
   @NotNull
   private NotificationType notificationType;
+
   @Column(nullable = false)
   @NotNull
   private String notificationMessage;
+
   @Column(nullable = false)
   @NotNull
   private Long tradeRequestId;
+
   @Column(nullable = false)
   @NotNull
   private Long requestId;
+
   @Column(nullable = false)
   @ColumnDefault("false")
   @NotNull

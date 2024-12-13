@@ -17,15 +17,19 @@ public class Kindness {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long kindnessId;
+
   @Column(nullable = false)
   @NotNull
   private Long reviewerId;
+
   @Column(nullable = false)
   @NotNull
   private Long revieweeId;
+
   @Column(nullable = false)
   @NotNull
   private Long tradeRoomId;
+
   @Enumerated(EnumType.STRING) // Java 레벨
   @Column(nullable = false)
   @NotNull
