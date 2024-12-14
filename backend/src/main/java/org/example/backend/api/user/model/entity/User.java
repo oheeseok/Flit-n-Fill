@@ -15,8 +15,6 @@ import org.example.backend.api.trade.model.entity.Kindness;
 import org.example.backend.api.trade.model.entity.Trade;
 import org.example.backend.api.trade.model.entity.TradeRequest;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.List;
 

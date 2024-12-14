@@ -41,6 +41,7 @@ public class Food {
   @NotNull
   private String foodListName;
 
+  @Enumerated(EnumType.STRING)
   @Column(length = 10, nullable = false)
   @NotNull
   private FoodCategory foodCategory;
@@ -50,6 +51,7 @@ public class Food {
   @NotNull
   private int foodCount;
 
+  @Enumerated(EnumType.STRING)
   @NotNull
   private FoodUnit foodUnit;
 
@@ -59,6 +61,7 @@ public class Food {
   @NotNull
   private LocalDate foodExpDate;
 
+  @Enumerated(EnumType.STRING)
   @Column(length = 10, nullable = false)
   @NotNull
   private FoodStorage foodStorage;
