@@ -6,20 +6,28 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.backend.api.foodlist.model.entity.FoodList;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="Cartitem")
+@Table(name="cartitem")
 public class CartItem {
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long cartId;
-  @Column(nullable = false)
-  @NotNull
-  private Long foodListId;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "cart_id", nullable = false)
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  private UserCart userCart;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "food_list_id", nullable = false)
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  private FoodList foodList;
+
   @Column(length = 45, nullable = false)
   @NotNull
   private String foodListName;

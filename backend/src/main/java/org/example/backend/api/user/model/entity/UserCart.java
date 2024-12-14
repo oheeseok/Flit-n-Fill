@@ -6,18 +6,28 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import java.util.List;
 
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="Usercart")
+@Table(name="usercart")
 public class UserCart {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long cartId;
-  @Column(nullable = false)
+
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", nullable = false)
+  @OnDelete(action = OnDeleteAction.CASCADE)
   @NotNull
-  private Long userId;
+  private User user;
+
+  @OneToMany(mappedBy = "userCart", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+  private List<CartItem> cartItemList;
 }

@@ -20,12 +20,16 @@ import java.util.List;
 public class TradeRoom {
   @Id
   private String tradeRoomId; // MongoDB의 기본 키
+
   @NotNull
   private LocalDateTime tradeRoomCreatedDate;
+
   @NotNull
   private Long tradeId;
+
   @NotNull
   private List<TradeRoomMessageDto> tradeRoomMessage;
+
   private Long writerId;
   private Long proposerId;
 }
