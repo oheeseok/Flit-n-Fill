@@ -9,7 +9,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.backend.api.myfridge.model.entity.Food;
+import org.example.backend.api.notification.model.entity.Notification;
 import org.example.backend.api.post.model.entity.Post;
+import org.example.backend.api.trade.model.entity.Kindness;
+import org.example.backend.api.trade.model.entity.Trade;
+import org.example.backend.api.trade.model.entity.TradeRequest;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -61,17 +65,40 @@ public class User {
   @NotNull
   private double userKindness;
 
+  // 연관관계 및 cascade 설정
   @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
   private BlackList blackList;
-  @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-  private List<Request> request;  // 신고한 회원
-  @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-  private List<Request> requestReported;  // 신고 받은 회원
+
+  @OneToMany(mappedBy = "requestUser", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+  private List<Request> requestUserList;  // 신고한 회원
+
+  @OneToMany(mappedBy = "reportedUser", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+  private List<Request> reportedUserList;  // 신고 받은 회원
+
   @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
   private UserCart userCart;
+
   @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-  private List<Food> food;
+  private List<Food> foodList;
+
   @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
   private List<Post> postList;
 
+  @OneToMany(mappedBy = "proposer", fetch = FetchType.LAZY)
+  private List<Trade> tradeList;
+
+  @OneToMany(mappedBy = "reviewer", fetch = FetchType.LAZY)
+  private List<Kindness> reviewerList;
+
+  @OneToMany(mappedBy = "reviewee", fetch = FetchType.LAZY)
+  private List<Kindness> revieweeList;
+
+  @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+  private List<BookmarkedRecipe> bookmarkedRecipeList;
+
+  @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+  private List<Notification> notificationList;
+
+  @OneToMany(mappedBy = "proposer", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+  private List<TradeRequest> tradeRequestList;
 }

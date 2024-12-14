@@ -28,6 +28,6 @@ public class UserCart {
   @NotNull
   private User user;
 
-  @OneToMany(mappedBy = "userCart", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  private List<CartItem> cartItem;
+  @OneToMany(mappedBy = "userCart", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+  private List<CartItem> cartItemList;
 }

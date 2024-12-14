@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.backend.api.trade.model.entity.Trade;
+import org.example.backend.api.trade.model.entity.TradeRequest;
 import org.example.backend.api.user.model.entity.User;
 import org.example.backend.enums.FoodUnit;
 import org.example.backend.enums.TradeType;
@@ -13,6 +15,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -79,4 +82,10 @@ public class Post {
   private String postPhoto1;
 
   private String postPhoto2;
+
+  @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+  private List<Trade> tradeList;
+
+  @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+  private List<TradeRequest> tradeRequestList;
 }

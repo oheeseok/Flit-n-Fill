@@ -26,12 +26,12 @@ public class Trade {
   private Long tradeId;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name="post_id", nullable = true)
+  @JoinColumn(name = "post_id", nullable = true)
   @OnDelete(action = OnDeleteAction.SET_NULL) // 부모 삭제 시 외래 키 null 처리
   private Post post;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name="proposer_id", nullable = true)
+  @JoinColumn(name = "proposer_id", nullable = true)
   @OnDelete(action = OnDeleteAction.SET_NULL) // 부모 삭제 시 외래 키 null 처리
   private User proposer;
 

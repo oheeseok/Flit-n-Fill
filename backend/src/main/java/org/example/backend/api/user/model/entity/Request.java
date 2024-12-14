@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.backend.api.notification.model.entity.Notification;
 import org.example.backend.enums.RequestType;
 import org.example.backend.enums.TaskStatus;
 import org.hibernate.annotations.ColumnDefault;
@@ -13,6 +14,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -28,7 +30,7 @@ public class Request {
   @JoinColumn(name = "request_user_id", nullable = false)
   @OnDelete(action = OnDeleteAction.CASCADE)
   @NotNull
-  private User user;
+  private User requestUser;
 
   @Enumerated(EnumType.STRING) // Java 레벨
   @Column(nullable = false)
@@ -53,4 +55,7 @@ public class Request {
   @ColumnDefault("'PENDING'") // SQL 레벨
   @NotNull
   private TaskStatus responseStatus = TaskStatus.PENDING;
+
+  @OneToMany(mappedBy = "request", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+  private List<Notification> notificationList;
 }

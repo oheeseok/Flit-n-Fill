@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.backend.api.recipe.model.entity.Recipe;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -18,6 +20,7 @@ public class BookmarkedRecipe {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "userId", nullable = false, insertable = false, updatable = false)  // User와 관계를 설정
+  @OnDelete(action = OnDeleteAction.CASCADE)
   private User user;  // BookmarkedRecipe는 User와 연관
 
   @Column(name = "recipeId", nullable = false, insertable = false, updatable = false)
