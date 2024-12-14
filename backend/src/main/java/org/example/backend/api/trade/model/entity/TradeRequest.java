@@ -37,6 +37,7 @@ public class TradeRequest {
   @OnDelete(action = OnDeleteAction.CASCADE)
   private User proposer;
 
+  @Enumerated(EnumType.STRING)
   private TaskStatus tradeTaskStatus;
 
   @Column(nullable = false)

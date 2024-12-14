@@ -34,12 +34,17 @@ public class Post {
 
   @Column(length = 10, nullable = false)
   @NotNull
+  private String address; // (글 등록 당시의) 사용자 위치
+
+  @Column(length = 10, nullable = false)
+  @NotNull
   private String writerFood;
 
   @Column(nullable = false)
   @NotNull
   private int writerCount;
 
+  @Enumerated(EnumType.STRING)
   @Column(length = 10, nullable = false)
   @NotNull
   private FoodUnit writerUnit;
@@ -49,6 +54,7 @@ public class Post {
 
   private int proposerCount;
 
+  @Enumerated(EnumType.STRING)
   @Column(length = 10)
   private FoodUnit proposerUnit;
 
@@ -56,6 +62,7 @@ public class Post {
   @NotNull
   private LocalDateTime postCreatedDate;
 
+  @Enumerated(EnumType.STRING)
   @Column(length = 10, nullable = false)
   @NotNull
   private TradeType tradeType;
@@ -73,9 +80,9 @@ public class Post {
   @NotNull
   private String meetingPlace;
 
-  @Column(length = 50, nullable = false)
+  @Column(nullable = false)
   @NotNull
-  private String meetingTime;
+  private LocalDateTime meetingTime;
 
   @Column(nullable = false)
   @NotNull
