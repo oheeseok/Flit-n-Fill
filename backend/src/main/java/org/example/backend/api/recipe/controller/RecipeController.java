@@ -23,7 +23,6 @@ import java.util.List;
 public class RecipeController {
     private final RecipeService recipeService;
 
-    @Authenticate
     @GetMapping
     public ResponseEntity<Object> getAllRecipes(HttpServletRequest request,
                                                 @RequestParam(value = "search-query", required = false) String keyword,
@@ -42,14 +41,12 @@ public class RecipeController {
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
-    @Authenticate
     @GetMapping("/{recipeId}")
     public ResponseEntity<RecipeDetailDto> getRecipeDetail(HttpServletRequest request, @PathVariable("recipeId") String recipeId) {
         RecipeDetailDto recipe = recipeService.getRecipeDetail(recipeId);
         return ResponseEntity.status(HttpStatus.OK).body(recipe);
     }
 
-    @Authenticate
     @PostMapping
     public ResponseEntity<RecipeDetailDto> addRecipe(HttpServletRequest request, @RequestBody RecipeRegisterDto recipeRegisterDto) {
         Long userId = (Long) request.getAttribute("userId");
