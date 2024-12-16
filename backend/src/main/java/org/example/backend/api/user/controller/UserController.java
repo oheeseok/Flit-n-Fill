@@ -45,6 +45,7 @@ public class UserController {
 
     @GetMapping("/logout")
     public ResponseEntity<String> logout(@RequestHeader("Authorization") String authHeader) {
+        log.info("여기는 들어와지나..");
         // Authorization 헤더에서 토큰 확인
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("유효하지 않은 토큰입니다.");

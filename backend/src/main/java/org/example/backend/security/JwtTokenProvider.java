@@ -48,6 +48,7 @@ public class JwtTokenProvider {
     // 토큰 검증 (Access Token과 Refresh Token 모두 검증 가능)
     public String validateToken(String token) {
         try {
+            System.out.println(token);
             Claims claims = Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
