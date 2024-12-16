@@ -23,6 +23,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final RecipeService recipeService;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final TokenBlacklistService tokenBlacklistService;
 
     // userEmail 중복 검사
     public boolean existsByUserEmail(String userEmail) {
@@ -95,6 +96,11 @@ public class UserService {
         // Refresh Token 삭제
         user.setRefreshToken(null);
         userRepository.save(user);
+
+        // Access Token 블랙리스트에 추가
+        long tokenExpiration = jwtTokenProvider.getExpirationDate(token).getTime();
+        log.info("만료기한 : {}", tokenExpiration);
+        tokenBlacklistService.addBlacklistToken(token, tokenExpiration);
     }
 
     public void deleteUser(Long userId) {
