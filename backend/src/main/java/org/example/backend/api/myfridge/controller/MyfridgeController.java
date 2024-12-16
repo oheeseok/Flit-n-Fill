@@ -26,16 +26,28 @@ public class MyfridgeController {
     @GetMapping
     public ResponseEntity<List<FoodSimpleDto>> getAllFood(HttpServletRequest request) {// 냉장고 재료 전체 조회
         Long userId = (Long) request.getAttribute("userId");
-        log.info("========== getAllFood UserID: {}", userId);
+        if (userId == null) {
+            throw new UserIdNullException("userId not found");
+        }
         List<FoodSimpleDto> allFood = myfridgeService.getAllFood();
         return ResponseEntity.status(HttpStatus.CREATED).body(allFood);
     }
 
+    @GetMapping("/{foodId}")
+    public ResponseEntity<FoodDetailDto> getFoodDetail(HttpServletRequest request, @PathVariable("foodId") Long foodId) {
+        Long userId = (Long) request.getAttribute("userId");
+        if (userId == null) {
+            throw new UserIdNullException("userId not found");
+        }
+
+        FoodDetailDto food = myfridgeService.getFoodDetail(foodId);
+        return ResponseEntity.status(HttpStatus.OK).body(food);
+
+    }
+
     @PostMapping
     public ResponseEntity<Void> addFood(HttpServletRequest request, @RequestBody FoodAddDto foodAddDto) {// 냉장고 재료 등록
-        log.info("========== addFood: {}", foodAddDto);
         Long userId = (Long) request.getAttribute("userId");
-        log.info("========== UserID: {}", userId);
         if (userId == null) {
             throw new UserIdNullException("userId not found");
         }
@@ -43,4 +55,5 @@ public class MyfridgeController {
         myfridgeService.addFood(userId, foodAddDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
 }
