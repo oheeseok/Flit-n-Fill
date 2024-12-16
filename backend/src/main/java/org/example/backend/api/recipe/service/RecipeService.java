@@ -93,42 +93,17 @@ public class RecipeService {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
 
-    return new RecipeDetailDto(
-        recipe.getRecipeId(),
-        recipe.getRecipeTitle(),
-        recipe.getRecipeMainPhoto(),
-        recipe.getRecipeFoodDetails(),
-        recipe.getRecipeSteps(),
-        recipe.isRecipeIsVisibility(),
-        user.getUserNickname(),
-        user.getUserProfile()
-    );
+    return RecipeDetailDto.of(recipe, user);
   }
 
   public RecipeDetailDto addRecipe(Long userId, RecipeRegisterDto dto) {
-    Recipe recipe = new Recipe();
-    recipe.setUserId(userId);
-    recipe.setRecipeTitle(dto.getRecipeTitle());
-    recipe.setRecipeMainPhoto(dto.getRecipeMainPhoto());
-    recipe.setRecipeFoodDetails(dto.getRecipeFoodDetails());
-    recipe.setRecipeSteps(dto.getRecipeSteps());
-    recipe.setRecipeIsVisibility(dto.isRecipeIsVisibility());
-
-    Recipe savedRecipe = recipeRepository.save(recipe);
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+            .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
 
-    RecipeDetailDto recipeDetailDto = new RecipeDetailDto();
-    recipeDetailDto.setRecipeId(savedRecipe.getRecipeId());
-    recipeDetailDto.setRecipeTitle(savedRecipe.getRecipeTitle());
-    recipeDetailDto.setRecipeMainPhoto(savedRecipe.getRecipeMainPhoto());
-    recipeDetailDto.setRecipeFoodDetails(savedRecipe.getRecipeFoodDetails());
-    recipeDetailDto.setRecipeSteps(savedRecipe.getRecipeSteps());
-    recipeDetailDto.setRecipeIsVisibility(savedRecipe.isRecipeIsVisibility());
-    recipeDetailDto.setUserNickname(user.getUserNickname());
-    recipeDetailDto.setUserProfile(user.getUserProfile());
+    Recipe recipe = Recipe.of(userId, dto);
+    Recipe savedRecipe = recipeRepository.save(recipe);
 
-    return recipeDetailDto;
+    return RecipeDetailDto.of(savedRecipe, user);
   }
 
   public RecipeDetailDto updateRecipe(Long userId, String recipeId, RecipeUpdateDto recipeUpdateDto) {
@@ -149,16 +124,7 @@ public class RecipeService {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
 
-    return new RecipeDetailDto(
-        recipe.getRecipeId(),
-        recipe.getRecipeTitle(),
-        recipe.getRecipeMainPhoto(),
-        recipe.getRecipeFoodDetails(),
-        recipe.getRecipeSteps(),
-        recipe.isRecipeIsVisibility(),
-        user.getUserNickname(),
-        user.getUserProfile()
-    );
+    return RecipeDetailDto.of(recipe, user);
   }
 
 
