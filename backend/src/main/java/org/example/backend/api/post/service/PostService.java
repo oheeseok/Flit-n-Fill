@@ -9,6 +9,8 @@ import org.example.backend.api.post.model.entity.Post;
 import org.example.backend.api.post.repository.PostRepository;
 import org.example.backend.api.user.model.entity.User;
 import org.example.backend.api.user.repository.UserRepository;
+import org.example.backend.exceptions.PostNotFoundException;
+import org.example.backend.exceptions.UserNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,25 +38,22 @@ public class PostService {
 
   public PostDetailDto addPost(Long userId, PostRegisterDto postRegisterDto) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+        .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
 
-    Post post = new Post();
-    post.setAddress(user.getUserAddress());
-    post.setWriterFood(postRegisterDto.getWriterFood());
-    post.setWriterCount(postRegisterDto.getWriterCount());
-    post.setWriterUnit(postRegisterDto.getWriterUnit());
-    post.setProposerFood(postRegisterDto.getProposerFood());
-    post.setProposerCount(postRegisterDto.getProposerCount());
-    post.setProposerUnit(postRegisterDto.getProposerUnit());
-    post.setPostContent(postRegisterDto.getPostContent());
-    post.setPostPhoto1(postRegisterDto.getPostPhoto1());
-    post.setPostPhoto2(postRegisterDto.getPostPhoto2());
-    post.setTradeType(postRegisterDto.getTradeType());
-    post.setMeetingPlace(postRegisterDto.getMeetingPlace());
-    post.setMeetingTime(postRegisterDto.getMeetingTime());
-    post.setPostCreatedDate(LocalDateTime.now());
-//    post.setPostTitle();
-    return null; // 임시
+    Post post = Post.of(user, postRegisterDto);
+
+    Post savedPost = postRepository.save(post);
+    return PostDetailDto.of(savedPost, savedPost.getUser());
   }
 
+  public PostDetailDto getPostDetail(Long postId) {
+    Post post = postRepository.findById(postId)
+            .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
+
+    Long userId = post.getUser().getUserId();
+    User user = userRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
+
+    return PostDetailDto.of(post, post.getUser());
+  }
 }

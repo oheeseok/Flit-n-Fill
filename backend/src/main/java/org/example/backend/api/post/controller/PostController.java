@@ -39,4 +39,9 @@ public class PostController {
     return ResponseEntity.status(HttpStatus.CREATED).body(post);
   }
 
+  @GetMapping("/{postId}")
+  public ResponseEntity<PostDetailDto> getPostDetail(HttpServletRequest request, @PathVariable("postId") Long postId) {
+    PostDetailDto post = postService.getPostDetail(postId);
+    return ResponseEntity.status(HttpStatus.OK).body(post);
+  }
 }

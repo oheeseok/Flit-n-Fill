@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.backend.api.post.model.dto.PostRegisterDto;
 import org.example.backend.api.trade.model.entity.Trade;
 import org.example.backend.api.trade.model.entity.TradeRequest;
 import org.example.backend.api.user.model.entity.User;
@@ -90,9 +91,40 @@ public class Post {
 
   private String postPhoto2;
 
+  // 연관관계
   @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
   private List<Trade> tradeList;
 
   @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
   private List<TradeRequest> tradeRequestList;
+
+  // of 메서드
+  public static Post of(User user, PostRegisterDto dto) {
+    Post post = new Post();
+    post.setUser(user);
+    post.setAddress(user.getUserAddress());
+    post.setWriterFood(dto.getWriterFood());
+    post.setWriterCount(dto.getWriterCount());
+    post.setWriterUnit(dto.getWriterUnit());
+    post.setProposerFood(dto.getProposerFood());
+    post.setProposerCount(dto.getProposerCount());
+    post.setProposerUnit(dto.getProposerUnit());
+    post.setPostContent(dto.getPostContent());
+    post.setPostPhoto1(dto.getPostPhoto1());
+    post.setPostPhoto2(dto.getPostPhoto2());
+    post.setTradeType(dto.getTradeType());
+    post.setMeetingPlace(dto.getMeetingPlace());
+    post.setMeetingTime(dto.getMeetingTime());
+    post.setPostCreatedDate(LocalDateTime.now());
+
+    String postTitle = String.format("[%s/%s] %s -> %s",
+            dto.getTradeType().getDescription(),
+            user.getUserAddress(),
+            dto.getWriterFood(),
+            dto.getProposerFood());
+
+    post.setPostTitle(postTitle);
+
+    return post;
+  }
 }
