@@ -63,6 +63,20 @@ public class User {
   @NotNull
   private double userKindness;
 
+  private String refreshToken;
+
+  // 생성자
+  public User(String userName, String userEmail, String userNickname, String userPassword, String userPhone, String userAddress, String userProfile, double userKindness) {
+    this.userName = userName;
+    this.userEmail = userEmail;
+    this.userNickname = userNickname;
+    this.userPassword = userPassword;
+    this.userPhone = userPhone;
+    this.userAddress = userAddress;
+    this.userProfile = userProfile;
+    this.userKindness = userKindness;
+  }
+
   // 연관관계 및 cascade 설정
   @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
   private BlackList blackList;
