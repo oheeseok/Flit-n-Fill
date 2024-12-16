@@ -6,5 +6,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 
 public interface RecipeRepository extends MongoRepository<Recipe, String> {
-    List<Recipe> findByUserId(Long userId);
+  List<Recipe> findByUserId(Long userId);
+  List<Recipe> findByRecipeTitleContainingIgnoreCaseOrRecipeFoodDetailsContainingIgnoreCase(String titleKeyword, String detailsKeyword);
 }
