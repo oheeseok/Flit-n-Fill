@@ -48,7 +48,6 @@ public class MyfridgeService {
         //
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
-        log.info("========== User: {}", user.getUserName());
         //
 
         Food food = new Food(
@@ -68,6 +67,10 @@ public class MyfridgeService {
         );
 
         myfridgeRepository.save(food);
+    }
+
+
+    public void deleteFood(Long foodId, String type) {
 
     }
 }

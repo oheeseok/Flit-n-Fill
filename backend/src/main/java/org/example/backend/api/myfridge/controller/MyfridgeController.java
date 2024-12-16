@@ -56,4 +56,14 @@ public class MyfridgeController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @DeleteMapping("/{foodId}")
+    public ResponseEntity<Void> deleteFood(HttpServletRequest request, @PathVariable("foodId") Long foodId, @RequestParam String type) {
+        Long userId = (Long) request.getAttribute("userId");
+        if (userId == null) {
+            throw new UserIdNullException("userId not found");
+        }
+
+        myfridgeService.deleteFood(foodId, type);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 }
