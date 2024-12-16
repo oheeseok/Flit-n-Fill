@@ -10,6 +10,7 @@ import org.example.backend.api.user.model.entity.User;
 import org.example.backend.api.user.repository.UserRepository;
 import org.example.backend.exceptions.LoginFailedException;
 import org.example.backend.security.JwtTokenProvider;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
     private final RecipeService recipeService;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     // userEmail 중복 검사
     public boolean existsByUserEmail(String userEmail) {
@@ -34,11 +36,13 @@ public class UserService {
 
     // 회원 가입
     public void registerUser(UserRegisterDto userRegisterDto) {
+        String encodedPassword = passwordEncoder.encode(userRegisterDto.getUserPassword());
+
         User user = new User(
                 userRegisterDto.getUserName(),
                 userRegisterDto.getUserEmail(),
                 userRegisterDto.getUserNickname(),
-                userRegisterDto.getUserPassword(),
+                encodedPassword, // 암호화된 비밀번호 사용
                 userRegisterDto.getUserPhone(),
                 userRegisterDto.getUserAddress(),
                 "default profile url",
@@ -57,7 +61,8 @@ public class UserService {
                 .orElseThrow(() -> new LoginFailedException("아이디 또는 비밀번호가 잘못되었습니다."));
 
         // 비밀번호 검증
-        if (!user.getUserPassword().equals(password)) {
+        // if (!user.getUserPassword().equals(password)) {
+        if (!passwordEncoder.matches(password, user.getUserPassword())) {
             throw new LoginFailedException("아이디 또는 비밀번호가 잘못되었습니다.");
         }
 

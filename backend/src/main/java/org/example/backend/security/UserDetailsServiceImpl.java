@@ -22,7 +22,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         Optional<User> findUser = userRepository.findByUserEmail(username);
         if (findUser.isPresent()) {
             User user = findUser.get();
-            return new UserDetailsImpl(user.getUserEmail(), user.getUserPassword(), "ROLE_USER");
+            return new UserDetailsImpl(user.getUserEmail(), user.getUserPassword());
         }
         throw new UserNotFoundException("User not found with userEmail: " + username);
     }
