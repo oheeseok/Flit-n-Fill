@@ -23,12 +23,7 @@ public class CartItem {
   @OnDelete(action = OnDeleteAction.CASCADE)
   private UserCart userCart;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "food_list_id", nullable = false)
-  @OnDelete(action = OnDeleteAction.CASCADE)
-  private FoodList foodList;
-
-  @Column(length = 45, nullable = false)
+  @Column(length = 50, nullable = false)
   @NotNull
-  private String foodListName;
+  private String memo;
 }
