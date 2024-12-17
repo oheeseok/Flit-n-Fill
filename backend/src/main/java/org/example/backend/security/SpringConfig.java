@@ -1,6 +1,7 @@
 package org.example.backend.security;
 
 import lombok.RequiredArgsConstructor;
+import org.example.backend.api.user.service.TokenBlacklistService;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,9 +15,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class SpringConfig {
     private final JwtTokenProvider jwtTokenProvider;
+    private final TokenBlacklistService tokenBlacklistService;
 
-    public SpringConfig(JwtTokenProvider jwtTokenProvider) {
+    public SpringConfig(JwtTokenProvider jwtTokenProvider, TokenBlacklistService tokenBlacklistService) {
         this.jwtTokenProvider = jwtTokenProvider;
+        this.tokenBlacklistService = tokenBlacklistService;
     }
 
     // password encoder
@@ -56,7 +59,7 @@ public class SpringConfig {
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter(jwtTokenProvider); // JwtTokenProvider 주입
+        return new JwtAuthenticationFilter(jwtTokenProvider, tokenBlacklistService); // JwtTokenProvider 주입
     }
 
     @Bean
