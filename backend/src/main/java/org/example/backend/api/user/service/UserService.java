@@ -3,14 +3,15 @@ package org.example.backend.api.user.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.backend.api.recipe.service.RecipeService;
-import org.example.backend.api.user.model.dto.UserLoginDto;
-import org.example.backend.api.user.model.dto.UserLoginResponse;
-import org.example.backend.api.user.model.dto.UserRegisterDto;
+import org.example.backend.api.user.model.dto.*;
 import org.example.backend.api.user.model.entity.User;
 import org.example.backend.api.user.repository.UserRepository;
 import org.example.backend.exceptions.LoginFailedException;
+import org.example.backend.exceptions.PasswordMismatchException;
+import org.example.backend.exceptions.UserNotFoundException;
 import org.example.backend.security.JwtTokenProvider;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final RecipeService recipeService;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final TokenBlacklistService tokenBlacklistService;
 
     // userEmail 중복 검사
     public boolean existsByUserEmail(String userEmail) {
@@ -95,6 +97,11 @@ public class UserService {
         // Refresh Token 삭제
         user.setRefreshToken(null);
         userRepository.save(user);
+
+        // Access Token 블랙리스트에 추가
+        long tokenExpiration = jwtTokenProvider.getExpirationDate(token).getTime();
+        log.info("만료기한 : {}", tokenExpiration);
+        tokenBlacklistService.addBlacklistToken(token, tokenExpiration);
     }
 
     public void deleteUser(Long userId) {
@@ -105,4 +112,64 @@ public class UserService {
     }
 
 
+    public UserInfoDto getUserInfoByEmail(String userEmail) {
+        if (userEmail == null) {
+            throw new IllegalArgumentException("계정 정보가 존재하지 않습니다.");
+        }
+
+        // DB에서 사용자 조회
+        User user = userRepository.findByUserEmail(userEmail)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+
+        // UserInfoDto 반환
+        return UserInfoDto.of(user);
+    }
+
+    public UserInfoDto updateUserInfo(String userEmail, UserUpdateDto updateDto) {
+        if (userEmail == null) {
+            throw new IllegalArgumentException("계정 정보가 존재하지 않습니다.");
+        }
+
+        // DB에서 사용자 조회
+        User user = userRepository.findByUserEmail(userEmail)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+
+        user.setUserNickname(updateDto.getUserNickname() != null ? updateDto.getUserNickname() : user.getUserNickname());
+        if (updateDto.getUserPassword() != null && !passwordEncoder.matches(updateDto.getUserPassword(), user.getUserPassword())) {
+            String password = passwordEncoder.encode(updateDto.getUserPassword());
+            user.setUserPassword(password);
+        }
+        user.setUserAddress(updateDto.getUserAddress() != null ? updateDto.getUserAddress() : user.getUserAddress());
+        user.setUserProfile(updateDto.getUserProfile() != null ? updateDto.getUserProfile() : user.getUserProfile());
+
+        User updatedUser = userRepository.save(user);
+
+        return UserInfoDto.of(user);
+    }
+
+    public OtherUserDto getOtherUserInfo(Long userId) {
+        // DB에서 사용자 조회
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("존재하지 않는 회원입니다."));
+
+        return OtherUserDto.of(user);
+    }
+
+    public void deleteUserByUserEmail(UserLoginDto loginDto) {
+        // DB 에서 사용자 조회
+        User user = userRepository.findByUserEmail(loginDto.getUserEmail())
+                .orElseThrow(() -> new UserNotFoundException("존재하지 않는 회원입니다."));
+
+        if (loginDto.getUserPassword() == null || !passwordEncoder.matches(loginDto.getUserPassword(), user.getUserPassword())) {
+            throw new PasswordMismatchException("비밀번호가 잘못 입력되었습니다.");
+        }
+
+        log.info("비밀번호 일치");
+        // 사용자를 삭제하기 전에 Recipe의 userId를 null로 설정
+        recipeService.setRecipesUserIdToNull(user.getUserId());
+
+        log.info("레시피 유저 아이디 null 설정완료");
+        // 사용자 삭제
+        userRepository.delete(user);
+    }
 }
