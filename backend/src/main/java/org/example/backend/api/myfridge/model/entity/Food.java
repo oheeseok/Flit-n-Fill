@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.backend.api.foodlist.model.entity.FoodList;
+import org.example.backend.api.post.model.entity.Post;
 import org.example.backend.api.user.model.entity.User;
 import org.example.backend.enums.FoodCategory;
 import org.example.backend.enums.FoodStorage;
@@ -16,6 +17,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Getter
@@ -49,7 +51,7 @@ public class Food {
   private LocalDate foodRegistDate;
 
   @NotNull
-  private int foodCount;
+  private float foodCount;
 
   @Enumerated(EnumType.STRING)
   @NotNull
@@ -70,4 +72,26 @@ public class Food {
   private boolean foodIsThaw = false;
 
   private String foodDescription;
+
+  // 연관관계 및 cascade 설정
+  @OneToMany(mappedBy = "writerFood", fetch = FetchType.LAZY)
+  private List<Post> postList;
+
+  // 생성자
+
+  public Food(Long foodId, User user, FoodList foodList, String foodListName, FoodCategory foodCategory, LocalDate foodRegistDate, float foodCount, FoodUnit foodUnit, LocalDate foodProDate, LocalDate foodExpDate, FoodStorage foodStorage, boolean foodIsThaw, String foodDescription) {
+    this.foodId = foodId;
+    this.user = user;
+    this.foodList = foodList;
+    this.foodListName = foodListName;
+    this.foodCategory = foodCategory;
+    this.foodRegistDate = foodRegistDate;
+    this.foodCount = foodCount;
+    this.foodUnit = foodUnit;
+    this.foodProDate = foodProDate;
+    this.foodExpDate = foodExpDate;
+    this.foodStorage = foodStorage;
+    this.foodIsThaw = foodIsThaw;
+    this.foodDescription = foodDescription;
+  }
 }

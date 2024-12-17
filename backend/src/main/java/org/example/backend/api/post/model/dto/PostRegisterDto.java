@@ -15,14 +15,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class PostRegisterDto {
     private String postContent;
-    private LocalDateTime meetingPlace;
+    private String meetingPlace;
+    private LocalDateTime meetingTime;
     private String postPhoto1;
     private String postPhoto2;
     private TradeType tradeType;
-    private String writerFood;
-    private int writerCount;
-    private FoodUnit writerUnit;
-    private String proposerFood;
-    private int proposerCount;
-    private FoodUnit proposerUnit;
+    private Long writerFoodId;
+    private Long proposerFoodListId;
 }

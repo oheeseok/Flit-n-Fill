@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.backend.api.post.model.entity.Post;
+import org.example.backend.api.user.model.entity.User;
 import org.example.backend.enums.TradeType;
 
 import java.time.LocalDateTime;
@@ -21,4 +23,22 @@ public class PostSimpleDto {
     private String userNickname;
     private String userProfile;
     private String address;
+
+    public static PostSimpleDto of(Post post, User user) {
+        PostSimpleDto dto = new PostSimpleDto();
+        dto.setPostId(post.getPostId());
+        dto.setPostTitle(post.getPostTitle());
+        dto.setPostPhoto1(post.getPostPhoto1());
+        dto.setTradeType(post.getTradeType());
+        dto.setPostCreatedDate(post.getPostCreatedDate());
+        dto.setAddress(post.getAddress());
+        if (user != null) {
+            dto.setUserNickname(user.getUserNickname());
+            dto.setUserProfile(user.getUserProfile());
+        } else {
+            dto.setUserNickname(null);
+            dto.setUserProfile(null);
+        }
+        return dto;
+    }
 }

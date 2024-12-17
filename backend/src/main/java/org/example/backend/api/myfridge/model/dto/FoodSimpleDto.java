@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.backend.api.foodlist.model.entity.FoodList;
 import org.example.backend.api.myfridge.model.entity.Food;
 import org.example.backend.enums.FoodStorage;
 import org.example.backend.enums.FoodUnit;
