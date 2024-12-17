@@ -10,6 +10,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<String> handleUnauthorizedAccess(RuntimeException ex) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized access");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
     }
 }
