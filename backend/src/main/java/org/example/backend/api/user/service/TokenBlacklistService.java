@@ -27,6 +27,7 @@ public class TokenBlacklistService {
         }
 
         // 현재 시간이 만료 시간 초과한 경우
+        // ttl 설정 실패, 시간 지연, 시간 동기화 문제 등을 대비하여 명시적 삭제 처리
         if (System.currentTimeMillis() > expirationTime) {
             // 만료된 토큰은 Redis에서 제거
             redisTemplate.delete(token);

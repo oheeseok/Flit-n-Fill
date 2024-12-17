@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.backend.api.user.model.entity.User;
 
 @Getter
 @Setter
@@ -17,4 +18,16 @@ public class UserInfoDto {
     private String userAddress;
     private String userProfile;
     private double userKindness;
+
+    public static UserInfoDto of(User user) {
+        return new UserInfoDto(
+                user.getUserName(),
+                user.getUserEmail(),
+                user.getUserNickname(),
+                user.getUserPhone(),
+                user.getUserAddress(),
+                user.getUserProfile(),
+                user.getUserKindness()
+        );
+    }
 }
