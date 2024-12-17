@@ -18,7 +18,7 @@ public class FoodDetailDto {
     private Long foodId;
     private String foodListName;
     private LocalDate foodRegistDate;
-    private int foodCount;
+    private float foodCount;
     private FoodUnit foodUnit;
     private LocalDate foodProDate;
     private LocalDate foodExpDate;
