@@ -16,6 +16,7 @@ import org.example.backend.api.user.repository.UserRepository;
 import org.example.backend.exceptions.RecipeNotFoundException;
 import org.example.backend.exceptions.UnauthorizedException;
 import org.example.backend.exceptions.UserNotFoundException;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,7 +45,7 @@ public class RecipeService {
   }
 
   public List<RecipeSimpleDto> getAllRecipes() {
-    List<Recipe> recipes = recipeRepository.findAll();
+    List<Recipe> recipes = recipeRepository.findAll(Sort.by(Sort.Direction.DESC, "recipeCreatedDate"));
     return recipes.stream()
         .map(recipe -> {
           // 각 레시피에 해당하는 userId를 가진 User를 찾음
@@ -60,7 +61,7 @@ public class RecipeService {
    * @return recipeTitle이나 recipeFoodDetails에 keyword가 포함된 레시피
    */
   public List<RecipeSimpleDto> searchRecipes(String keyword) {
-    List<Recipe> recipes = recipeRepository.findByRecipeTitleContainingIgnoreCaseOrRecipeFoodDetailsContainingIgnoreCase(keyword, keyword);
+    List<Recipe> recipes = recipeRepository.findByRecipeTitleContainingIgnoreCaseOrRecipeFoodDetailsContainingIgnoreCase(keyword, keyword, Sort.by(Sort.Direction.DESC, "recipeCreatedDate"));
     return recipes.stream()
         .map(recipe -> {
           User user = userRepository.findById(recipe.getUserId()).orElse(null);
@@ -110,7 +111,7 @@ public class RecipeService {
     Recipe recipe = recipeRepository.findById(recipeId)
         .orElseThrow(() -> new RecipeNotFoundException("레시피를 찾을 수 없습니다."));
 
-    if (! recipe.getUserId().equals(userId)) {
+    if (!recipe.getUserId().equals(userId)) {
       throw new UnauthorizedException("레시피 수정 권한이 없습니다.");
     }
 

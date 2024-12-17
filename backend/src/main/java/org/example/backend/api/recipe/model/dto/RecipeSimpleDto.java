@@ -7,6 +7,8 @@ import lombok.Setter;
 import org.example.backend.api.recipe.model.entity.Recipe;
 import org.example.backend.api.user.model.entity.User;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -16,6 +18,7 @@ public class RecipeSimpleDto {
     private String recipeTitle;
     private String recipeMainPhoto;
     private boolean recipeIsVisibility;
+    private LocalDateTime recipeCreatedDate;
     private String userNickname;
     private String userProfile;
 
@@ -25,6 +28,7 @@ public class RecipeSimpleDto {
         dto.setRecipeTitle(recipe.getRecipeTitle());
         dto.setRecipeMainPhoto(recipe.getRecipeMainPhoto());
         dto.setRecipeIsVisibility(recipe.isRecipeIsVisibility());
+        dto.setRecipeCreatedDate(recipe.getRecipeCreatedDate());
         if (user != null) {
             dto.setUserNickname(user.getUserNickname());
             dto.setUserProfile(user.getUserProfile());

@@ -7,9 +7,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.backend.api.recipe.model.dto.RecipeRegisterDto;
 import org.example.backend.api.recipe.model.dto.RecipeStepDto;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Document(collection = "recipe")
@@ -38,6 +40,9 @@ public class Recipe {
   @NotNull
   private boolean recipeIsVisibility = false;
 
+  @CreatedDate
+  private LocalDateTime recipeCreatedDate;
+
   public static Recipe of(Long userId, RecipeRegisterDto dto) {
     Recipe recipe = new Recipe();
     recipe.setUserId(userId);
@@ -46,6 +51,7 @@ public class Recipe {
     recipe.setRecipeFoodDetails(dto.getRecipeFoodDetails());
     recipe.setRecipeSteps(dto.getRecipeSteps());
     recipe.setRecipeIsVisibility(dto.isRecipeIsVisibility());
+    recipe.setRecipeCreatedDate(LocalDateTime.now());
     return recipe;
   }
 }
