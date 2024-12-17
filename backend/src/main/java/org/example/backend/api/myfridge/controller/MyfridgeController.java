@@ -63,5 +63,26 @@ public class MyfridgeController {
         myfridgeService.deleteFood(userId, foodId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
+    @PutMapping("/{foodId}")
+    public ResponseEntity<FoodDetailDto> updateFood(HttpServletRequest request, @PathVariable("foodId") Long foodId, @RequestBody FoodUpdateDto foodUpdateDto) {    // 냉장고 재료 수정
+        Long userId = (Long) request.getAttribute("userId");
+        if (userId == null) {
+            throw new UserIdNullException("userId not found");
+        }
+
+        FoodDetailDto food = myfridgeService.updateFood(userId, foodId, foodUpdateDto);
+        return ResponseEntity.status(HttpStatus.OK).body(food);
+    }
+
+    @PatchMapping("/{foodId}/exp-date")
+    public ResponseEntity<Void> updateExpDate(HttpServletRequest request, @PathVariable("foodId") Long foodId, @RequestBody FoodUpdateDto foodUpdateDto) {    // 냉장고 재료 소비기한 수정
+        Long userId = (Long) request.getAttribute("userId");
+        if (userId == null) {
+            throw new UserIdNullException("userId not found");
+        }
+
+        myfridgeService.updateExpDate(userId, foodId, foodUpdateDto);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

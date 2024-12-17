@@ -53,10 +53,22 @@ public class MyfridgeService {
         FoodList foodList = foodListRepository.findById(foodDto.getFoodListId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid FoodList ID: " + foodDto.getFoodListId()));
 
-        //
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
-        //
+
+        LocalDate registDate = foodDto.getFoodRegistDate();
+        LocalDate expDate;
+
+        if (foodDto.getFoodExpDate() != null) {
+            expDate = foodDto.getFoodExpDate();
+        } else {
+            switch (foodDto.getFoodStorage()) {
+                case FROZEN -> expDate = registDate.plusDays(365);
+                case REFRIGERATED -> expDate = registDate.plusDays(7);
+                case ROOM_TEMPERATURE -> expDate = registDate.plusDays(2);
+                default -> throw new IllegalArgumentException("Invalid storage type: " + foodDto.getFoodStorage());
+            }
+        }
 
         Food food = new Food(
                 null,
@@ -64,11 +76,11 @@ public class MyfridgeService {
                 foodList,
                 foodDto.getFoodListName(),
                 foodDto.getFoodCategory(),
-                foodDto.getFoodRegistDate() != null ? foodDto.getFoodRegistDate() : LocalDate.now(),
+                LocalDate.now(),
                 foodDto.getFoodCount(),
                 foodDto.getFoodUnit(),
                 foodDto.getFoodProDate(),
-                foodDto.getFoodExpDate(),
+                expDate,
                 foodDto.getFoodStorage(),
                 false,
                 foodDto.getFoodDescription()
@@ -92,5 +104,44 @@ public class MyfridgeService {
     }
 
 
+    public FoodDetailDto updateFood(Long userId, Long foodId, FoodUpdateDto foodUpdateDto) {
+        Food food = myfridgeRepository.findByFoodId(foodId);
+        if (food == null) {
+            throw new NoSuchElementException("해당 재료가 존재하지 않습니다.");
+        }
+
+        if (!food.getUser().getUserId().equals(userId)) {
+            throw new IllegalArgumentException("해당 재료에 대한 조회 권한이 없습니다.");
+        }
+
+        food.setFoodCount(foodUpdateDto.getFoodCount());
+        food.setFoodUnit(foodUpdateDto.getFoodUnit());
+        food.setFoodProDate(foodUpdateDto.getFoodProDate());
+        food.setFoodStorage(foodUpdateDto.getFoodStorage());
+        food.setFoodDescription(foodUpdateDto.getFoodDescription());
+
+        if (!food.isFoodIsThaw() && foodUpdateDto.isFoodIsThaw()) {
+            food.setFoodExpDate(LocalDate.now().plusDays(3));
+        } else {
+            food.setFoodExpDate(foodUpdateDto.getFoodExpDate());
+        }
+        food.setFoodIsThaw(foodUpdateDto.isFoodIsThaw());
+
+        myfridgeRepository.save(food);
+        return FoodDetailDto.of(food);
+    }
+
+    public void updateExpDate(Long userId, Long foodId, FoodUpdateDto foodUpdateDto) {
+        Food food = myfridgeRepository.findByFoodId(foodId);
+        if (food == null) {
+            throw new NoSuchElementException("해당 재료가 존재하지 않습니다.");
+        }
+
+        if (!food.getUser().getUserId().equals(userId)) {
+            throw new IllegalArgumentException("해당 재료에 대한 조회 권한이 없습니다.");
+        }
+
+        food.setFoodExpDate(foodUpdateDto.getFoodExpDate());
+        myfridgeRepository.save(food);
     }
 }
