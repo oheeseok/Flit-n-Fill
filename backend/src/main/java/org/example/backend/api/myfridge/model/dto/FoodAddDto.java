@@ -19,7 +19,7 @@ public class FoodAddDto {
     private String foodListName;
     private FoodCategory foodCategory;
     private LocalDate foodRegistDate;
-    private int foodCount;
+    private float foodCount;
     private FoodUnit foodUnit;
     private LocalDate foodProDate;
     private LocalDate foodExpDate;

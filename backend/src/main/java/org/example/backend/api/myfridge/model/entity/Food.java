@@ -51,7 +51,7 @@ public class Food {
   private LocalDate foodRegistDate;
 
   @NotNull
-  private int foodCount;
+  private float foodCount;
 
   @Enumerated(EnumType.STRING)
   @NotNull

@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.sql.CallableStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Date;
 
 @Component
@@ -48,6 +51,7 @@ public class JwtTokenProvider {
     // 토큰 검증 (Access Token과 Refresh Token 모두 검증 가능)
     public String validateToken(String token) {
         try {
+            System.out.println(token);
             Claims claims = Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
@@ -80,6 +84,19 @@ public class JwtTokenProvider {
             return false; // 만료되지 않음
         } catch (ExpiredJwtException e) {
             return true; // 만료됨
+        }
+    }
+
+    public Date getExpirationDate(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            return claims.getExpiration();
+        } catch (ExpiredJwtException e) {
+            throw new IllegalStateException("유효하지 않는 JWT 토큰입니다.", e);
         }
     }
 }

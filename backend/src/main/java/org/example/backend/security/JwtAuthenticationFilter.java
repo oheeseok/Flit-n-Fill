@@ -4,18 +4,22 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.backend.api.user.service.TokenBlacklistService;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 @Slf4j
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
-
-    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider) {
-        this.jwtTokenProvider = jwtTokenProvider;
-    }
+    private final TokenBlacklistService tokenBlaclistService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -40,6 +44,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
+            if (tokenBlaclistService.isTokenExpired(token)) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Token is blocked");
+                return;
+            }
+
             try {
                 String userEmail = jwtTokenProvider.validateToken(token); // JWT 검증
                 Long userId = jwtTokenProvider.getUserIdFromToken(token);
@@ -48,6 +58,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 request.setAttribute("userEmail", userEmail); // 사용자 정보를 request에 설정
                 request.setAttribute("userId", userId);
                 log.info("[JwtAuthenticationFilter] userEmail: {}, userId: {}", request.getAttribute("userEmail"), request.getAttribute("userId"));
+
+                // spring security 인증 정보 설정
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(userEmail, null, new ArrayList<>());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
 
             } catch (Exception e) {
                 log.error("[JwtAuthenticationFilter] Token validation error", e);
