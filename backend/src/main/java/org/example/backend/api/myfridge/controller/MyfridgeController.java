@@ -29,7 +29,7 @@ public class MyfridgeController {
         if (userId == null) {
             throw new UserIdNullException("userId not found");
         }
-        List<FoodSimpleDto> allFood = myfridgeService.getAllFood();
+        List<FoodSimpleDto> allFood = myfridgeService.getAllFood(userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(allFood);
     }
 
@@ -40,7 +40,7 @@ public class MyfridgeController {
             throw new UserIdNullException("userId not found");
         }
 
-        FoodDetailDto food = myfridgeService.getFoodDetail(foodId);
+        FoodDetailDto food = myfridgeService.getFoodDetail(userId, foodId);
         return ResponseEntity.status(HttpStatus.OK).body(food);
 
     }

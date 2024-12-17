@@ -28,15 +28,21 @@ public class MyfridgeService {
     private final FoodListRepository foodListRepository;
     private final UserRepository userRepository;
 
-    public List<FoodSimpleDto> getAllFood() {
-        List<FoodSimpleDto> FoodSimpleDtoList = myfridgeRepository.findAll().stream()
+    public List<FoodSimpleDto> getAllFood(Long userId) {
+        User user = userRepository.findById(userId).get();
+        List<FoodSimpleDto> FoodSimpleDtoList = myfridgeRepository.findByUser(user).stream()
                 .map(food -> FoodSimpleDto.of(food))
                 .collect(Collectors.toList());
         return FoodSimpleDtoList;
     }
 
-    public FoodDetailDto getFoodDetail(Long foodId) {
+    public FoodDetailDto getFoodDetail(Long userId, Long foodId) {
         Food food = myfridgeRepository.findByFoodId(foodId);
+
+        if (!food.getUser().getUserId().equals(userId)) {
+            throw new IllegalArgumentException("해당 음식에 대한 조회 권한이 없습니다.");
+        }
+
         FoodDetailDto foodDetailDto = FoodDetailDto.of(food);
         return foodDetailDto;
     }
