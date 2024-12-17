@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface MyfridgeRepository extends JpaRepository<Food, Long> {
     Food findByFoodId(Long foodId);
-    List<Food> findByUser(User user);
+    List<Food> findByUserOrderByFoodExpDateAsc(User user);
 }

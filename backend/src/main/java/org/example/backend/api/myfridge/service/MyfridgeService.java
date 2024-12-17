@@ -30,7 +30,7 @@ public class MyfridgeService {
 
     public List<FoodSimpleDto> getAllFood(Long userId) {
         User user = userRepository.findById(userId).get();
-        List<FoodSimpleDto> FoodSimpleDtoList = myfridgeRepository.findByUser(user).stream()
+        List<FoodSimpleDto> FoodSimpleDtoList = myfridgeRepository.findByUserOrderByFoodExpDateAsc(user).stream()
                 .map(food -> FoodSimpleDto.of(food))
                 .collect(Collectors.toList());
         return FoodSimpleDtoList;
