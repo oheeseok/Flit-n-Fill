@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.backend.api.post.model.entity.Post;
 import org.example.backend.api.user.model.entity.User;
-import org.example.backend.enums.FoodUnit;
 import org.example.backend.enums.TradeType;
 
 import java.time.LocalDateTime;
@@ -25,12 +24,8 @@ public class PostDetailDto {
     private String postPhoto1;
     private String postPhoto2;
     private TradeType tradeType;
-    private String writerFood;
-    private int writerCount;
-    private FoodUnit writerUnit;
-    private String proposerFood;
-    private int proposerCount;
-    private FoodUnit proposerUnit;
+    private Long writerFoodId;
+    private Long proposerFoodListId;
     private String userNickname;
     private String userProfile;
     private String address;
@@ -46,12 +41,8 @@ public class PostDetailDto {
         dto.setPostPhoto1(post.getPostPhoto1());
         dto.setPostPhoto2(post.getPostPhoto2());
         dto.setTradeType(post.getTradeType());
-        dto.setWriterFood(post.getWriterFood());
-        dto.setWriterCount(post.getWriterCount());
-        dto.setWriterUnit(post.getWriterUnit());
-        dto.setProposerFood(post.getProposerFood());
-        dto.setProposerCount(post.getProposerCount());
-        dto.setProposerUnit(post.getProposerUnit());
+        dto.setWriterFoodId(post.getWriterFood().getFoodId());
+        dto.setProposerFoodListId(post.getProposerFoodList().getFoodListId());
         dto.setAddress(post.getAddress());
 
         if (user != null) {
