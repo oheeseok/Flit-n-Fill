@@ -50,7 +50,7 @@ public class User {
   @NotNull
   private String userPhone;
 
-  @Column(length = 10, nullable = false)
+  @Column(length = 20, nullable = false)
   @NotNull
   private String userAddress;
 
