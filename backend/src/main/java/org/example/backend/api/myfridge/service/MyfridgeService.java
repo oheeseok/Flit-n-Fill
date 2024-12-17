@@ -4,9 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.backend.api.foodlist.model.entity.FoodList;
 import org.example.backend.api.foodlist.repository.FoodListRepository;
-import org.example.backend.api.myfridge.model.dto.FoodAddDto;
-import org.example.backend.api.myfridge.model.dto.FoodDetailDto;
-import org.example.backend.api.myfridge.model.dto.FoodSimpleDto;
+import org.example.backend.api.myfridge.model.dto.*;
 import org.example.backend.api.myfridge.model.entity.Food;
 import org.example.backend.api.myfridge.repository.MyfridgeRepository;
 import org.example.backend.api.user.model.entity.User;
@@ -17,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,6 +37,9 @@ public class MyfridgeService {
 
     public FoodDetailDto getFoodDetail(Long userId, Long foodId) {
         Food food = myfridgeRepository.findByFoodId(foodId);
+        if (food == null) {
+            throw new NoSuchElementException("해당 재료가 존재하지 않습니다.");
+        }
 
         if (!food.getUser().getUserId().equals(userId)) {
             throw new IllegalArgumentException("해당 음식에 대한 조회 권한이 없습니다.");
@@ -76,7 +78,19 @@ public class MyfridgeService {
     }
 
 
-    public void deleteFood(Long foodId, String type) {
+    public void deleteFood(Long userId, Long foodId) {
+        Food food = myfridgeRepository.findByFoodId(foodId);
+        if (food == null) {
+            throw new NoSuchElementException("해당 재료가 존재하지 않습니다.");
+        }
+
+        if (!food.getUser().getUserId().equals(userId)) {
+            throw new IllegalArgumentException("해당 재료에 대한 조회 권한이 없습니다.");
+        }
+
+        myfridgeRepository.delete(food);
+    }
+
 
     }
 }
