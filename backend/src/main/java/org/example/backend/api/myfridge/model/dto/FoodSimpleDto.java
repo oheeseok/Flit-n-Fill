@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.backend.api.foodlist.model.entity.FoodList;
 import org.example.backend.api.myfridge.model.entity.Food;
 import org.example.backend.enums.FoodStorage;
 import org.example.backend.enums.FoodUnit;
@@ -14,34 +15,21 @@ import java.time.LocalDate;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class FoodDetailDto {
+public class FoodSimpleDto {
     private Long foodId;
     private String foodListName;
-    private LocalDate foodRegistDate;
-    private float foodCount;
-    private FoodUnit foodUnit;
-    private LocalDate foodProDate;
-    private LocalDate foodExpDate;
     private FoodStorage foodStorage;
-    private boolean foodIsThaw;
-    private String foodDescription;
+    private LocalDate foodExpDate;
     private int foodListIcon;
 
-    public static FoodDetailDto of(Food food) {
-        String foodListName = food.getFoodListName();
+    public static FoodSimpleDto of(Food food) {
         int foodListIcon = food.getFoodList().getFoodListIcon();
 
-        FoodDetailDto dto = new FoodDetailDto(
+        FoodSimpleDto dto = new FoodSimpleDto(
                 food.getFoodId(),
-                foodListName,
-                food.getFoodRegistDate(),
-                food.getFoodCount(),
-                food.getFoodUnit(),
-                food.getFoodProDate(),
-                food.getFoodExpDate(),
+                food.getFoodListName(),
                 food.getFoodStorage(),
-                food.isFoodIsThaw(),
-                food.getFoodDescription(),
+                food.getFoodExpDate(),
                 foodListIcon
         );
         return dto;

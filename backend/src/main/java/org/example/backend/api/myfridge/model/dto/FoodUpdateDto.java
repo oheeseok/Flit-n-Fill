@@ -14,9 +14,11 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FoodUpdateDto {
-    private int foodCount;
+    private float foodCount;
+    private FoodUnit foodUnit;
     private LocalDate foodProDate;
     private LocalDate foodExpDate;
     private FoodStorage foodStorage;
+    private boolean foodIsThaw;
     private String foodDescription;
 }
