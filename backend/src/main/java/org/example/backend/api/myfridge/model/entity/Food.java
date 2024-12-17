@@ -76,4 +76,22 @@ public class Food {
   // 연관관계 및 cascade 설정
   @OneToMany(mappedBy = "writerFood", fetch = FetchType.LAZY)
   private List<Post> postList;
+
+  // 생성자
+
+  public Food(Long foodId, User user, FoodList foodList, String foodListName, FoodCategory foodCategory, LocalDate foodRegistDate, float foodCount, FoodUnit foodUnit, LocalDate foodProDate, LocalDate foodExpDate, FoodStorage foodStorage, boolean foodIsThaw, String foodDescription) {
+    this.foodId = foodId;
+    this.user = user;
+    this.foodList = foodList;
+    this.foodListName = foodListName;
+    this.foodCategory = foodCategory;
+    this.foodRegistDate = foodRegistDate;
+    this.foodCount = foodCount;
+    this.foodUnit = foodUnit;
+    this.foodProDate = foodProDate;
+    this.foodExpDate = foodExpDate;
+    this.foodStorage = foodStorage;
+    this.foodIsThaw = foodIsThaw;
+    this.foodDescription = foodDescription;
+  }
 }
