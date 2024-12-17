@@ -17,12 +17,8 @@ public class PostUpdateDto {
     private String postContent;
     private String postPhoto1;
     private String postPhoto2;
-    private String writerFood;
-    private int writerCount;
-    private FoodUnit writerUnit;
-    private String proposerFood;
-    private int proposerCount;
-    private FoodUnit proposerUnit;
+    private Long writerFoodId;
+    private Long proposerFoodListId;
     private String meetingPlace;
     private LocalDateTime meetingTime;
 }

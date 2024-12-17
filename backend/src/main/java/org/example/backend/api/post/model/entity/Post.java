@@ -6,10 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.backend.api.foodlist.model.entity.FoodList;
+import org.example.backend.api.myfridge.model.entity.Food;
+import org.example.backend.api.post.model.dto.PostRegisterDto;
 import org.example.backend.api.trade.model.entity.Trade;
 import org.example.backend.api.trade.model.entity.TradeRequest;
 import org.example.backend.api.user.model.entity.User;
-import org.example.backend.enums.FoodUnit;
 import org.example.backend.enums.TradeType;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -36,27 +38,15 @@ public class Post {
   @NotNull
   private String address; // (글 등록 당시의) 사용자 위치
 
-  @Column(length = 10, nullable = false)
-  @NotNull
-  private String writerFood;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "writer_food_id", nullable = true)
+  @OnDelete(action = OnDeleteAction.SET_NULL)
+  private Food writerFood;
 
-  @Column(nullable = false)
-  @NotNull
-  private int writerCount;
-
-  @Enumerated(EnumType.STRING)
-  @Column(length = 10, nullable = false)
-  @NotNull
-  private FoodUnit writerUnit;
-
-  @Column(length = 10)
-  private String proposerFood;
-
-  private int proposerCount;
-
-  @Enumerated(EnumType.STRING)
-  @Column(length = 10)
-  private FoodUnit proposerUnit;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "proposer_food_list_id", nullable = true)
+  @OnDelete(action = OnDeleteAction.SET_NULL)
+  private FoodList proposerFoodList;
 
   @Column(nullable = false)
   @NotNull
@@ -90,9 +80,25 @@ public class Post {
 
   private String postPhoto2;
 
+  // 연관관계
   @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
   private List<Trade> tradeList;
 
   @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
   private List<TradeRequest> tradeRequestList;
+
+  // of 메서드
+  public static Post of(User user, PostRegisterDto dto) {
+    Post post = new Post();
+    post.setUser(user);
+    post.setAddress(user.getUserAddress());
+    post.setPostContent(dto.getPostContent());
+    post.setPostPhoto1(dto.getPostPhoto1());
+    post.setPostPhoto2(dto.getPostPhoto2());
+    post.setTradeType(dto.getTradeType());
+    post.setMeetingPlace(dto.getMeetingPlace());
+    post.setMeetingTime(dto.getMeetingTime());
+    post.setPostCreatedDate(LocalDateTime.now());
+    return post;
+  }
 }

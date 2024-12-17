@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.backend.api.myfridge.model.entity.Food;
+import org.example.backend.api.post.model.entity.Post;
 
 import java.util.List;
 
@@ -36,6 +37,11 @@ public class FoodList {
   @NotNull
   private int foodListIcon;
 
+  // 연관관계 및 cascade 설정
+
   @OneToMany(mappedBy = "foodList", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-  private List<Food> food;
+  private List<Food> foods;
+
+  @OneToMany(mappedBy = "proposerFoodList", fetch = FetchType.LAZY)
+  private List<Post> postList;
 }

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface MyfridgeRepository extends JpaRepository<Food, Long> {
-    Food findByFoodId(Long foodId);
-    List<Food> findByUserOrderByFoodExpDateAsc(User user);
+  Food findByFoodId(Long foodId);
+  List<Food> findByUser(User user);
+  List<Food> findByUserOrderByFoodExpDateAsc(User user);
 }

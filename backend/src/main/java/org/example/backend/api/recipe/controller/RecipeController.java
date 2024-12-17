@@ -57,7 +57,6 @@ public class RecipeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(recipe);
     }
 
-    @Authenticate
     @PutMapping("/{recipeId}")
     public ResponseEntity<RecipeDetailDto> updateRecipe(HttpServletRequest request,
                                                         @PathVariable("recipeId") String recipeId,
@@ -70,7 +69,6 @@ public class RecipeController {
         return ResponseEntity.status(HttpStatus.OK).body(updatedRecipe);
     }
 
-    @Authenticate
     @PatchMapping("/{recipeId}/visibility")
     public ResponseEntity<Void> changeRecipeVisibility(HttpServletRequest request,
                                                        @PathVariable("recipeId") String recipeId) {
@@ -83,7 +81,6 @@ public class RecipeController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @Authenticate
     @DeleteMapping("/{recipeId}")
     public ResponseEntity<Void> deleteRecipe(HttpServletRequest request,
                                              @PathVariable("recipeId") String recipeId) {
@@ -96,7 +93,6 @@ public class RecipeController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @Authenticate
     @PatchMapping("/{recipeId}")
     public ResponseEntity<Void> toggleRecipeBookmark(HttpServletRequest request,
                                                      @PathVariable("recipeId") String recipeId) {
@@ -109,7 +105,6 @@ public class RecipeController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @Authenticate
     @GetMapping("/todays-recipe")
     public ResponseEntity<List<RecipeSimpleDto>> getTodaysRecipe(HttpServletRequest request) {
         Long userId = (Long) request.getAttribute("userId");
