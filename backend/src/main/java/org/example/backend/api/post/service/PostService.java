@@ -46,7 +46,7 @@ public class PostService {
   }
 
   public List<PostSimpleDto> searchPost(String keyword) {
-    List<Post> posts = postRepository.findByPostTitleContainingOrderByPostCreatedDateDesc(keyword);
+    List<Post> posts = postRepository.findByKeyword(keyword);
     return posts.stream()
         .map(post -> {
           User user = userRepository.findById(post.getUser().getUserId()).orElse(null);
