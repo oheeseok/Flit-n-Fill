@@ -74,7 +74,7 @@ public class Food {
   private String foodDescription;
 
   // 연관관계 및 cascade 설정
-  @OneToMany(mappedBy = "writerFood", fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "writerFood", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
   private List<Post> postList;
 
   // 생성자

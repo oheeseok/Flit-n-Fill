@@ -42,6 +42,6 @@ public class FoodList {
   @OneToMany(mappedBy = "foodList", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
   private List<Food> foods;
 
-  @OneToMany(mappedBy = "proposerFoodList", fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "proposerFoodList", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
   private List<Post> postList;
 }
