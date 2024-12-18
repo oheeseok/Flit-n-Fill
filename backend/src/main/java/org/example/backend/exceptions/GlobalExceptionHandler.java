@@ -10,7 +10,19 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<String> handleUnauthorizedAccess(RuntimeException ex) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+//        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+        StackTraceElement stackTraceElement = ex.getStackTrace()[0];
+
+        // 발생 위치 정보 구성
+        String errorLocation = String.format("Exception in %s.%s (line: %d)",
+            stackTraceElement.getClassName(),
+            stackTraceElement.getMethodName(),
+            stackTraceElement.getLineNumber());
+
+        // 상세 에러 메시지 작성
+        String errorMessage = String.format("Error occurred: %s\nLocation: %s", ex.getMessage(), errorLocation);
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
     }
 
     @ExceptionHandler(RecipeNotFoundException.class)
