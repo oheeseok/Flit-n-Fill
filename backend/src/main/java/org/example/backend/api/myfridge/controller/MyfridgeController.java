@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.backend.api.myfridge.model.dto.*;
 import org.example.backend.api.myfridge.service.MyfridgeService;
+import org.example.backend.api.user.model.dto.CartSimpleDto;
 import org.example.backend.exceptions.UserIdNullException;
 import org.example.backend.security.Authenticate;
 import org.springframework.http.HttpStatus;
@@ -84,5 +85,17 @@ public class MyfridgeController {
 
         myfridgeService.updateExpDate(userId, foodId, foodUpdateDto);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    //장바구니
+    @GetMapping("/shoppingcart")
+    public ResponseEntity<List<CartSimpleDto>> getMyCart(HttpServletRequest request) {      // 장바구니 조회
+        Long userId = (Long) request.getAttribute("userId");
+        if (userId == null) {
+            throw new UserIdNullException("userId not found");
+        }
+
+        List<CartSimpleDto> allCart = myfridgeService.getMyCart(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(allCart);
     }
 }
