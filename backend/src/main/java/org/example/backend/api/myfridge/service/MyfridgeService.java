@@ -70,11 +70,16 @@ public class MyfridgeService {
             }
         }
 
+        String foodListName = foodList.getFoodListType();
+        if (foodListName == null) {
+            foodListName = foodList.getFoodListProduct();
+        }
+
         Food food = new Food(
                 null,
                 user,
                 foodList,
-                foodDto.getFoodListName(),
+                foodListName,
                 foodDto.getFoodCategory(),
                 LocalDate.now(),
                 foodDto.getFoodCount(),
