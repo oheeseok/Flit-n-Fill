@@ -9,8 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> handleUnauthorizedAccess(RuntimeException ex) {
-//        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+    public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
         StackTraceElement stackTraceElement = ex.getStackTrace()[0];
 
         // 발생 위치 정보 구성
@@ -22,7 +21,7 @@ public class GlobalExceptionHandler {
         // 상세 에러 메시지 작성
         String errorMessage = String.format("Error occurred: %s\nLocation: %s", ex.getMessage(), errorLocation);
 
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
     }
 
     @ExceptionHandler(RecipeNotFoundException.class)
