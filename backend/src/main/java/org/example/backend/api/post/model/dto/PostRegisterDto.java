@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostRegisterDto {
+    private String postTitle;
     private String postContent;
     private String meetingPlace;
     private LocalDateTime meetingTime;
