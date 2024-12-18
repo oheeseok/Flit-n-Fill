@@ -11,5 +11,5 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CartSimpleDto {
     private Long cartId;
-    private String foodListName;
+    private String memo;
 }
