@@ -21,12 +21,12 @@ public class Kindness {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long kindnessId;
 
-  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "reviewer_id", nullable = true)
   @OnDelete(action = OnDeleteAction.SET_NULL)
   private User reviewer;
 
-  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "reviewee_id", nullable = true)
   @OnDelete(action = OnDeleteAction.SET_NULL)
   private User reviewee;
