@@ -174,4 +174,44 @@ public class MyfridgeService {
 
         return cartSimpleDtoList;
     }
+
+    public void saveCart(Long userId, List<String> memo) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
+
+        UserCart userCart = userCartRepository.findByUser(user);
+        if (userCart == null) {
+            throw new NoSuchElementException("장바구니가 존재하지 않습니다.");
+        }
+
+        cartItemRepository.deleteByUserCart(userCart);
+
+        for (String m : memo) {
+            CartItem cartItem = new CartItem();
+            cartItem.setUserCart(userCart);
+            cartItem.setMemo(m);
+
+            cartItemRepository.save(cartItem);
+        }
+    }
+
+    public void addItemToCart(Long userId, Long foodId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
+
+        UserCart userCart = userCartRepository.findByUser(user);
+        if (userCart == null) {
+            throw new NoSuchElementException("장바구니가 존재하지 않습니다.");
+        }
+
+        Food food = myfridgeRepository.findByFoodId(foodId);
+        if (food == null) {
+            throw new NoSuchElementException("해당 재료가 냉장고에 존재하지 않습니다.");
+        }
+
+        CartItem cartItem = new CartItem();
+        cartItem.setUserCart(userCart);
+        cartItem.setMemo(food.getFoodListName());
+        cartItemRepository.save(cartItem);
+    }
 }

@@ -1,6 +1,7 @@
 package org.example.backend.api.myfridge.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.backend.api.myfridge.model.dto.*;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/my-fridge")
@@ -89,13 +91,38 @@ public class MyfridgeController {
 
     //장바구니
     @GetMapping("/shoppingcart")
-    public ResponseEntity<List<CartSimpleDto>> getMyCart(HttpServletRequest request) {      // 장바구니 조회
+    public ResponseEntity<List<String>> getMyCart(HttpServletRequest request) {      // 장바구니 조회
         Long userId = (Long) request.getAttribute("userId");
         if (userId == null) {
             throw new UserIdNullException("userId not found");
         }
 
         List<CartSimpleDto> allCart = myfridgeService.getMyCart(userId);
-        return ResponseEntity.status(HttpStatus.OK).body(allCart);
+        List<String> memoList = allCart.stream()
+                .map(CartSimpleDto::getMemo)
+                .collect(Collectors.toList());
+        return ResponseEntity.status(HttpStatus.OK).body(memoList);
+    }
+
+    @PostMapping("/shoppingcart")
+    public ResponseEntity<Void> saveCart(HttpServletRequest request, @RequestBody List<String> memo) {      // 장바구니 내용 저장
+        Long userId = (Long) request.getAttribute("userId");
+        if (userId == null) {
+            throw new UserIdNullException("userId not found");
+        }
+
+        myfridgeService.saveCart(userId, memo);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PostMapping("/add/{foodId}")
+    public ResponseEntity<Void> addItemToCart(HttpServletRequest request, @PathVariable("foodId") Long foodId) {      // 장바구니 재료 추가
+        Long userId = (Long) request.getAttribute("userId");
+        if (userId == null) {
+            throw new UserIdNullException("userId not found");
+        }
+
+        myfridgeService.addItemToCart(userId, foodId);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
