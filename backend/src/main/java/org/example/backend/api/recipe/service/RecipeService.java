@@ -17,8 +17,13 @@ import org.example.backend.exceptions.RecipeNotFoundException;
 import org.example.backend.exceptions.UnauthorizedException;
 import org.example.backend.exceptions.UserNotFoundException;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -35,21 +40,22 @@ public class RecipeService {
   private final RecipeRepository recipeRepository;
   private final UserRepository userRepository;
   private final BookmarkedRecipeRepository bookmarkedRecipeRepository;
+  private final MongoTemplate mongoTemplate;
 
   public void setRecipesUserIdToNull(Long userId) {
-    List<Recipe> recipes = recipeRepository.findByUserId(userId);
-    for (Recipe recipe : recipes) {
-      recipe.setUserId(null);
-    }
-    recipeRepository.saveAll(recipes);
+    Query query = new Query(Criteria.where("userId").is(userId));
+    Update update = new Update().set("userId", null);
+
+    mongoTemplate.updateMulti(query, update, Recipe.class);
+
+    log.info("setRecipesUserIdToNull: Updated recipes with userId {} to null", userId);
   }
 
   public List<RecipeSimpleDto> getAllRecipes() {
     List<Recipe> recipes = recipeRepository.findAll(Sort.by(Sort.Direction.DESC, "recipeCreatedDate"));
     return recipes.stream()
         .map(recipe -> {
-          // 각 레시피에 해당하는 userId를 가진 User를 찾음
-          User user = userRepository.findById(recipe.getUserId()).orElse(null);
+          User user = recipe.getUserId() != null ? userRepository.findById(recipe.getUserId()).orElse(null) : null;
           // Recipe -> RecipeSimpleDto로 변환
           return RecipeSimpleDto.of(recipe, user);
         })
@@ -64,7 +70,7 @@ public class RecipeService {
     List<Recipe> recipes = recipeRepository.findByRecipeTitleContainingIgnoreCaseOrRecipeFoodDetailsContainingIgnoreCase(keyword, keyword, Sort.by(Sort.Direction.DESC, "recipeCreatedDate"));
     return recipes.stream()
         .map(recipe -> {
-          User user = userRepository.findById(recipe.getUserId()).orElse(null);
+          User user = recipe.getUserId() != null ? userRepository.findById(recipe.getUserId()).orElse(null) : null;
           return RecipeSimpleDto.of(recipe, user);
         })
         .collect(Collectors.toList());
@@ -203,7 +209,7 @@ public class RecipeService {
 
     return selectedRecipes.stream()
         .map(recipe -> {
-          User user = userRepository.findById(recipe.getUserId()).orElse(null);
+          User user = recipe.getUserId() != null ? userRepository.findById(recipe.getUserId()).orElse(null) : null;
           return RecipeSimpleDto.of(recipe, user);
         })
         .collect(Collectors.toList());

@@ -24,7 +24,7 @@ public class Notification {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long notificationId;
 
-  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   @OnDelete(action = OnDeleteAction.CASCADE)
   private User user;
@@ -38,12 +38,12 @@ public class Notification {
   @NotNull
   private String notificationMessage;
 
-  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "trade_request_id")
   @OnDelete(action = OnDeleteAction.CASCADE)
   private TradeRequest tradeRequest;
 
-  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "request_id")
   @OnDelete(action = OnDeleteAction.CASCADE)
   private Request request;

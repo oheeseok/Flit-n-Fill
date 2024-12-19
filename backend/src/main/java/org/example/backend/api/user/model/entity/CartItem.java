@@ -18,12 +18,15 @@ import org.hibernate.annotations.OnDeleteAction;
 @Table(name="cartitem")
 public class CartItem {
   @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long cartItemId;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "cart_id", nullable = false)
   @OnDelete(action = OnDeleteAction.CASCADE)
+  @NotNull
   private UserCart userCart;
 
-  @Column(length = 50, nullable = false)
-  @NotNull
+  @Column(length = 50)
   private String memo;
 }

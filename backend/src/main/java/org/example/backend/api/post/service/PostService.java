@@ -46,7 +46,7 @@ public class PostService {
   }
 
   public List<PostSimpleDto> searchPost(String keyword) {
-    List<Post> posts = postRepository.findByPostTitleContainingOrderByPostCreatedDateDesc(keyword);
+    List<Post> posts = postRepository.findByKeyword(keyword);
     return posts.stream()
         .map(post -> {
           User user = userRepository.findById(post.getUser().getUserId()).orElse(null);
@@ -60,7 +60,7 @@ public class PostService {
         .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
 
     Post post = Post.of(user, postRegisterDto);
-    // setPostTitle만 따로 하는 이유: myfridgeRepository, foodListRepository를 써야하기 때문
+    // setWriterFood, setProposerFoodList 따로 하는 이유: myfridgeRepository, foodListRepository를 써야하기 때문
 
     Optional<Food> writerFood = myfridgeRepository.findById(postRegisterDto.getWriterFoodId());
     if (! writerFood.isPresent()) {
@@ -78,13 +78,6 @@ public class PostService {
         foodList.get().getFoodListType();
 
     log.info("[PostService.addPost] writerFoodName: {}, proposerFoodName: {}", writerFoodName, proposerFoodName);
-
-    String postTitle = String.format("[%s/%s] %s -> %s",
-        postRegisterDto.getTradeType().getDescription(),
-        user.getUserAddress(),
-        writerFoodName,
-        proposerFoodName);
-    post.setPostTitle(postTitle);
 
     post.setWriterFood(writerFood.get());
     post.setProposerFoodList(foodList.get());
@@ -133,19 +126,13 @@ public class PostService {
     // 글 수정 시 교환, 나눔은 불변
     // 글 수정 시 사용자의 위치로 변경
 
+    post.setPostTitle(postUpdateDto.getPostTitle());
     post.setPostContent(postUpdateDto.getPostContent());
     post.setPostPhoto1(postUpdateDto.getPostPhoto1());
     post.setPostPhoto2(postUpdateDto.getPostPhoto2());
     post.setMeetingPlace(postUpdateDto.getMeetingPlace());
     post.setMeetingTime(postUpdateDto.getMeetingTime());
     post.setAddress(post.getUser().getUserAddress());
-
-    String postTitle = String.format("[%s/%s] %s -> %s",
-        post.getTradeType().getDescription(),
-        post.getUser().getUserAddress(),
-        writerFoodName,
-        proposerFoodName);
-    post.setPostTitle(postTitle);
 
     post.setWriterFood(writerFood.get());
     post.setProposerFoodList(foodList.get());
