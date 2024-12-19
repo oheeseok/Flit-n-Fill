@@ -17,7 +17,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class NotificationController {
     private final NotificationService notificationService;
 
-    public String sendEmail() {
+    public String sendExpirationEmail() {
         notificationService.sendExpirationEmail();
         return "메일 전송 완료";
     }
