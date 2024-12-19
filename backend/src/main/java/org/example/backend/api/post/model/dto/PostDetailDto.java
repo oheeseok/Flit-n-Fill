@@ -41,6 +41,17 @@ public class PostDetailDto {
         dto.setPostPhoto1(post.getPostPhoto1());
         dto.setPostPhoto2(post.getPostPhoto2());
         dto.setTradeType(post.getTradeType());
+//        if (post.getWriterFood() == null) {
+//            dto.setWriterFoodId(null);
+//        } else {
+//            dto.setWriterFoodId(post.getWriterFood().getFoodId());
+//        }
+//
+//        if (post.getProposerFoodList() == null) {
+//            dto.setProposerFoodListId(null);
+//        } else {
+//            dto.setProposerFoodListId(post.getProposerFoodList().getFoodListId());
+//        }
         dto.setWriterFoodId(post.getWriterFood().getFoodId());
         dto.setProposerFoodListId(post.getProposerFoodList().getFoodListId());
         dto.setAddress(post.getAddress());

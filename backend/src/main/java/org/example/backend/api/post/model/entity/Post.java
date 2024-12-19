@@ -29,7 +29,7 @@ public class Post {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long postId;
 
-  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   @OnDelete(action = OnDeleteAction.CASCADE)
   private User user;
@@ -39,13 +39,13 @@ public class Post {
   private String address; // (글 등록 당시의) 사용자 위치
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "writer_food_id", nullable = true)
-  @OnDelete(action = OnDeleteAction.SET_NULL)
+  @JoinColumn(name = "writer_food_id")
+  @OnDelete(action = OnDeleteAction.CASCADE)
   private Food writerFood;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "proposer_food_list_id", nullable = true)
-  @OnDelete(action = OnDeleteAction.SET_NULL)
+  @JoinColumn(name = "proposer_food_list_id")
+  @OnDelete(action = OnDeleteAction.CASCADE)
   private FoodList proposerFoodList;
 
   @Column(nullable = false)
@@ -92,6 +92,7 @@ public class Post {
     Post post = new Post();
     post.setUser(user);
     post.setAddress(user.getUserAddress());
+    post.setPostTitle(dto.getPostTitle());
     post.setPostContent(dto.getPostContent());
     post.setPostPhoto1(dto.getPostPhoto1());
     post.setPostPhoto2(dto.getPostPhoto2());

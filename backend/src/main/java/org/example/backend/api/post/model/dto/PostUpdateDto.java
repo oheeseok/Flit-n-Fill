@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostUpdateDto {
+    private String postTitle;
     private String postContent;
     private String postPhoto1;
     private String postPhoto2;
