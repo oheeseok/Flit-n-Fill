@@ -2,6 +2,7 @@ package org.example.backend.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 
+@Slf4j
 @Component
 public class JwtTokenProvider {
     private final Key key;
@@ -29,8 +31,8 @@ public class JwtTokenProvider {
     // Access Token 생성
     public String generateAccessToken(String userEmail, Long userId) {
         return Jwts.builder()
-                .setSubject(userEmail)
-                .claim("userId", userId)
+                .setSubject(String.valueOf(userId))
+                .claim("userEmail", userEmail)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpirationTime))
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -40,8 +42,8 @@ public class JwtTokenProvider {
     // Refresh Token 생성
     public String generateRefreshToken(String userEmail, Long userId) {
         return Jwts.builder()
-                .setSubject(userEmail)
-                .claim("userId", userId)
+                .setSubject(String.valueOf(userId))
+                .claim("userEmail", userEmail)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpirationTime))
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -57,7 +59,7 @@ public class JwtTokenProvider {
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
-            return claims.getSubject(); // userEmail 반환
+            return claims.getSubject(); // userId 반환
         } catch (ExpiredJwtException e) {
             throw new RuntimeException("Token expired", e);
         } catch (JwtException | IllegalArgumentException e) {
@@ -65,13 +67,13 @@ public class JwtTokenProvider {
         }
     }
 
-    public Long getUserIdFromToken(String token) {
+    public String getUserEmailFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-        return claims.get("userId", Long.class); // userId를 Long 타입으로 추출
+        return claims.get("userEmail", String.class); // userId를 Long 타입으로 추출
     }
 
     // 토큰 만료 여부 확인
@@ -83,7 +85,11 @@ public class JwtTokenProvider {
                     .parseClaimsJws(token);
             return false; // 만료되지 않음
         } catch (ExpiredJwtException e) {
+            log.warn("Token expired: {}", token);
             return true; // 만료됨
+        } catch (Exception e) {
+            log.error("토큰 파싱 중 오류 발생: {}", e.getMessage(), e);
+            return true; // 다른 예외도 만료된 것으로 간주
         }
     }
 

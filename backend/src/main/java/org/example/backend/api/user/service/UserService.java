@@ -1,5 +1,6 @@
 package org.example.backend.api.user.service;
 
+import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.backend.api.recipe.service.RecipeService;
@@ -74,6 +75,7 @@ public class UserService {
         String accessToken = jwtTokenProvider.generateAccessToken(email, userId);
         String refreshToken = jwtTokenProvider.generateRefreshToken(email, userId);
 
+
         // Refresh Token을 DB에 저장
         user.setRefreshToken(refreshToken);
         userRepository.save(user);
@@ -84,7 +86,7 @@ public class UserService {
 
     public void logout(String token) {
         // 토큰에서 사용자 이메일 추출
-        String userEmail = jwtTokenProvider.validateToken(token);
+        String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
 
         if (userEmail == null) {
             throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
