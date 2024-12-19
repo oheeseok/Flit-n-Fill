@@ -7,7 +7,12 @@ import org.example.backend.api.foodlist.repository.FoodListRepository;
 import org.example.backend.api.myfridge.model.dto.*;
 import org.example.backend.api.myfridge.model.entity.Food;
 import org.example.backend.api.myfridge.repository.MyfridgeRepository;
+import org.example.backend.api.user.model.dto.CartSimpleDto;
+import org.example.backend.api.user.model.entity.CartItem;
 import org.example.backend.api.user.model.entity.User;
+import org.example.backend.api.user.model.entity.UserCart;
+import org.example.backend.api.user.repository.CartItemRepository;
+import org.example.backend.api.user.repository.UserCartRepository;
 import org.example.backend.api.user.repository.UserRepository;
 import org.example.backend.exceptions.UserNotFoundException;
 import org.springframework.stereotype.Service;
@@ -26,6 +31,8 @@ public class MyfridgeService {
     private final MyfridgeRepository myfridgeRepository;
     private final FoodListRepository foodListRepository;
     private final UserRepository userRepository;
+    private final UserCartRepository userCartRepository;
+    private final CartItemRepository cartItemRepository;
 
     public List<FoodSimpleDto> getAllFood(Long userId) {
         User user = userRepository.findById(userId).get();
@@ -70,11 +77,16 @@ public class MyfridgeService {
             }
         }
 
+        String foodListName = foodList.getFoodListType();
+        if (foodListName == null) {
+            foodListName = foodList.getFoodListProduct();
+        }
+
         Food food = new Food(
                 null,
                 user,
                 foodList,
-                foodDto.getFoodListName(),
+                foodListName,
                 foodDto.getFoodCategory(),
                 LocalDate.now(),
                 foodDto.getFoodCount(),
@@ -143,5 +155,63 @@ public class MyfridgeService {
 
         food.setFoodExpDate(foodUpdateDto.getFoodExpDate());
         myfridgeRepository.save(food);
+    }
+
+    //장바구니
+    public List<CartSimpleDto> getMyCart(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
+
+        UserCart userCart = userCartRepository.findByUser(user);
+        if (userCart == null) {
+            throw new NoSuchElementException("장바구니가 존재하지 않습니다.");
+        }
+        List<CartItem> cartItemList = cartItemRepository.findByUserCart(userCart);
+
+        List<CartSimpleDto> cartSimpleDtoList = cartItemList.stream()
+                .map(cartItem -> new CartSimpleDto(userCart.getCartId(), cartItem.getMemo()))
+                .collect(Collectors.toList());
+
+        return cartSimpleDtoList;
+    }
+
+    public void saveCart(Long userId, List<String> memo) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
+
+        UserCart userCart = userCartRepository.findByUser(user);
+        if (userCart == null) {
+            throw new NoSuchElementException("장바구니가 존재하지 않습니다.");
+        }
+
+        cartItemRepository.deleteByUserCart(userCart);
+
+        for (String m : memo) {
+            CartItem cartItem = new CartItem();
+            cartItem.setUserCart(userCart);
+            cartItem.setMemo(m);
+
+            cartItemRepository.save(cartItem);
+        }
+    }
+
+    public void addItemToCart(Long userId, Long foodId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
+
+        UserCart userCart = userCartRepository.findByUser(user);
+        if (userCart == null) {
+            throw new NoSuchElementException("장바구니가 존재하지 않습니다.");
+        }
+
+        Food food = myfridgeRepository.findByFoodId(foodId);
+        if (food == null) {
+            throw new NoSuchElementException("해당 재료가 냉장고에 존재하지 않습니다.");
+        }
+
+        CartItem cartItem = new CartItem();
+        cartItem.setUserCart(userCart);
+        cartItem.setMemo(food.getFoodListName());
+        cartItemRepository.save(cartItem);
     }
 }

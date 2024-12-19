@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.backend.api.recipe.service.RecipeService;
 import org.example.backend.api.user.model.dto.*;
 import org.example.backend.api.user.model.entity.User;
+import org.example.backend.api.user.model.entity.UserCart;
+import org.example.backend.api.user.repository.UserCartRepository;
 import org.example.backend.api.user.repository.UserRepository;
 import org.example.backend.exceptions.LoginFailedException;
 import org.example.backend.exceptions.PasswordMismatchException;
@@ -22,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
+    private final UserCartRepository userCartRepository;
     private final RecipeService recipeService;
     private final BCryptPasswordEncoder passwordEncoder;
     private final TokenBlacklistService tokenBlacklistService;
@@ -51,6 +54,10 @@ public class UserService {
                 0
         );
         userRepository.save(user);
+
+        UserCart userCart = new UserCart();
+        userCart.setUser(user);
+        userCartRepository.save(userCart);
     }
 
     // 로그인
