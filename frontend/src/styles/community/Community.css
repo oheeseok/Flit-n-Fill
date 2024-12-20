@@ -1,0 +1,105 @@
+.community-page {
+  display: block; /* flex 정렬 제거 */
+  place-items: initial;
+}
+
+/* Body Wrapper */
+.communitybody {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  max-width: 1541.74px;
+  margin: 0 auto;
+}
+
+/* 배경 이미지 */
+.community-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("../../assets/images/main2.jpg");
+  background-size: cover;
+  background-position: center;
+  opacity: 0.5;
+  z-index: -1; /* 배경을 뒤로 배치 */
+}
+
+/* 컨텐츠 */
+.community-content {
+  position: relative;
+  z-index: 1; /* 배경보다 위에 배치 */
+  width: 100%;
+}
+
+/* 등록 버튼 */
+.community-toresister-button {
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+  margin: 50px;
+}
+
+/* 제목 */
+.community-title {
+  width: 100%;
+  margin-top: 230px;
+  color: var(--light-black, #3c3c3c);
+  font-family: Ubuntu, sans-serif;
+  font-size: 60px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* 주소 선택 */
+.community-address {
+  font-family: Ubuntu, sans-serif;
+  width: 100%;
+  margin-top: 100px;
+  margin-bottom: 40px;
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+}
+
+.community-select {
+  width: 160px;
+  padding: 10px;
+  font-size: 18px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+/* 버튼 그룹 */
+.community-button-group {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+  margin-bottom: 280px;
+  width: 100%;
+}
+
+.community-button {
+  font-family: ubuntu;
+  font-weight: 700;
+  width: 100px;
+  height: 48px;
+  display: inline-flex;
+  padding: 12px 16px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  background: var(--light-green, #d4efc7);
+  margin-top: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.community-button:hover {
+  background-color: #85b573;
+  color: #fff;
+  transform: scale(1.05);
+}

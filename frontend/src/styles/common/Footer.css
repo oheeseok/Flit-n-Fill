@@ -1,0 +1,37 @@
+.footer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  background: rgba(199, 239, 230, 0.5);
+}
+
+.footertext {
+  width: 100%;
+  height: 100%;
+  margin: 67px;
+  color: var(--light-black, #3c3c3c);
+  font-family: Ubuntu;
+  font-size: 22px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  text-align: left;
+}
+
+/* 반응형 디자인: 화면 크기 1024px 이하일 때 */
+@media (max-width: 1024px) {
+  .footer {
+    display: flex;
+    flex-direction: column; /* 푸터를 세로로 정렬 */
+    justify-content: center;
+    align-items: center;
+    padding: 20px; /* 푸터 내 여백을 추가 */
+  }
+
+  .footertext {
+    margin: 20px 0; /* 위/아래 margin을 적당히 줄임 */
+    font-size: 18px; /* 텍스트 크기를 줄임 */
+    text-align: center; /* 텍스트 중앙 정렬 */
+  }
+}

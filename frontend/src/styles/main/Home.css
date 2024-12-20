@@ -1,0 +1,187 @@
+/* 기본 스타일 */
+.homebody {
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  display: flex;
+  flex-direction: column; /* 세로 방향으로 배치 */
+}
+
+.maincontainer {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.maincontextbox {
+  width: 100%; /* 화면 크기에 맞게 수정 */
+  height: 100%;
+  background: #fff;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 두 개의 열로 나누기 */
+}
+
+.mainfridgeimg {
+  background-image: url("../../assets/images/fridge.jpg");
+  background-size: cover;
+  background-position: center;
+  width: 1150px;
+  height: 742px;
+  grid-column: 2 / 2; /* 이미지 오른쪽에 위치 */
+  position: relative;
+  /* 텍스트가 이미지 위에 오도록 하기 위해 position 설정 */
+}
+
+.maintextbox {
+  position: absolute;
+  margin-top: 200px;
+  margin-left: 133px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+}
+
+.maintext1 {
+  color: var(--light-black, #3c3c3c);
+  font-family: Ubuntu;
+  font-size: 100px;
+  font-weight: 700;
+  line-height: normal;
+  margin-bottom: 50px;
+  text-align: center;
+}
+
+.maintext2 {
+  color: var(--light-black, #3c3c3c);
+  font-family: Ubuntu;
+  font-size: 35px;
+  font-weight: 400;
+  line-height: normal;
+  margin-bottom: 50px;
+  text-align: left;
+}
+
+/* 커뮤니티 컨테이너 */
+.maincommunitycontainer {
+  display: flex;
+  width: 100%;
+  height: 653px;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+}
+
+.maincommunitybox {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(71deg, #f8fff5 64.61%, #fff 100%);
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 두 개의 열로 나누기 */
+}
+
+.maincommunityimg {
+  background-image: url("../../assets/images/main2.jpg");
+  background-size: cover;
+  background-position: center;
+  width: 980px;
+  height: 653.333px;
+  grid-column: 1 / 2; /* 이미지 왼쪽쪽 위치 */
+  position: relative; /* 텍스트가 이미지 위에 오도록 하기 위해 position 설정 */
+  transform: translateX(-130px);
+}
+
+.maincommunitytextbox {
+  position: absolute;
+  margin-top: 150px;
+  margin-left: 1100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+}
+
+.maincommunitytext1 {
+  color: var(--light-black, #3c3c3c);
+  font-family: Ubuntu;
+  font-size: 60px;
+  font-weight: 700;
+  line-height: normal;
+  margin-bottom: 50px;
+  text-align: left;
+  transform: translateX(190px);
+}
+
+.maincommunitytext2 {
+  color: var(--light-black, #3c3c3c);
+  font-family: Ubuntu;
+  font-size: 28px;
+  font-weight: 400;
+  line-height: normal;
+  margin-bottom: 50px;
+  text-align: left;
+  transform: translateX(168px);
+}
+
+/* 반응형 디자인: 화면 크기 조정 */
+
+/* 화면 크기 1024px 이하일 때 */
+@media (max-width: 1024px) {
+  .maincontextbox {
+    grid-template-columns: 1fr; /* 한 열로 변경 */
+  }
+
+  .mainfridgeimg {
+    width: 100%;
+    height: auto;
+    grid-column: 1 / 1; /* 이미지가 위로 이동 */
+  }
+
+  .maintextbox {
+    margin-top: 100px;
+    margin-left: 10;
+    text-align: center; /* 텍스트 가운데 정렬 */
+  }
+
+  .maintext1 {
+    font-size: 70px;
+    margin-bottom: 30px;
+  }
+
+  .maintext2 {
+    font-size: 25px;
+    margin-bottom: 30px;
+  }
+
+  .maincommunitybox {
+    grid-template-columns: 1fr; /* 한 열로 변경 */
+  }
+
+  .maincommunityimg {
+    width: 30%;
+    height: auto;
+    grid-column: 1 / 1; /* 이미지가 위로 이동 */
+  }
+
+  .maincommunitytextbox {
+    margin-left: 0;
+    text-align: center;
+  }
+
+  .maincommunitytext1 {
+    font-size: 40px;
+    margin-bottom: 20px;
+  }
+
+  .maincommunitytext2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+}
