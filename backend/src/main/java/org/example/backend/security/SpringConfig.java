@@ -1,11 +1,9 @@
 package org.example.backend.security;
 
-import lombok.RequiredArgsConstructor;
-import org.example.backend.api.user.service.TokenBlacklistService;
+import org.example.backend.api.user.service.TokenManagementService;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.core.aggregation.ArithmeticOperators;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -16,15 +14,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class SpringConfig {
     private final JwtTokenProvider jwtTokenProvider;
-    private final TokenBlacklistService tokenBlacklistService;
+    private final TokenManagementService tokenManagementService;
     private final CustomOAuth2UserService oAuth2UserService;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     public SpringConfig(JwtTokenProvider jwtTokenProvider,
-                        TokenBlacklistService tokenBlacklistService,
+                        TokenManagementService tokenManagementService,
                         CustomOAuth2UserService oAuth2UserService, OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler) {
         this.jwtTokenProvider = jwtTokenProvider;
-        this.tokenBlacklistService = tokenBlacklistService;
+        this.tokenManagementService = tokenManagementService;
         this.oAuth2UserService = oAuth2UserService;
         this.oAuth2LoginSuccessHandler = oAuth2LoginSuccessHandler;
     }
@@ -77,7 +75,7 @@ public class SpringConfig {
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter(jwtTokenProvider, tokenBlacklistService); // JwtTokenProvider 주입
+        return new JwtAuthenticationFilter(jwtTokenProvider, tokenManagementService); // JwtTokenProvider 주입
     }
 
     @Bean

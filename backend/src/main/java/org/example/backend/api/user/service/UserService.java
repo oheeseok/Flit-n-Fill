@@ -1,6 +1,6 @@
 package org.example.backend.api.user.service;
 
-import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.backend.api.recipe.service.RecipeService;
@@ -14,7 +14,6 @@ import org.example.backend.exceptions.PasswordMismatchException;
 import org.example.backend.exceptions.UserNotFoundException;
 import org.example.backend.security.JwtTokenProvider;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +27,7 @@ public class UserService {
     private final UserCartRepository userCartRepository;
     private final RecipeService recipeService;
     private final BCryptPasswordEncoder passwordEncoder;
-    private final TokenBlacklistService tokenBlacklistService;
+    private final TokenManagementService tokenManagementService;
 
     // userEmail 중복 검사
     public boolean existsByUserEmail(String userEmail) {
@@ -62,7 +61,7 @@ public class UserService {
     }
 
     // 로그인
-    public UserLoginResponse login(UserLoginDto userLoginDto) {
+    public UserLoginResponse login(UserLoginDto userLoginDto, HttpServletResponse response) {
         String email = userLoginDto.getUserEmail();
         String password = userLoginDto.getUserPassword();
 
@@ -76,22 +75,10 @@ public class UserService {
             throw new LoginFailedException("아이디 또는 비밀번호가 잘못되었습니다.");
         }
 
-        Long userId = user.getUserId();
-
-        // JWT token 생성
-        String accessToken = jwtTokenProvider.generateAccessToken(email, userId);
-        String refreshToken = jwtTokenProvider.generateRefreshToken(email, userId);
-
-
-        // Refresh Token을 DB에 저장
-        user.setRefreshToken(refreshToken);
-        userRepository.save(user);
-
-        // UserLoginResponse 반환
-        return new UserLoginResponse(accessToken, refreshToken);
+       return tokenManagementService.handleSuccessfulLogin(user, response);
     }
 
-    public void logout(String token) {
+    public void logout(String token, HttpServletResponse response) {
         // 토큰에서 사용자 이메일 추출
         String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
 
@@ -110,7 +97,7 @@ public class UserService {
         // Access Token 블랙리스트에 추가
         long tokenExpiration = jwtTokenProvider.getExpirationDate(token).getTime();
         log.info("만료기한 : {}", tokenExpiration);
-        tokenBlacklistService.addBlacklistToken(token, tokenExpiration);
+        tokenManagementService.addBlacklistToken(token, tokenExpiration, response);
     }
 
     public void deleteUser(Long userId) {

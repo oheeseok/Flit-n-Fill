@@ -46,7 +46,7 @@ public record OAuth2UserInfo(
         user.setUserEmail(email);
         user.setUserName(name);
         user.setUserProfile(profile);
-        user.setUserEmail(email.split("@")[0]);
+        user.setUserNickname(email.split("@")[0]);
         return user;
     }
 }
