@@ -114,4 +114,15 @@ public class RecipeController {
         List<RecipeSimpleDto> todaysRecipe = recipeService.getTodaysRecipe(userId);
         return ResponseEntity.status(HttpStatus.OK).body(todaysRecipe);
     }
+
+    @GetMapping("/near-expiry")
+    public ResponseEntity<List<RecipeSimpleDto>> recommendNearExpiryRecipes(HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        if (userId == null) {
+            throw new UserIdNullException("userId not found");
+        }
+
+        List<RecipeSimpleDto> nearExpiryRecipes = recipeService.recommendNearExpiryRecipes(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(nearExpiryRecipes);
+    }
 }
