@@ -99,8 +99,7 @@ public class RecipeService {
         .orElseThrow(() -> new RecipeNotFoundException("레시피를 찾을 수 없습니다."));
 
     Long userId = recipe.getUserId();
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
+    User user = recipe.getUserId() != null ? userRepository.findById(recipe.getUserId()).orElse(null) : null;
 
     return RecipeDetailDto.of(recipe, user);
   }
