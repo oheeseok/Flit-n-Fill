@@ -7,6 +7,7 @@ import org.example.backend.api.user.model.entity.User;
 import org.example.backend.api.user.repository.UserRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         log.info("OAuth2UserRequest: {}", userRequest);
         log.info("Client Registration: {}", userRequest.getClientRegistration());
+
+        OAuth2AccessToken accessToken1 = userRequest.getAccessToken();
+        log.info("token {}", accessToken1.getTokenValue());
+
         // 유저 정보(attribute) 가져오기
         Map<String, Object> oAuthUserAttributes = super.loadUser(userRequest).getAttributes();
         log.info("OAuth2UserAttributes: {}", oAuthUserAttributes);
