@@ -2,6 +2,8 @@ package org.example.backend.api.recipe.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.backend.api.myfridge.model.entity.Food;
+import org.example.backend.api.myfridge.repository.MyfridgeRepository;
 import org.example.backend.api.recipe.model.dto.RecipeDetailDto;
 import org.example.backend.api.recipe.model.dto.RecipeRegisterDto;
 import org.example.backend.api.recipe.model.dto.RecipeSimpleDto;
@@ -27,9 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,6 +41,7 @@ public class RecipeService {
   private final RecipeRepository recipeRepository;
   private final UserRepository userRepository;
   private final BookmarkedRecipeRepository bookmarkedRecipeRepository;
+  private final MyfridgeRepository myfridgeRepository;
   private final MongoTemplate mongoTemplate;
 
   public void setRecipesUserIdToNull(Long userId) {
@@ -214,4 +216,114 @@ public class RecipeService {
         })
         .collect(Collectors.toList());
   }
+
+  /**
+   * 소비기한이 임박한 재료들을 포함한 레시피 추천
+   * today - 2 < expdate < today + 5
+   * @param userId
+   * @return
+   */
+  public List<RecipeSimpleDto> recommendNearExpiryRecipes(Long userId) {
+    LocalDate today = LocalDate.now();
+    LocalDate startDate = today.minusDays(2);
+    LocalDate endDate = today.plusDays(3);
+    // 소비기한이 임박한 food 조회
+    List<Food> foodByExpDateRange = myfridgeRepository.findFoodByExpDateRange(startDate, endDate);
+
+    // 동일한 이름의 food가 존재하면, 소비기한이 가장 짧은 것만 남기고 중복 제거
+    Map<String, Food> filteredFoodMap = new HashMap<>();
+    for (Food food : foodByExpDateRange) {
+      String foodName = food.getFoodListName();
+      filteredFoodMap.merge(foodName, food, (existing, current) ->
+          existing.getFoodExpDate().isBefore(current.getFoodExpDate()) ? existing : current
+      );
+    }
+
+    // 소비기한 임박 순으로 정렬
+    List<Food> filteredFoodList = filteredFoodMap.values().stream()
+        .sorted(Comparator.comparing(Food::getFoodExpDate))
+        .collect(Collectors.toList());
+
+    // 가중치 부여 (가중치 = today - foodExpDate + 3)
+    Map<String, Integer> foodWeightMap = new HashMap<>();
+    for (Food food : filteredFoodList) {
+      String foodName = food.getFoodListName();
+      int weight = food.getFoodExpDate().until(today).getDays() + 3;
+      foodWeightMap.put(foodName, weight);
+    }
+
+    List<Recipe> recipeList = recipeRepository.findAll();
+    Map<String, Pair<Integer, Integer>> recipeWeightAndCountMap = new HashMap<>();
+
+    for (Recipe recipe : recipeList) {
+      String recipeFoodDetails = recipe.getRecipeFoodDetails();
+      String recipeId = recipe.getRecipeId();
+
+      int maxWeight = 0; // 가장 큰 가중치
+      int ingredientCount = 0; // 포함된 재료 개수
+
+      for (Map.Entry<String, Integer> entry : foodWeightMap.entrySet()) {
+        String ingredient = entry.getKey();
+        int weight = entry.getValue();
+
+        // Recipe의 foodDetails에 재료 이름 포함 여부 확인
+        if (recipeFoodDetails.toLowerCase().contains(ingredient.toLowerCase())) {
+          ingredientCount++; // 포함된 재료 개수 증가
+          maxWeight = Math.max(maxWeight, weight); // 최대 가중치 갱신
+        }
+      }
+
+      if (ingredientCount > 0) {
+        recipeWeightAndCountMap.put(recipeId, new Pair<>(maxWeight, ingredientCount));
+      }
+    }
+
+    // recipeWeightAndCountMap을 가중치와 개수에 따라 정렬 (내림차순 정렬)
+    List<Map.Entry<String, Pair<Integer, Integer>>> sortedEntries = recipeWeightAndCountMap.entrySet()
+        .stream()
+        .sorted((entry1, entry2) -> {
+          // 먼저 Weight 기준 내림차순
+          int weightComparison = Integer.compare(entry2.getValue().getFirst(), entry1.getValue().getFirst());
+          if (weightComparison != 0) {
+            return weightComparison;
+          }
+          // Weight가 동일하면 Count 기준 내림차순
+          return Integer.compare(entry2.getValue().getSecond(), entry1.getValue().getSecond());
+        })
+        .collect(Collectors.toList());
+
+    // 정렬된 결과를 RecipeSimpleDto로 변환
+    List<RecipeSimpleDto> result = new ArrayList<>();
+    for (Map.Entry<String, Pair<Integer, Integer>> entry : sortedEntries) {
+      String recipeId = entry.getKey();
+      Recipe recipe = recipeRepository.findById(recipeId).orElse(null); // Recipe 조회
+      User user = recipe.getUserId() != null ? userRepository.findById(recipe.getUserId()).orElse(null) : null;
+
+      // Recipe가 존재하면 RecipeSimpleDto 생성
+      if (recipe != null) {
+        RecipeSimpleDto dto = RecipeSimpleDto.of(recipe, user);
+        result.add(dto);
+      }
+    }
+    return result;
+  }
+
+  public static class Pair<K, V> {
+    private final K first;
+    private final V second;
+
+    public Pair(K first, V second) {
+      this.first = first;
+      this.second = second;
+    }
+
+    public K getFirst() {
+      return first;
+    }
+
+    public V getSecond() {
+      return second;
+    }
+  }
+
 }
