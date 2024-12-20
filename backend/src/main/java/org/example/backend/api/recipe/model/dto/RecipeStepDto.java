@@ -10,6 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RecipeStepDto {
+  private int seq;
   private String photo;
   private String description;
 }
