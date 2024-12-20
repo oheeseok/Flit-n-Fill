@@ -1,0 +1,189 @@
+.reciperesisterbody {
+  width: 100%;
+  margin: 0 auto; /* 가운데 정렬 */
+  display: flex;
+  flex-wrap: wrap; /* 자식 요소들이 넘칠 경우 새 줄로 내려가도록 설정 */
+}
+.recipe-resister-title-container {
+  width: 48%;
+  display: flex;
+  flex-direction: column; /* 수직 방향으로 배치 */
+  gap: 10px;
+  justify-content: center;
+  margin-left: 40px;
+}
+.recipe-resister-title {
+  color: #000;
+  text-align: start;
+  font-family: Ubuntu;
+  font-size: 38px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+}
+.recipe-resister-title-input {
+  display: flex;
+  width: 89%;
+  height: 42px;
+  padding: 0px 15px;
+  align-items: flex-start;
+  flex-shrink: 0;
+  border-radius: 10px;
+  border: 1px solid var(--Schemes-Outline, #79747e);
+
+  /* M3/body/large */
+  font-family: var(--Body-Large-Font, Ubuntu);
+  font-size: var(--Body-Large-Size, 16px);
+  font-style: normal;
+  font-weight: 400;
+  line-height: var(--Body-Large-Line-Height, 24px);
+  letter-spacing: var(--Body-Large-Tracking, 0.5px);
+  margin-top: 4px;
+}
+
+.recipe-resister-ingredients-container {
+  width: 46.4%;
+  height: 655px;
+  border-radius: 30px;
+  border-top: 1px solid var(--light-sky, #c7efe6);
+  border-right: 5px solid var(--light-sky, #c7efe6);
+  border-bottom: 5px solid var(--light-sky, #c7efe6);
+  border-left: 1px solid var(--light-sky, #c7efe6);
+  background: rgba(199, 239, 230, 0.3);
+  margin-top: 46px;
+  display: flex;
+  flex-direction: column; /* 수직 방향으로 배치 */
+  justify-content: center; /* 수평 가운데 정렬 */
+  align-items: center; /* 수직 가운데 정렬 */
+  margin-right: 40px;
+}
+.recipe-resister-ingredients-title {
+  color: #3c3c3c;
+  text-align: center;
+  font-family: Ubuntu;
+  font-size: 38px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  margin-top: 16px;
+}
+.recipe-resister-ingredients-textbox {
+  width: 92%;
+  height: 550px;
+  flex-shrink: 0;
+  border-radius: 30px;
+  border-right: 4px solid var(--light-pink, #ffcbc3);
+  border-bottom: 4px solid var(--light-pink, #ffcbc3);
+  background: #fff;
+  margin-top: 10px;
+}
+.recipe-resister-method-container {
+  width: 100%;
+  height: 100%;
+  margin: 40px 40px;
+  border-radius: 30px;
+  border-top: 1px solid var(--light-sky, #c7efe6);
+  border-right: 5px solid var(--light-sky, #c7efe6);
+  border-bottom: 5px solid var(--light-sky, #c7efe6);
+  border-left: 1px solid var(--light-sky, #c7efe6);
+  background: rgba(199, 239, 230, 0.3);
+  display: flex;
+  flex-direction: column; /* 수직 방향으로 배치 */
+  align-items: center; /* 수직 가운데 정렬 */
+}
+
+.recipe-resister-method-title {
+  color: #3c3c3c;
+  text-align: center;
+  font-family: Ubuntu;
+  font-size: 38px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  margin-top: 16px;
+}
+.recipe-resister-method-box {
+  width: 96%;
+  height: auto;
+  border-radius: 30px;
+  border-right: 4px solid var(--light-pink, #ffcbc3);
+  border-bottom: 4px solid var(--light-pink, #ffcbc3);
+  background: #fff;
+  margin-top: 20px;
+  padding: 10px;
+  display: flex;
+  align-items: center; /* 수직 가운데 정렬 */
+}
+.recipe-resister-method-box-num {
+  font-family: Ubuntu;
+  font-size: 22px;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  fill: rgba(235, 208, 239);
+  stroke-width: 1px;
+  stroke: var(--light-purple, #ebd0ef);
+  margin: 0 20px;
+}
+.recipe-resister-method-box-button {
+  display: flex;
+  gap: 20px;
+}
+.recipe-resister-method-box-add-button {
+  margin: 20px 0;
+  border-right: 4px solid var(--light-pink, #ffcbc3);
+  border-bottom: 4px solid var(--light-pink, #ffcbc3);
+  background: #fff;
+  border-radius: 40px;
+  font-family: Ubuntu;
+  font-size: 22px;
+}
+
+.recipe-resister-method-box-remove {
+  margin: 20px;
+  border-right: 4px solid var(--light-pink, #ffcbc3);
+  border-bottom: 4px solid var(--light-pink, #ffcbc3);
+  background: #fff;
+  border-radius: 40px;
+  font-family: Ubuntu;
+  font-size: 22px;
+}
+.recipe-resister-ingredients-textbox textarea {
+  width: 95%;
+  height: 95%;
+  padding: 10px;
+  border: 0px solid #ddd;
+  border-radius: 30px;
+  resize: none; /* 크기 조절 비활성화 */
+  font-size: 16px;
+  font-family: "Ubuntu", sans-serif;
+  line-height: 1.5;
+}
+
+.recipe-resister-method-box textarea {
+  width: 90%;
+  height: 220px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 30px;
+  resize: none; /* 크기 조절 비활성화 */
+  font-size: 16px;
+  font-family: "Ubuntu", sans-serif;
+  line-height: 1.5;
+}
+
+.recipe-resister-ingredients-textbox textarea:focus,
+.recipe-resister-method-box textarea:focus {
+  border-color: #ffcbc3;
+  outline: none;
+  box-shadow: 0 0 10px rgba(255, 203, 195, 1);
+}
+
+.recipe-resister-to-recipedetail-button-container {
+  width: 100%;
+  display: flex;
+  gap: 20px;
+  margin-bottom: 40px;
+  justify-content: flex-end;
+  margin-right: 40px;
+}

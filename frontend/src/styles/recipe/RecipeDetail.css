@@ -1,0 +1,194 @@
+/* Body Wrapper */
+.recipe-detail-body {
+  width: 100%;
+  margin: 0 auto; /* 가운데 정렬 */
+  display: flex;
+  flex-wrap: wrap; /* 자식 요소들이 넘칠 경우 새 줄로 내려가도록 설정 */
+}
+
+/* Title Section */
+.recipe-detail-title-container {
+  width: 48%;
+  display: flex;
+  flex-direction: column; /* 수직 방향으로 배치 */
+  gap: 10px;
+  justify-content: center;
+  margin-left: 40px;
+}
+
+.recipe-detail-title {
+  color: #000;
+  text-align: start;
+  font-family: Ubuntu;
+  font-size: 38px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+}
+
+.recipe-detail-image {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+}
+
+.recipe-detail-image img {
+  width: 686px;
+  height: 600px;
+  border-radius: 30px;
+  object-fit: cover;
+  cursor: pointer;
+  border: 1px solid #d9d9d9; /* 디폴트 테두리 */
+}
+
+/* Ingredients Section */
+.recipe-detail-ingredients-container {
+  width: 46.4%;
+  height: 655px;
+  border-radius: 30px;
+  border-top: 1px solid var(--light-sky, #c7efe6);
+  border-right: 5px solid var(--light-sky, #c7efe6);
+  border-bottom: 5px solid var(--light-sky, #c7efe6);
+  border-left: 1px solid var(--light-sky, #c7efe6);
+  background: rgba(199, 239, 230, 0.3);
+  margin-top: 46px;
+  display: flex;
+  flex-direction: column; /* 수직 방향으로 배치 */
+  justify-content: center; /* 수평 가운데 정렬 */
+  align-items: center; /* 수직 가운데 정렬 */
+  margin-right: 40px;
+}
+
+.recipe-detail-ingredients-title {
+  color: #3c3c3c;
+  text-align: center;
+  font-family: Ubuntu;
+  font-size: 38px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  margin-top: 16px;
+}
+
+.recipe-detail-ingredients-text {
+  width: 92%;
+  height: 550px;
+  flex-shrink: 0;
+  border-radius: 30px;
+  border-right: 4px solid var(--light-pink, #ffcbc3);
+  border-bottom: 4px solid var(--light-pink, #ffcbc3);
+  background: #fff;
+  font-size: 16px;
+  font-family: "Ubuntu", sans-serif;
+  line-height: 1.5;
+  overflow-y: auto;
+  margin-top: 10px;
+}
+
+/* Steps Section */
+.recipe-detail-steps-container {
+  width: 100%;
+  height: 100%;
+  margin: 40px 40px;
+  border-radius: 30px;
+  border-top: 1px solid var(--light-sky, #c7efe6);
+  border-right: 5px solid var(--light-sky, #c7efe6);
+  border-bottom: 5px solid var(--light-sky, #c7efe6);
+  border-left: 1px solid var(--light-sky, #c7efe6);
+  background: rgba(199, 239, 230, 0.3);
+  display: flex;
+  flex-direction: column; /* 수직 방향으로 배치 */
+  align-items: center; /* 수직 가운데 정렬 */
+}
+
+.recipe-detail-steps-title {
+  color: #3c3c3c;
+  text-align: center;
+  font-family: Ubuntu;
+  font-size: 38px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  margin-top: 16px;
+  margin-bottom: 10px;
+}
+
+.recipe-detail-step-box {
+  width: 96%;
+  height: auto;
+  border-radius: 30px;
+  border-right: 4px solid var(--light-pink, #ffcbc3);
+  border-bottom: 4px solid var(--light-pink, #ffcbc3);
+  background: #fff;
+  margin-top: 10px;
+  display: flex;
+  align-items: center; /* 수직 가운데 정렬 */
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.recipe-detail-step-num {
+  font-family: Ubuntu;
+  font-size: 22px;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  fill: rgba(235, 208, 239);
+  stroke-width: 1px;
+  stroke: var(--light-purple, #ebd0ef);
+  margin: 0 20px;
+}
+
+.recipe-detail-step-image {
+  width: 240px; /* 고정 너비 설정 */
+  height: 240px; /* 고정 높이 설정 */
+  border-radius: 30px; /* 이미지 모서리 둥글게 */
+  object-fit: cover; /* 이미지 비율 유지 */
+  border: 1px solid #d9d9d9; /* 기본 테두리 */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* 약간의 그림자 효과 */
+  margin-right: 20px;
+}
+
+.recipe-detail-step-image img {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit; /* 부모의 둥근 모서리 상속 */
+  object-fit: inherit; /* 부모의 object-fit 속성 상속 */
+}
+
+.recipe-detail-step-description {
+  width: 74%;
+  height: 220px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 30px;
+  resize: none; /* 크기 조절 비활성화 */
+  font-size: 16px;
+  font-family: "Ubuntu", sans-serif;
+  line-height: 1.5;
+  text-align: start;
+}
+
+.recipe-detail-delete-container {
+  width: 100%;
+  display: flex;
+  margin-bottom: 40px;
+  justify-content: flex-end;
+  margin-right: 40px;
+}
+
+.recipe-detail-delete-button {
+  background-color: #ffcbc3;
+  color: 3c3c3c;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.recipe-detail-delete-button:hover {
+  background-color: #e99b8f;
+}

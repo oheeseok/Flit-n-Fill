@@ -1,0 +1,234 @@
+.fridge-toresister-button-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+  margin-right: 20px;
+}
+
+.fridgetoresister {
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+}
+
+.fridgebody {
+  width: 100%;
+  display: flex;
+  flex-direction: row; /* 수직 방향으로 배치 */
+  justify-content: flex-start; /* 위에서부터 차례대로 배치 */
+  position: relative; /* 각 door 위치를 조정하기 위한 기준 */
+  flex-wrap: wrap; /* 자식 요소들이 넘칠 경우 새 줄로 내려가도록 설정 */
+}
+/* 냉장고 부분 */
+.fridge-container {
+  margin-top: 50px;
+  width: 61%;
+  height: 1200px;
+  flex-shrink: 0;
+  border: 0px solid black;
+  margin-left: 20px;
+  display: flex;
+  flex-direction: column; /* 수직 방향으로 배치 */
+  justify-content: flex-start; /* 위에서부터 차례대로 배치 */
+  position: relative; /* 각 door 위치를 조정하기 위한 기준 */
+}
+
+.cold-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 800px;
+  height: 600px;
+  flex-shrink: 0;
+  border-radius: 60px 60px 0px 0px;
+  background: #c7efe6;
+  position: relative; /* 문을 우측에 배치하기 위한 기준 */
+}
+.cold-side {
+  font-family: Ubuntu;
+  font-size: 22px;
+  width: 760px;
+  height: 560px;
+  flex-shrink: 0;
+  border-radius: 58px;
+  background: rgba(63, 126, 112, 0.3);
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  align-items: center;
+}
+.cold-back {
+  width: 600px;
+  height: 480px;
+  flex-shrink: 0;
+  border-radius: 56px 56px 0px 0px;
+  background: rgba(71, 173, 195, 0.6);
+}
+.cold-door {
+  width: 80px;
+  height: 600px;
+  border-radius: 30px 30px 0px 0px;
+  background: linear-gradient(
+    90deg,
+    rgba(41, 81, 86, 0.6) 0%,
+    rgba(199, 239, 230, 0.6) 40%
+  );
+  position: absolute;
+  right: 60px;
+}
+.cold-door-hand {
+  width: 40px;
+  height: 120px;
+  border-radius: 0px 30px 30px 0px;
+  background: linear-gradient(90deg, #877789 0%, #ebd0ef 40%);
+  position: absolute;
+  right: 20px;
+  top: 420px;
+}
+
+.freeze-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 800px;
+  height: 600px;
+  flex-shrink: 0;
+  border-radius: 0px 0px 60px 60px;
+  background: var(--light-green, #d4efc7);
+  position: relative;
+}
+
+.freeze-side {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+  width: 760px;
+  height: 560px;
+  flex-shrink: 0;
+  border-radius: 58px;
+  background: rgba(63, 126, 112, 0.3);
+}
+
+.freeze-back {
+  font-family: Ubuntu;
+  font-size: 22px;
+  width: 600px;
+  height: 480px;
+  flex-shrink: 0;
+  border-radius: 0px 0px 56px 56px;
+  background: rgba(63, 126, 112, 0.6);
+}
+.freeze-door {
+  width: 80px;
+  height: 600px;
+  border-radius: 0px 0px 30px 30px;
+  background: linear-gradient(
+    90deg,
+    rgba(63, 126, 112, 0.6) 0%,
+    rgba(212, 239, 199, 0.6) 40%
+  );
+  position: absolute;
+  right: 60px;
+  bottom: 0;
+}
+.freeze-door-hand {
+  width: 40px;
+  height: 120px;
+  border-radius: 0px 30px 30px 0px;
+  background: linear-gradient(90deg, #877789 0%, #ebd0ef 40%);
+  position: absolute;
+  right: 20px;
+  bottom: 420px;
+}
+
+/* 실온 부분 */
+.out-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 35%;
+  height: 920px;
+  background: #fae8e6;
+  border-radius: 40px;
+  margin: 330px 20px 0 10px;
+}
+
+.out-side {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+  width: 480px;
+  height: 860px;
+  border-radius: 35px;
+  background: #f1d3d0;
+}
+
+.out-area1 {
+  font-family: Ubuntu;
+  font-size: 22px;
+  width: 380px;
+  height: 200px;
+  margin-top: 60px;
+  border-radius: 30px 30px 0 0;
+  background: #eebfbb;
+}
+.out-frame {
+  width: 480px;
+  height: 30px;
+  background: #fae8e6;
+}
+.out-area2 {
+  width: 380px;
+  height: 200px;
+  margin-top: 40px;
+  margin-bottom: 40px;
+  background: #eebfbb;
+}
+.out-area3 {
+  width: 380px;
+  height: 200px;
+  background: #eebfbb;
+}
+
+/* cart 부분 */
+.bucket-container {
+  margin: 80px 20px 80px 20px;
+  width: 1100px;
+  height: 600px;
+  background: #fffbd6;
+  border-radius: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.bucket-side {
+  width: 1000px;
+  height: 520px;
+  background: #faf3b8;
+  border-radius: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.bucket-area {
+  font-family: Ubuntu;
+  font-size: 22px;
+  width: 900px;
+  height: 440px;
+  background: #ebe298;
+  border-radius: 160px;
+}
+.button-container {
+  position: absolute;
+  right: 20px;
+  bottom: 90px;
+}
