@@ -17,29 +17,30 @@ public class PrincipalDetails implements UserDetails, OAuth2User {
     private final User user;
     private final Map<String, Object> attributes;
 //    private final String attributekey;
-    @Getter
-    private final String accessToken;
-    @Getter
-    private final String refreshToken;
+//    @Getter
+//    private final String accessToken;
+//    @Getter
+//    private final String refreshToken;
 
     // 기본 인증 생성자 (폼 로그인 사용)
     public PrincipalDetails(User user) {
         this.user = user;
         this.attributes = null;
 //        this.attributekey = null;
-        this.accessToken = null;
-        this.refreshToken = null;
+//        this.accessToken = null;
+//        this.refreshToken = null;
     }
 
     // OAuth2 인증 사용자
-    public PrincipalDetails(User user, Map<String, Object> attributes,
+    public PrincipalDetails(User user, Map<String, Object> attributes
 //                            String attributekey,
-                            String accessToken, String refreshToken) {
+//                            String accessToken, String refreshToken
+                            ) {
         this.user = user;
         this.attributes = attributes;
 //        this.attributekey = attributekey;
-        this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
+//        this.accessToken = accessToken;
+//        this.refreshToken = refreshToken;
     }
 
     @Override

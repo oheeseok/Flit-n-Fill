@@ -33,7 +33,7 @@ public class User {
   @Column(length = 50, unique = true)
   private String userEmail;
 
-  @Column(length = 20, unique = true)
+  @Column(length = 20)
   private String userNickname;
 
   @Size(min = 10, max = 15, message = "비밀번호의 길이는 10자에서 15자 사이입니다.")

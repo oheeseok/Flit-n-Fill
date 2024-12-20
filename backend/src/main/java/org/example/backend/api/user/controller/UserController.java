@@ -38,24 +38,7 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserLoginDto userLoginDto, HttpServletResponse response) {
         try {
-            UserLoginResponse login = userService.login(userLoginDto);
-            // 쿠키에 토큰 저장 (Access Token)
-            Cookie accessTokenCookie = new Cookie("accessToken", login.getAccessToken());
-            accessTokenCookie.setHttpOnly(true); // JavaScript에서 접근 불가
-            accessTokenCookie.setSecure(false); // HTTPS 연결에서만 전송
-            accessTokenCookie.setPath("/"); // 모든 경로에서 접근 가능
-            accessTokenCookie.setMaxAge(3600); // 쿠키 만료 시간 (1시간)
-
-            // 쿠키에 Refresh Token 저장
-            Cookie refreshTokenCookie = new Cookie("refreshToken", login.getRefreshToken());
-            refreshTokenCookie.setHttpOnly(true);
-            refreshTokenCookie.setSecure(false);
-            refreshTokenCookie.setPath("/");
-            refreshTokenCookie.setMaxAge(3600); // 1시간
-
-            // 응답에 쿠키 추가
-            response.addCookie(accessTokenCookie);
-            response.addCookie(refreshTokenCookie);
+            UserLoginResponse login = userService.login(userLoginDto, response);
 
             return ResponseEntity.status(HttpStatus.OK).body("로그인에 성공하였습니다.");
         } catch (LoginFailedException e) {
@@ -106,7 +89,7 @@ public class UserController {
     }
 
     @GetMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletRequest request) {
+    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
         // 쿠키에서 토큰 가져오기
         Cookie[] cookies = request.getCookies();
         String token = null;
@@ -125,7 +108,7 @@ public class UserController {
         }
         try {
             // 로그아웃 처리
-            userService.logout(token);
+            userService.logout(token, response);
             return ResponseEntity.ok("로그아웃되었습니다.");
         } catch (Exception e) {
             // 잘못된 토큰이나 사용자 정보가 없는 경우
