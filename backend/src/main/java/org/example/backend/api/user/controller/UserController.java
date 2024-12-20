@@ -1,13 +1,11 @@
 package org.example.backend.api.user.controller;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.backend.api.user.model.dto.UserInfoDto;
-import org.example.backend.api.user.model.dto.UserLoginDto;
-import org.example.backend.api.user.model.dto.UserRegisterDto;
-import org.example.backend.api.user.model.dto.UserUpdateDto;
+import org.example.backend.api.user.model.dto.*;
 import org.example.backend.api.user.service.UserService;
 import org.example.backend.exceptions.LoginFailedException;
 import org.example.backend.exceptions.UserNotFoundException;
@@ -38,9 +36,28 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserLoginDto userLoginDto) {
+    public ResponseEntity<?> login(@RequestBody UserLoginDto userLoginDto, HttpServletResponse response) {
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(userService.login(userLoginDto));
+            UserLoginResponse login = userService.login(userLoginDto);
+            // 쿠키에 토큰 저장 (Access Token)
+            Cookie accessTokenCookie = new Cookie("accessToken", login.getAccessToken());
+            accessTokenCookie.setHttpOnly(true); // JavaScript에서 접근 불가
+            accessTokenCookie.setSecure(false); // HTTPS 연결에서만 전송
+            accessTokenCookie.setPath("/"); // 모든 경로에서 접근 가능
+            accessTokenCookie.setMaxAge(3600); // 쿠키 만료 시간 (1시간)
+
+            // 쿠키에 Refresh Token 저장
+            Cookie refreshTokenCookie = new Cookie("refreshToken", login.getRefreshToken());
+            refreshTokenCookie.setHttpOnly(true);
+            refreshTokenCookie.setSecure(false);
+            refreshTokenCookie.setPath("/");
+            refreshTokenCookie.setMaxAge(3600); // 1시간
+
+            // 응답에 쿠키 추가
+            response.addCookie(accessTokenCookie);
+            response.addCookie(refreshTokenCookie);
+
+            return ResponseEntity.status(HttpStatus.OK).body("로그인에 성공하였습니다.");
         } catch (LoginFailedException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
@@ -63,6 +80,7 @@ public class UserController {
     @PutMapping("/info")
     public ResponseEntity<?> updateUserInfo(HttpServletRequest request, @RequestBody UserUpdateDto updateDto) throws Exception {
         String userEmail = (String) request.getAttribute("userEmail");
+        log.info("logined email: {}", userEmail);
 
         if (userService.existsByUserNickname(updateDto.getUserNickname())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 사용중인 닉네임입니다.");
@@ -88,15 +106,23 @@ public class UserController {
     }
 
     @GetMapping("/logout")
-    public ResponseEntity<String> logout(@RequestHeader("Authorization") String authHeader) {
-        // Authorization 헤더에서 토큰 확인
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("유효하지 않은 토큰입니다.");
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+        // 쿠키에서 토큰 가져오기
+        Cookie[] cookies = request.getCookies();
+        String token = null;
+
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("accessToken".equals(cookie.getName())) {
+                    token = cookie.getValue();
+                    break;
+                }
+            }
         }
 
-        // "Bearer " 접두어 제거
-        String token = authHeader.substring(7);
-
+        if (token == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("유효하지 않은 토큰입니다.");
+        }
         try {
             // 로그아웃 처리
             userService.logout(token);

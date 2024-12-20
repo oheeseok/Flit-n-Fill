@@ -9,7 +9,6 @@ import org.example.backend.api.recipe.model.dto.RecipeSimpleDto;
 import org.example.backend.api.recipe.model.dto.RecipeUpdateDto;
 import org.example.backend.api.recipe.service.RecipeService;
 import org.example.backend.exceptions.UserIdNullException;
-import org.example.backend.security.Authenticate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

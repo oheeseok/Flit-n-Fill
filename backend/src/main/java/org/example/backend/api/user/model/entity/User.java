@@ -28,34 +28,24 @@ public class User {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long userId;
 
-  @Column(length = 5, nullable = false)
-  @NotNull
   private String userName;
 
-  @Column(length = 50, nullable = false, unique = true)
-  @NotNull
+  @Column(length = 50, unique = true)
   private String userEmail;
 
-  @Column(length = 8, nullable = false, unique = true)
-  @NotNull
+  @Column(length = 20, unique = true)
   private String userNickname;
 
-  @Column(nullable = false)
   @Size(min = 10, max = 15, message = "비밀번호의 길이는 10자에서 15자 사이입니다.")
   @Pattern(regexp = "[a-zA-Z0-9`~!@#$%^&*()_=+|{};:,.<>/?]*$", message = "비밀번호 형식이 일치하지 않습니다")
-  @NotNull
   private String userPassword;
 
-  @Column(length = 13, nullable = false)
-  @NotNull
+  @Column(length = 13)
   private String userPhone;
 
-  @Column(length = 20, nullable = false)
-  @NotNull
+  @Column(length = 20)
   private String userAddress;
 
-  @Column(nullable = false)
-  @NotNull
   private String userProfile;
 
   @Column(columnDefinition = "DECIMAL(5,1)", nullable = false)

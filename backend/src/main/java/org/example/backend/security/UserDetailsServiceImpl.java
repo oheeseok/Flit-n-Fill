@@ -1,6 +1,5 @@
 package org.example.backend.security;
 
-import jdk.jshell.spi.ExecutionControl;
 import lombok.RequiredArgsConstructor;
 import org.example.backend.api.user.model.entity.User;
 import org.example.backend.api.user.repository.UserRepository;
@@ -22,7 +21,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         Optional<User> findUser = userRepository.findByUserEmail(username);
         if (findUser.isPresent()) {
             User user = findUser.get();
-            return new UserDetailsImpl(user.getUserEmail(), user.getUserPassword());
+            return new PrincipalDetails(user);
         }
         throw new UserNotFoundException("User not found with userEmail: " + username);
     }
