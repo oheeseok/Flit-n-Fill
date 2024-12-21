@@ -58,12 +58,14 @@ public class User {
   private String refreshToken;
 
   @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
+  @Column(nullable = false, length = 10)
+  @NotNull
   @ColumnDefault("'USER'")
   private Role role;
 
   @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
+  @Column(nullable = false, length = 10)
+  @NotNull
   @ColumnDefault("'LOCAL'")
   private AuthProvider authProvider;
 

@@ -1,7 +1,7 @@
 package org.example.backend.enums;
 
 public enum Role {
-    USER("알반사용자"),
+    USER("일반사용자"),
     ADMIN("관리자");
 
     private final String description;

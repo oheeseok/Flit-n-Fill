@@ -1,7 +1,7 @@
 package org.example.backend.enums;
 
 public enum AuthProvider {
-    LOCAL("일반 가입"),
+    LOCAL("일반가입"),
     GOOGLE("google"),
     KAKAO("kakao");
 
