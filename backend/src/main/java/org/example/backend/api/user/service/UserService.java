@@ -1,5 +1,6 @@
 package org.example.backend.api.user.service;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,13 +10,20 @@ import org.example.backend.api.user.model.entity.User;
 import org.example.backend.api.user.model.entity.UserCart;
 import org.example.backend.api.user.repository.UserCartRepository;
 import org.example.backend.api.user.repository.UserRepository;
+import org.example.backend.enums.AuthProvider;
 import org.example.backend.exceptions.LoginFailedException;
 import org.example.backend.exceptions.PasswordMismatchException;
+import org.example.backend.exceptions.UnauthorizedException;
 import org.example.backend.exceptions.UserNotFoundException;
 import org.example.backend.security.JwtTokenProvider;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional
@@ -51,7 +59,8 @@ public class UserService {
                 userRegisterDto.getUserPhone(),
                 userRegisterDto.getUserAddress(),
                 "default profile url",
-                0
+                0,
+                AuthProvider.LOCAL
         );
         userRepository.save(user);
 
@@ -78,12 +87,9 @@ public class UserService {
        return tokenManagementService.handleSuccessfulLogin(user, response);
     }
 
-    public void logout(String token, HttpServletResponse response) {
-        // 토큰에서 사용자 이메일 추출
-        String userEmail = jwtTokenProvider.getUserEmailFromToken(token);
-
+    public void logout(String token, String userEmail, HttpServletResponse response) {
         if (userEmail == null) {
-            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+            throw new IllegalArgumentException("이메일이 존재하지 않습니다.");
         }
 
         // DB에서 사용자 조회
@@ -95,8 +101,13 @@ public class UserService {
         userRepository.save(user);
 
         // Access Token 블랙리스트에 추가
-        long tokenExpiration = jwtTokenProvider.getExpirationDate(token).getTime();
-        log.info("만료기한 : {}", tokenExpiration);
+        long tokenExpiration = 0;
+        try {
+            tokenExpiration = jwtTokenProvider.getExpirationDate(token).getTime();
+        } catch (Exception e) {
+            log.info(e + "이미 만료된 토큰입니다.");
+        }
+//        log.info("만료기한 : {}", tokenExpiration);
         tokenManagementService.addBlacklistToken(token, tokenExpiration, response);
     }
 

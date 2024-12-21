@@ -128,7 +128,9 @@ public class TokenManagementService {
         ValueOperations<String, Long> ops = redisTemplate.opsForValue();
 
         // Redis에 토큰과 만료 시간 저장, 만료 시간 설정 (만료된 후 자동 삭제)
-        ops.set("Blacklist:" + token, expirationTime, expirationTime - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+        if (expirationTime != 0) {
+            ops.set("Blacklist:" + token, expirationTime, expirationTime - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+        }
         clearCookie(response, "accessToken");
         clearCookie(response, "refreshToken");
     }
