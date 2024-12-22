@@ -9,16 +9,21 @@ import org.example.backend.api.myfridge.model.entity.Food;
 import org.example.backend.api.myfridge.repository.MyfridgeRepository;
 import org.example.backend.api.user.model.dto.CartSimpleDto;
 import org.example.backend.api.user.model.entity.CartItem;
+import org.example.backend.api.user.model.entity.Request;
 import org.example.backend.api.user.model.entity.User;
 import org.example.backend.api.user.model.entity.UserCart;
 import org.example.backend.api.user.repository.CartItemRepository;
+import org.example.backend.api.user.repository.RequestRepository;
 import org.example.backend.api.user.repository.UserCartRepository;
 import org.example.backend.api.user.repository.UserRepository;
+import org.example.backend.enums.RequestType;
+import org.example.backend.enums.TaskStatus;
 import org.example.backend.exceptions.UserNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -33,6 +38,7 @@ public class MyfridgeService {
     private final UserRepository userRepository;
     private final UserCartRepository userCartRepository;
     private final CartItemRepository cartItemRepository;
+    private final RequestRepository requestRepository;
 
     public List<FoodSimpleDto> getAllFood(Long userId) {
         User user = userRepository.findById(userId).get();
@@ -213,5 +219,22 @@ public class MyfridgeService {
         cartItem.setUserCart(userCart);
         cartItem.setMemo(food.getFoodListName());
         cartItemRepository.save(cartItem);
+    }
+
+    public void requestAddFood(Long userId, String requestFood) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
+
+        Request request = new Request(
+            null,
+            user,
+            RequestType.ADD_FOOD,
+            requestFood,
+            null,
+            LocalDateTime.now(),
+            TaskStatus.PENDING
+        );
+
+        requestRepository.save(request);
     }
 }
