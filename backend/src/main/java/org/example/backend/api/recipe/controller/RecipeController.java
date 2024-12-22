@@ -26,23 +26,34 @@ public class RecipeController {
     public ResponseEntity<Object> getAllRecipes(HttpServletRequest request,
                                                 @RequestParam(value = "search-query", required = false) String keyword,
                                                 @RequestParam(value = "src", required = false) String src) {
+
+        Long userId = (Long) request.getAttribute("userId");
+        if (userId == null) {
+            throw new UserIdNullException("userId not found");
+        }
+
         Object result;
         if (keyword != null && ! keyword.isEmpty()) {
             // src이 null이 아니면 src와 keyword를 모두 사용하여 검색
             if ("youtube".equals(src)) {
                 result = recipeService.searchYoutubeRecipes(keyword);
             } else {
-                result = recipeService.searchRecipes(keyword); // keyword만 사용하여 검색
+                result = recipeService.searchRecipes(userId, keyword); // keyword만 사용하여 검색
             }
         } else {
-            result = recipeService.getAllRecipes(); // 모든 레시피 조회
+            result = recipeService.getAllRecipes(userId); // 모든 레시피 조회
         }
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
     @GetMapping("/{recipeId}")
     public ResponseEntity<RecipeDetailDto> getRecipeDetail(HttpServletRequest request, @PathVariable("recipeId") String recipeId) {
-        RecipeDetailDto recipe = recipeService.getRecipeDetail(recipeId);
+        Long userId = (Long) request.getAttribute("userId");
+        if (userId == null) {
+            throw new UserIdNullException("userId not found");
+        }
+
+        RecipeDetailDto recipe = recipeService.getRecipeDetail(userId, recipeId);
         return ResponseEntity.status(HttpStatus.OK).body(recipe);
     }
 
