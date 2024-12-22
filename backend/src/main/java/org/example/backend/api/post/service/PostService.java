@@ -6,10 +6,7 @@ import org.example.backend.api.foodlist.model.entity.FoodList;
 import org.example.backend.api.foodlist.repository.FoodListRepository;
 import org.example.backend.api.myfridge.model.entity.Food;
 import org.example.backend.api.myfridge.repository.MyfridgeRepository;
-import org.example.backend.api.post.model.dto.PostDetailDto;
-import org.example.backend.api.post.model.dto.PostRegisterDto;
-import org.example.backend.api.post.model.dto.PostSimpleDto;
-import org.example.backend.api.post.model.dto.PostUpdateDto;
+import org.example.backend.api.post.model.dto.*;
 import org.example.backend.api.post.model.entity.Post;
 import org.example.backend.api.post.repository.PostRepository;
 import org.example.backend.api.user.model.entity.User;
@@ -152,4 +149,17 @@ public class PostService {
 
     postRepository.deleteById(postId);
   }
+
+    public void createTradeRequest(Long userId, TradeRequestCreateDto tradeRequestCreateDto) {
+      // email 전송, push 알림 전송, notification 테이블에 데이터 저장
+
+      // email 전송
+
+
+      // push 알림 전송
+
+
+      // notification 테이블에 데이터 저장
+
+    }
 }
