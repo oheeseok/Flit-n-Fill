@@ -58,4 +58,14 @@ public class Request {
 
   @OneToMany(mappedBy = "request", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
   private List<Notification> notificationList;
+
+  public Request(Long requestId, User requestUser, RequestType requestType, String requestContent, User reportedUser, LocalDateTime requestDate, TaskStatus responseStatus) {
+    this.requestId = requestId;
+    this.requestUser = requestUser;
+    this.requestType = requestType;
+    this.requestContent = requestContent;
+    this.reportedUser = reportedUser;
+    this.requestDate = requestDate;
+    this.responseStatus = responseStatus;
+  }
 }

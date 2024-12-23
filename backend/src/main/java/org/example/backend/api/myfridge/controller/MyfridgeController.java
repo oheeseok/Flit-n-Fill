@@ -122,4 +122,20 @@ public class MyfridgeController {
         myfridgeService.addItemToCart(userId, foodId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
+    // 재료 추가 요청
+    @PostMapping("/request")
+    public ResponseEntity<String> requestAddFood(HttpServletRequest request, @RequestBody String requestFood) {
+        Long userId = (Long) request.getAttribute("userId");
+        if (userId == null) {
+            throw new UserIdNullException("userId not found");
+        }
+
+        if (requestFood == null || requestFood.trim().isEmpty()) {
+            throw new IllegalArgumentException("요청한 재료 이름이 비어 있습니다.");
+        }
+
+        myfridgeService.requestAddFood(userId, requestFood);
+        return ResponseEntity.status(HttpStatus.CREATED).body("재료 추가 요청이 접수되었습니다.");
+    }
 }
