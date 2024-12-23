@@ -68,9 +68,4 @@ public class NotificationController {
         notificationService.sendExpirationEmail();
         return "메일 전송 완료";
     }
-
-    public String sendTradeRequestEmail() {
-        notificationService.sendTradeRequestEmail(userId);
-        return "메일 전송 완료";
-    }
 }
