@@ -12,7 +12,9 @@ import org.example.backend.api.post.model.dto.PostRegisterDto;
 import org.example.backend.api.trade.model.entity.Trade;
 import org.example.backend.api.trade.model.entity.TradeRequest;
 import org.example.backend.api.user.model.entity.User;
+import org.example.backend.enums.Progress;
 import org.example.backend.enums.TradeType;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -80,6 +82,12 @@ public class Post {
 
   private String postPhoto2;
 
+  @Column(length = 10, nullable = false)
+  @Enumerated(EnumType.STRING)
+  @ColumnDefault("'PENDING'")
+  @NotNull
+  private Progress progress = Progress.PENDING;
+
   // 연관관계
   @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
   private List<Trade> tradeList;
@@ -100,6 +108,7 @@ public class Post {
     post.setMeetingPlace(dto.getMeetingPlace());
     post.setMeetingTime(dto.getMeetingTime());
     post.setPostCreatedDate(LocalDateTime.now());
+    post.setProgress(Progress.PENDING);
     return post;
   }
 }
