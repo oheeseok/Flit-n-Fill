@@ -9,6 +9,7 @@ import org.example.backend.api.user.model.dto.*;
 import org.example.backend.api.user.service.UserService;
 import org.example.backend.exceptions.LoginFailedException;
 import org.example.backend.exceptions.UserNotFoundException;
+import org.example.backend.security.PrincipalDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -52,8 +53,12 @@ public class UserController {
     @GetMapping("/info")
     public ResponseEntity<?> getUserInfo(Authentication authentication) {
         String userEmail = authentication.getName();
-        log.info(userEmail);
+//        log.info(userEmail);
+        Object principal = authentication.getPrincipal();
 
+        PrincipalDetails principalDetails = (PrincipalDetails) principal;
+        log.info("princiaplDetails : {}",principalDetails.getUsername());
+        log.info("princiaplDetails : {}",principalDetails.getUserId());
         try {
             return ResponseEntity.status(HttpStatus.OK).body(userService.getUserInfoByEmail(userEmail));
         } catch (Exception e) {

@@ -43,6 +43,7 @@ public class TokenManagementService {
 
         // access token, refresh token 쿠키 설정
         addCookie(response, "userEmail", user.getUserEmail());
+        addCookie(response, "userId", String.valueOf(user.getUserId()));
         addCookie(response, "accessToken", accessToken);
         addCookie(response, "refreshToken", refreshToken);
 
@@ -108,13 +109,6 @@ public class TokenManagementService {
         if (expirationTime == null) {
             return token; // 블랙리스트에 없으면 만료되지 않은 것과 동일
         }
-        // 현재 시간이 만료 시간 초과한 경우
-        // ttl 설정 실패, 시간 지연, 시간 동기화 문제 등을 대비하여 명시적 삭제 처리
-//        if (System.currentTimeMillis() > expirationTime) {
-//            // 만료된 토큰은 Redis에서 제거
-//            redisTemplate.delete(token);
-//            return token;
-//        }
 
         // 로그아웃된 토큰이므로 true 반환
         response.sendRedirect("/login");

@@ -16,6 +16,7 @@ import org.example.backend.exceptions.PasswordMismatchException;
 import org.example.backend.exceptions.UnauthorizedException;
 import org.example.backend.exceptions.UserNotFoundException;
 import org.example.backend.security.JwtTokenProvider;
+import org.example.backend.security.PrincipalDetails;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -178,5 +179,12 @@ public class UserService {
         log.info("레시피 유저 아이디 null 설정완료");
         // 사용자 삭제
         userRepository.delete(user);
+    }
+
+    public PrincipalDetails getPrincipalDetailsByUserId(Long userId) {
+        User user = userRepository.findById(userId)
+               .orElseThrow(() -> new UserNotFoundException("존재하지 않는 회원입니다."));
+
+        return new PrincipalDetails(user);
     }
 }

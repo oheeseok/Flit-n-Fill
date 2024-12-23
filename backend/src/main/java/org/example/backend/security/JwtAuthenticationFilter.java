@@ -13,22 +13,29 @@ import org.example.backend.api.user.repository.UserRepository;
 import org.example.backend.api.user.service.TokenManagementService;
 import org.example.backend.api.user.service.UserService;
 import org.example.backend.exceptions.UserNotFoundException;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
+@Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
     private final TokenManagementService tokenManagementService;
-    private final UserRepository userRepository;
+    private final CustomUserDetailsService customUserDetailsService;
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -79,12 +86,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 request.setAttribute("userId", userId);
                 log.info("[JwtAuthenticationFilter] userEmail: {}, userId: {}", request.getAttribute("userEmail"), request.getAttribute("userId"));
 
-                // 사용자 권한을 가져오는 로직 (예: DB에서 권한을 가져오는 방식)
-                List<GrantedAuthority> authorities = getUserAuthorities(userEmail); // userEmail을 기반으로 권한을 가져옵니다.
+                // 사용자 권한을 가져오는 로직
+                UserDetails user = customUserDetailsService.loadUserByUsername(userEmail);
+                Collection<? extends GrantedAuthority> auth = user.getAuthorities();
 
                 // spring security 인증 정보 설정
                 UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(userEmail, null, authorities);
+                        new UsernamePasswordAuthenticationToken(user, null, auth);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
             } catch (ExpiredJwtException e) {
@@ -100,15 +108,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response); // 다음 필터로 전달
-    }
-
-    private List<GrantedAuthority> getUserAuthorities(String userEmail) {
-        // DB 에서 사용자 조회
-        User user = userRepository.findByUserEmail(userEmail)
-                .orElseThrow(() -> new UserNotFoundException("존재하지 않는 회원입니다."));
-
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole().name())); // ROLE_USER 또는 ROLE_ADMIN 추가
-        return authorities;
     }
 }

@@ -23,7 +23,7 @@ public class SpringConfig {
     private final TokenManagementService tokenManagementService;
     private final CustomOAuth2UserService oAuth2UserService;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
-    private final UserRepository userRepository;
+    private final CustomUserDetailsService customUserDetailsService;
 
     // password encoder
     @Bean
@@ -73,7 +73,7 @@ public class SpringConfig {
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter(jwtTokenProvider, tokenManagementService, userRepository); // JwtTokenProvider 주입
+        return new JwtAuthenticationFilter(jwtTokenProvider, tokenManagementService, customUserDetailsService); // JwtTokenProvider 주입
     }
 
     @Bean
