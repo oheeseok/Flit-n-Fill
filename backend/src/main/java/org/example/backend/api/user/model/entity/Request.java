@@ -56,6 +56,8 @@ public class Request {
   @NotNull
   private TaskStatus responseStatus = TaskStatus.PENDING;
 
+  private String responseMessage;
+
   @OneToMany(mappedBy = "request", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
   private List<Notification> notificationList;
 
