@@ -53,13 +53,16 @@ public class RecipeService {
     log.info("setRecipesUserIdToNull: Updated recipes with userId {} to null", userId);
   }
 
-  public List<RecipeSimpleDto> getAllRecipes() {
+  public List<RecipeSimpleDto> getAllRecipes(Long userId) {
+    List<String> bookmarkedRecipeIds = bookmarkedRecipeRepository.findRecipeIdsByUserId(userId);
     List<Recipe> recipes = recipeRepository.findAll(Sort.by(Sort.Direction.DESC, "recipeCreatedDate"));
     return recipes.stream()
         .map(recipe -> {
           User user = recipe.getUserId() != null ? userRepository.findById(recipe.getUserId()).orElse(null) : null;
           // Recipe -> RecipeSimpleDto로 변환
-          return RecipeSimpleDto.of(recipe, user);
+          RecipeSimpleDto recipeSimpleDto = RecipeSimpleDto.of(recipe, user);
+          recipeSimpleDto.setRecipeIsBookmarked(bookmarkedRecipeIds.contains(recipeSimpleDto.getRecipeId()));
+          return recipeSimpleDto;
         })
         .collect(Collectors.toList());
   }
@@ -68,12 +71,15 @@ public class RecipeService {
    * @param keyword
    * @return recipeTitle이나 recipeFoodDetails에 keyword가 포함된 레시피
    */
-  public List<RecipeSimpleDto> searchRecipes(String keyword) {
+  public List<RecipeSimpleDto> searchRecipes(Long userId, String keyword) {
+    List<String> bookmarkedRecipeIds = bookmarkedRecipeRepository.findRecipeIdsByUserId(userId);
     List<Recipe> recipes = recipeRepository.findByRecipeTitleContainingIgnoreCaseOrRecipeFoodDetailsContainingIgnoreCase(keyword, keyword, Sort.by(Sort.Direction.DESC, "recipeCreatedDate"));
     return recipes.stream()
         .map(recipe -> {
           User user = recipe.getUserId() != null ? userRepository.findById(recipe.getUserId()).orElse(null) : null;
-          return RecipeSimpleDto.of(recipe, user);
+          RecipeSimpleDto recipeSimpleDto = RecipeSimpleDto.of(recipe, user);
+          recipeSimpleDto.setRecipeIsBookmarked(bookmarkedRecipeIds.contains(recipeSimpleDto.getRecipeId()));
+          return recipeSimpleDto;
         })
         .collect(Collectors.toList());
   }
@@ -94,14 +100,15 @@ public class RecipeService {
     }
   }
 
-  public RecipeDetailDto getRecipeDetail(String recipeId) {
+  public RecipeDetailDto getRecipeDetail(Long userId, String recipeId) {
+    List<String> bookmarkedRecipeIds = bookmarkedRecipeRepository.findRecipeIdsByUserId(userId);
     Recipe recipe = recipeRepository.findById(recipeId)
         .orElseThrow(() -> new RecipeNotFoundException("레시피를 찾을 수 없습니다."));
 
-    Long userId = recipe.getUserId();
     User user = recipe.getUserId() != null ? userRepository.findById(recipe.getUserId()).orElse(null) : null;
-
-    return RecipeDetailDto.of(recipe, user);
+    RecipeDetailDto recipeDetailDto = RecipeDetailDto.of(recipe, user);
+    recipeDetailDto.setRecipeIsBookmarked(bookmarkedRecipeIds.contains(recipeDetailDto.getRecipeId()));
+    return recipeDetailDto;
   }
 
   public RecipeDetailDto addRecipe(Long userId, RecipeRegisterDto dto) {
@@ -111,7 +118,10 @@ public class RecipeService {
     Recipe recipe = Recipe.of(userId, dto);
     Recipe savedRecipe = recipeRepository.save(recipe);
 
-    return RecipeDetailDto.of(savedRecipe, user);
+    RecipeDetailDto recipeDetailDto = RecipeDetailDto.of(savedRecipe, user);
+    recipeDetailDto.setRecipeIsBookmarked(false);
+
+    return recipeDetailDto;
   }
 
   public RecipeDetailDto updateRecipe(Long userId, String recipeId, RecipeUpdateDto recipeUpdateDto) {
@@ -132,7 +142,10 @@ public class RecipeService {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
 
-    return RecipeDetailDto.of(recipe, user);
+    RecipeDetailDto recipeDetailDto = RecipeDetailDto.of(recipe, user);
+    recipeDetailDto.setRecipeIsBookmarked(false);
+
+    return recipeDetailDto;
   }
 
 
@@ -161,7 +174,7 @@ public class RecipeService {
   }
 
   public void toggleRecipeBookmark(Long userId, String recipeId) {
-    Recipe recipe = recipeRepository.findById(recipeId)
+    recipeRepository.findById(recipeId)
         .orElseThrow(() -> new RecipeNotFoundException("레시피를 찾을 수 없습니다. ID: " + recipeId));
 
     RecipeUserId bookmarkedRecipeId = new RecipeUserId(userId, recipeId);
@@ -180,13 +193,10 @@ public class RecipeService {
       User user = userRepository.findById(userId)
           .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
       newBookmark.setUser(user); // User 설정
-
       newBookmark.setRecipeId(recipeId); // Recipe ID 설정
 
       bookmarkedRecipeRepository.save(newBookmark);
     }
-
-
   }
 
   /**
@@ -195,6 +205,7 @@ public class RecipeService {
    * @return 랜덤한 레시피 5개 또는 전체 레시피(5개 미만인 경우)
    */
   public List<RecipeSimpleDto> getTodaysRecipe(Long userId) {
+    List<String> bookmarkedRecipeIds = bookmarkedRecipeRepository.findRecipeIdsByUserId(userId);
     List<Recipe> allRecipes = recipeRepository.findAll();
 
     // 레시피가 없는 경우
@@ -211,7 +222,9 @@ public class RecipeService {
     return selectedRecipes.stream()
         .map(recipe -> {
           User user = recipe.getUserId() != null ? userRepository.findById(recipe.getUserId()).orElse(null) : null;
-          return RecipeSimpleDto.of(recipe, user);
+          RecipeSimpleDto recipeSimpleDto = RecipeSimpleDto.of(recipe, user);
+          recipeSimpleDto.setRecipeIsBookmarked(bookmarkedRecipeIds.contains(recipeSimpleDto.getRecipeId()));
+          return recipeSimpleDto;
         })
         .collect(Collectors.toList());
   }
@@ -223,6 +236,8 @@ public class RecipeService {
    * @return
    */
   public List<RecipeSimpleDto> recommendNearExpiryRecipes(Long userId) {
+    List<String> bookmarkedRecipeIds = bookmarkedRecipeRepository.findRecipeIdsByUserId(userId);
+
     LocalDate today = LocalDate.now();
     LocalDate startDate = today.minusDays(2);
     LocalDate endDate = today.plusDays(3);
@@ -301,6 +316,7 @@ public class RecipeService {
       // Recipe가 존재하면 RecipeSimpleDto 생성
       if (recipe != null) {
         RecipeSimpleDto dto = RecipeSimpleDto.of(recipe, user);
+        dto.setRecipeIsBookmarked(bookmarkedRecipeIds.contains(dto.getRecipeId()));
         result.add(dto);
       }
     }
