@@ -3,6 +3,7 @@ package org.example.backend.security;
 import jakarta.security.auth.message.AuthException;
 import lombok.Builder;
 import org.example.backend.api.user.model.entity.User;
+import org.example.backend.enums.AuthProvider;
 
 import java.util.Map;
 
@@ -10,7 +11,8 @@ import java.util.Map;
 public record OAuth2UserInfo(
         String name,
         String email,
-        String profile
+        String profile,
+        AuthProvider authProvider
 ) {
 
     public static OAuth2UserInfo of(String registrationId, Map<String, Object> attributes) throws AuthException {
@@ -26,6 +28,7 @@ public record OAuth2UserInfo(
                 .name((String)attributes.get("name"))
                 .email((String) attributes.get("email"))
                 .profile((String) attributes.get("picture"))
+                .authProvider(AuthProvider.GOOGLE)
                 .build();
     }
 
@@ -37,6 +40,7 @@ public record OAuth2UserInfo(
                 .name((String) profile.getOrDefault("nickname", "Unknown"))
                 .email((String) account.getOrDefault("email", "unknown@kakao.com"))
                 .profile((String) profile.getOrDefault("profile_image_url", ""))
+                .authProvider(AuthProvider.KAKAO)
                 .build();
 
     }
@@ -47,6 +51,7 @@ public record OAuth2UserInfo(
         user.setUserName(name);
         user.setUserProfile(profile);
         user.setUserNickname(email.split("@")[0]);
+        user.setAuthProvider(authProvider);
         return user;
     }
 }

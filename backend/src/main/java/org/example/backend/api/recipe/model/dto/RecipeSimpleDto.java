@@ -18,6 +18,7 @@ public class RecipeSimpleDto {
     private String recipeTitle;
     private String recipeMainPhoto;
     private boolean recipeIsVisibility;
+    private boolean recipeIsBookmarked; // 현재 로그인한 사용자 기준의 북마크 여부
     private LocalDateTime recipeCreatedDate;
     private String userNickname;
     private String userProfile;
