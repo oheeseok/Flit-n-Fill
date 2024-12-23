@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SSE Test</title>
+</head>
+<body>
+<h1>SSE Test</h1>
+<ul id="notifications"></ul>
+
+<script>
+    // 사용자 ID를 예시로 설정
+    const userId = 1;
+
+    // SSE 연결
+    const eventSource = new EventSource(`/api/subscribe/${userId}`);
+
+    // 알림 수신 처리
+    eventSource.addEventListener("notification", function (event) {
+        const notifications = document.getElementById("notifications");
+        const newNotification = document.createElement("li");
+        newNotification.textContent = event.data;
+        notifications.appendChild(newNotification);
+    });
+
+    // 오류 처리
+    eventSource.onerror = function () {
+        console.error("SSE 연결 오류!");
+        eventSource.close();
+    };
+</script>
+</body>
+</html>
