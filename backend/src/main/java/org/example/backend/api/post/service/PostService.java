@@ -6,18 +6,27 @@ import org.example.backend.api.foodlist.model.entity.FoodList;
 import org.example.backend.api.foodlist.repository.FoodListRepository;
 import org.example.backend.api.myfridge.model.entity.Food;
 import org.example.backend.api.myfridge.repository.MyfridgeRepository;
+import org.example.backend.api.notification.service.EmailService;
+import org.example.backend.api.notification.service.NotificationService;
 import org.example.backend.api.notification.service.PushNotificationService;
 import org.example.backend.api.post.model.dto.*;
 import org.example.backend.api.post.model.entity.Post;
 import org.example.backend.api.post.repository.PostRepository;
+import org.example.backend.api.trade.model.entity.TradeRequest;
+import org.example.backend.api.trade.repository.TradeRequestRepository;
 import org.example.backend.api.user.model.entity.User;
 import org.example.backend.api.user.repository.UserRepository;
+import org.example.backend.enums.NotificationType;
+import org.example.backend.enums.TaskStatus;
+import org.example.backend.enums.TradeType;
 import org.example.backend.exceptions.PostNotFoundException;
 import org.example.backend.exceptions.UnauthorizedException;
 import org.example.backend.exceptions.UserNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -32,7 +41,10 @@ public class PostService {
   private final UserRepository userRepository;
   private final MyfridgeRepository myfridgeRepository;
   private final FoodListRepository foodListRepository;
+  private final TradeRequestRepository tradeRequestRepository;
   private final PushNotificationService pushNotificationService;
+  private final NotificationService notificationService;
+  private final EmailService emailService;
 
   public List<PostSimpleDto> getAllPosts() {
     List<Post> posts = postRepository.findAllByOrderByPostCreatedDateDesc();
@@ -154,32 +166,58 @@ public class PostService {
 
   public void createTradeRequest(Long proposerId, Long postId) {
     // email 전송, push 알림 전송, notification 테이블에 데이터 저장
-    Optional<Post> post = postRepository.findById(postId);
-    if (! post.isPresent()) {
-      throw new NoSuchElementException("Post does not exist with ID: " + postId);
+    try {
+
+      Optional<Post> post = postRepository.findById(postId);
+      if (!post.isPresent()) {
+        throw new NoSuchElementException("Post does not exist with ID: " + postId);
+      }
+
+      User proposer = userRepository.findById(proposerId)
+              .orElseThrow(() -> new UserNotFoundException("회원(요청자)을 찾을 수 없습니다."));
+
+      User writer = userRepository.findById(post.get().getUser().getUserId())
+              .orElseThrow(() -> new UserNotFoundException("회원(작성자)을 찾을 수 없습니다."));
+
+      // TradeRequest 생성
+      TradeRequest tradeRequest = new TradeRequest(
+              null,
+              post.get(),
+              proposer,
+              TaskStatus.PENDING,
+              LocalDateTime.now()
+      );
+      tradeRequestRepository.save(tradeRequest);
+
+      // email 전송
+      log.info("1. send email");
+      emailService.sendTradeRequestEmail(writer.getUserId(), proposerId, postId);
+      log.info("1. send email --- done");
+
+      // push 알림 전송
+      log.info("2. send push noti");
+
+      String message = String.format("[%s 요청 알림]\n" +
+                      "%s 님이 %s을 요청합니다.",
+              post.get().getTradeType().getDescription(),
+              proposer.getUserNickname(),
+              post.get().getTradeType().getDescription());
+      log.info("message: {}", message);
+      pushNotificationService.sendPushNotification(writer.getUserId(), message);
+      log.info("2. send push --- done");
+
+      // notification 테이블에 데이터 저장
+      log.info("3. save data to db");
+      NotificationType notificationType = post.get().getTradeType().equals(TradeType.EXCHANGE) ? NotificationType.TRADE_REQUEST : NotificationType.SHARE_REQUEST;
+      notificationService.saveTradeRequestNotification(
+              writer,
+              notificationType,
+              post.get().getTradeType().getDescription() + "요청이 왔습니다!",
+              tradeRequest.getTradeRequestId());
+      log.info("3. save data to db --- done");
+    } catch (Exception e) {
+      log.info("error ==== ");
+      e.printStackTrace();
     }
-
-    User proposer = userRepository.findById(proposerId)
-        .orElseThrow(() -> new UserNotFoundException("회원(요청자)을 찾을 수 없습니다."));
-
-    User writer = userRepository.findById(post.get().getUser().getUserId())
-        .orElseThrow(() -> new UserNotFoundException("회원(나눔자)을 찾을 수 없습니다."));
-
-    // email 전송
-    log.info("1. send email");
-
-    // push 알림 전송
-    log.info("2. send push noti");
-
-    String message = String.format("[%s 요청 알림]\n" +
-            "%s 님이 %s을 요청합니다.",
-        post.get().getTradeType().getDescription(),
-        proposer.getUserNickname(),
-        post.get().getTradeType().getDescription());
-    log.info("message: {}", message);
-    pushNotificationService.sendPushNotification(writer.getUserId(), message);
-
-    // notification 테이블에 데이터 저장
-    log.info("3. save data to db");
   }
 }

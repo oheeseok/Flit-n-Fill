@@ -3,6 +3,7 @@ package org.example.backend.api.notification.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.example.backend.api.notification.model.dto.NotificationViewDto;
+import org.example.backend.api.notification.service.EmailService;
 import org.example.backend.api.notification.service.NotificationService;
 import org.example.backend.enums.NotificationType;
 import org.example.backend.exceptions.UserIdNullException;
@@ -19,6 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NotificationController {
     private final NotificationService notificationService;
+    private final EmailService emailService;
 
     @GetMapping
     public ResponseEntity<List<NotificationViewDto>> getAllNotifications(HttpServletRequest request) {  // 알림 전체 조회
@@ -65,12 +67,9 @@ public class NotificationController {
     }
 
     public String sendExpirationEmail() {   // 소비기한 임박 재료 알림 메일링
-        notificationService.sendExpirationEmail();
+        emailService.sendExpirationEmail();
         return "메일 전송 완료";
     }
 
-    public String sendTradeRequestEmail() {
-        notificationService.sendTradeRequestEmail(userId);
-        return "메일 전송 완료";
-    }
+
 }
