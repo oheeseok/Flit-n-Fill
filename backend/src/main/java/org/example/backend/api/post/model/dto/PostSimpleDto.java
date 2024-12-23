@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.backend.api.post.model.entity.Post;
 import org.example.backend.api.user.model.entity.User;
+import org.example.backend.enums.Progress;
 import org.example.backend.enums.TradeType;
 
 import java.time.LocalDateTime;
@@ -23,6 +24,7 @@ public class PostSimpleDto {
     private String userNickname;
     private String userProfile;
     private String address;
+    private Progress progress;
 
     public static PostSimpleDto of(Post post, User user) {
         PostSimpleDto dto = new PostSimpleDto();
@@ -32,6 +34,7 @@ public class PostSimpleDto {
         dto.setTradeType(post.getTradeType());
         dto.setPostCreatedDate(post.getPostCreatedDate());
         dto.setAddress(post.getAddress());
+        dto.setProgress(post.getProgress());
         if (user != null) {
             dto.setUserNickname(user.getUserNickname());
             dto.setUserProfile(user.getUserProfile());

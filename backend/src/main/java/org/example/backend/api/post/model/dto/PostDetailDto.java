@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.backend.api.post.model.entity.Post;
 import org.example.backend.api.user.model.entity.User;
+import org.example.backend.enums.Progress;
 import org.example.backend.enums.TradeType;
 
 import java.time.LocalDateTime;
@@ -29,6 +30,7 @@ public class PostDetailDto {
     private String userNickname;
     private String userProfile;
     private String address;
+    private Progress progress;
 
     public static PostDetailDto of(Post post, User user) {
         PostDetailDto dto = new PostDetailDto();
@@ -41,20 +43,10 @@ public class PostDetailDto {
         dto.setPostPhoto1(post.getPostPhoto1());
         dto.setPostPhoto2(post.getPostPhoto2());
         dto.setTradeType(post.getTradeType());
-//        if (post.getWriterFood() == null) {
-//            dto.setWriterFoodId(null);
-//        } else {
-//            dto.setWriterFoodId(post.getWriterFood().getFoodId());
-//        }
-//
-//        if (post.getProposerFoodList() == null) {
-//            dto.setProposerFoodListId(null);
-//        } else {
-//            dto.setProposerFoodListId(post.getProposerFoodList().getFoodListId());
-//        }
         dto.setWriterFoodId(post.getWriterFood().getFoodId());
         dto.setProposerFoodListId(post.getProposerFoodList().getFoodListId());
         dto.setAddress(post.getAddress());
+        dto.setProgress(post.getProgress());
 
         if (user != null) {
             dto.setUserNickname(user.getUserNickname());

@@ -73,14 +73,15 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PostMapping("/request")
+    @GetMapping("/{postId}/request")
     public ResponseEntity<Void> createTradeRequest(HttpServletRequest request,
-                                                   @RequestBody TradeRequestCreateDto tradeRequestCreateDto) {
+                                                   @PathVariable("postId") Long postId) {
         Long userId = (Long) request.getAttribute("userId");
+        log.info("PostController.createTradeRequest userId: {}", userId);
         if (userId == null) {
             throw new UserIdNullException("userId not found");
         }
-        postService.createTradeRequest(userId, tradeRequestCreateDto);
+        postService.createTradeRequest(userId, postId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
