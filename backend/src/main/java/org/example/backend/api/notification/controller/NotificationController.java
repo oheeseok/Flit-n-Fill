@@ -69,8 +69,8 @@ public class NotificationController {
         return "메일 전송 완료";
     }
 
-    @GetMapping(value = "/exp", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter sendExpirationPush() {
-        return notificationService.sendExpirationPush();
+    public String sendTradeRequestEmail() {
+        notificationService.sendTradeRequestEmail(userId);
+        return "메일 전송 완료";
     }
 }
