@@ -87,7 +87,6 @@ public class EmailService {
             content.append("<h3>소비기한이 임박한 재료가 있어 안내드립니다.</h3>" +
                     "<h3>아래의 재료를 확인하시고 빠르게 사용해 주세요!</h3><br>");
             for (long dday = 0 ; dday <= 3 ; dday++) {
-
                 List<Food> groupedFoods = foodList.get(dday);
                 if (groupedFoods != null && !groupedFoods.isEmpty()) {
                     if (dday == 0) {

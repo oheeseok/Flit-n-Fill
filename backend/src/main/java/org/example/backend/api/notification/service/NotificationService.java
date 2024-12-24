@@ -60,7 +60,7 @@ public class NotificationService {
     @Value("${server.port}")
     private String port;
 
-    public void saveTradeRequestNotification(User user, NotificationType type, String message, Long tradeRequestId) {
+    public void saveTradeRequestNotification(User user, NotificationType type, String message, Long tradeRequestId) {   // 교환, 나눔 요청 시 알림
         TradeRequest tradeRequest = tradeRequestRepository.findById(tradeRequestId).orElseThrow(() -> new RequestNotFoundException("tradeRequest not found"));
 
         Notification notification = new Notification();
@@ -72,7 +72,7 @@ public class NotificationService {
         notificationRepository.save(notification);
     }
 
-    public void saveRequestNotification(User user, NotificationType type, String message, Long requestId) {
+    public void saveRequestNotification(User user, NotificationType type, String message, Long requestId) {     // 재료추가 or 신고 요청 시 알림
         Request request = requestRepository.findById(requestId).orElseThrow(() -> new RequestNotFoundException("request not found"));
 
         Notification notification = new Notification();
