@@ -105,6 +105,14 @@ public class NotificationService {
             // email 전송(#54)
 
             // push 알림(#55)
+            log.info("2. send push noti");
+            String message = String.format("[%s 결과 알림] 회원님께서 요청하신 %s이 거절되었습니다.",
+                notification.getNotificationType().getDescription(),
+                notification.getNotificationType().getDescription()
+                );
+            log.info("message: {}", message);
+            pushNotificationService.sendPushNotification(proposer.getUserId(), message);
+            log.info("2. send push --- done");
 
             // db 저장
             if (notification.getNotificationType().equals(NotificationType.TRADE_REQUEST)) {    // 교환 요청
@@ -126,6 +134,14 @@ public class NotificationService {
             // email 전송(#54)
 
             // push 알림(#55)
+            log.info("2. send push noti");
+            String message = String.format("[%s 결과 알림] 회원님께서 요청하신 %s이 수락되었습니다.",
+                notification.getNotificationType().getDescription(),
+                notification.getNotificationType().getDescription()
+            );
+            log.info("message: {}", message);
+            pushNotificationService.sendPushNotification(proposer.getUserId(), message);
+            log.info("2. send push --- done");
 
             // db 저장
             if (notification.getNotificationType().equals(NotificationType.TRADE_REQUEST)) {    // 교환 요청
