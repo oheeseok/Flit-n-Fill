@@ -171,8 +171,7 @@ public class PostService {
     // push 알림 전송
     log.info("2. send push noti");
 
-    String message = String.format("[%s 요청 알림]\n" +
-            "%s 님이 %s을 요청합니다.",
+    String message = String.format("[%s 요청 알림] %s 님이 %s을 요청합니다.",
         post.get().getTradeType().getDescription(),
         proposer.getUserNickname(),
         post.get().getTradeType().getDescription());
