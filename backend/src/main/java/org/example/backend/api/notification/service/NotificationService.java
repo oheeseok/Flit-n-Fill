@@ -18,8 +18,10 @@ import org.example.backend.api.user.model.entity.User;
 import org.example.backend.api.user.repository.RequestRepository;
 import org.example.backend.api.user.repository.UserRepository;
 import org.example.backend.enums.NotificationType;
+import org.example.backend.enums.TaskStatus;
 import org.example.backend.enums.TradeType;
 import org.example.backend.exceptions.RequestNotFoundException;
+import org.example.backend.exceptions.TradeRequestHandleException;
 import org.example.backend.exceptions.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -46,13 +48,12 @@ import java.util.stream.Collectors;
 @Transactional
 @EnableScheduling
 public class NotificationService {
-    private final JavaMailSender mailSender;
     private final UserRepository userRepository;
-    private final MyfridgeRepository myfridgeRepository;
     private final NotificationRepository notificationRepository;
-    private final PostRepository postRepository;
     private final RequestRepository requestRepository;
     private final TradeRequestRepository tradeRequestRepository;
+    private final EmailService emailService;
+    private final PushNotificationService pushNotificationService;
 
     @Value("${server.host}")
     private String host;
@@ -82,6 +83,69 @@ public class NotificationService {
         notification.setRequest(request);
 
         notificationRepository.save(notification);
+    }
+
+    public void handelRequestNotification(Long userId, Long notificationId, String status) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
+
+        // Notification -> TradeRequest -> TradeTaskStatus 변경
+        Notification notification = notificationRepository.findByNotificationId(notificationId);
+        Long tradeRequestId = notification.getTradeRequest().getTradeRequestId();
+        TradeRequest tradeRequest = tradeRequestRepository.findById(tradeRequestId)
+                .orElseThrow(() -> new RequestNotFoundException("tradeRequest not found"));
+
+        TaskStatus taskStatus = TaskStatus.valueOf(status);
+        tradeRequest.setTradeTaskStatus(taskStatus);    // ACCEPTED or DENIED
+        tradeRequestRepository.save(tradeRequest);
+
+        User proposer = userRepository.findById(tradeRequest.getProposer().getUserId())
+                .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
+        if (tradeRequest.getTradeTaskStatus().equals(TaskStatus.DENIED)) {  // 거절
+            // email 전송(#54)
+
+            // push 알림(#55)
+
+            // db 저장
+            if (notification.getNotificationType().equals(NotificationType.TRADE_REQUEST)) {    // 교환 요청
+                saveTradeRequestNotification(
+                        proposer,
+                        NotificationType.TRADE_REQUEST_RESULT,
+                        notification.getNotificationType().getDescription() + " : 거절되었습니다!",
+                        tradeRequestId);
+            } else if (notification.getNotificationType().equals(NotificationType.SHARE_REQUEST)) {     // 나눔 요청
+                saveTradeRequestNotification(
+                        proposer,
+                        NotificationType.SHARE_REQUEST_RESULT,
+                        notification.getNotificationType().getDescription() + " : 거절되었습니다!",
+                        tradeRequestId);
+            } else {
+                throw new TradeRequestHandleException("요청에 대한 결과가 아닙니다.");
+            }
+        } else if (tradeRequest.getTradeTaskStatus().equals(TaskStatus.ACCEPTED)) {    // 수락
+            // email 전송(#54)
+
+            // push 알림(#55)
+
+            // db 저장
+            if (notification.getNotificationType().equals(NotificationType.TRADE_REQUEST)) {    // 교환 요청
+                saveTradeRequestNotification(
+                        proposer,
+                        NotificationType.TRADE_REQUEST_RESULT,
+                        notification.getNotificationType().getDescription() + " : 수락되었습니다!",
+                        tradeRequestId);
+            } else if (notification.getNotificationType().equals(NotificationType.SHARE_REQUEST)) {     // 나눔 요청
+                saveTradeRequestNotification(
+                        proposer,
+                        NotificationType.SHARE_REQUEST_RESULT,
+                        notification.getNotificationType().getDescription() + " : 수락되었습니다!",
+                        tradeRequestId);
+            } else {
+                throw new TradeRequestHandleException("요청에 대한 결과가 아닙니다.");
+            }
+        } else {
+            throw new TradeRequestHandleException("요청 대기 중입니다.");
+        }
     }
 
     public List<NotificationViewDto> getAllNotifications(Long userId) {

@@ -6,6 +6,7 @@ import org.example.backend.api.notification.model.dto.NotificationViewDto;
 import org.example.backend.api.notification.service.EmailService;
 import org.example.backend.api.notification.service.NotificationService;
 import org.example.backend.enums.NotificationType;
+import org.example.backend.enums.TaskStatus;
 import org.example.backend.exceptions.UserIdNullException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -63,6 +64,20 @@ public class NotificationController {
         }
 
         notificationService.deleteOneNotification(userId, notificationId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PatchMapping("/{notificationId}")
+    public ResponseEntity<Void> handleRequestNotification(HttpServletRequest request, @PathVariable("notificationId") Long notificationId, @RequestBody String status) {    // 교환/나눔 요청 수락/거절
+        Long userId = (Long) request.getAttribute("userId");
+        if (userId == null) {
+            throw new UserIdNullException("User ID is null");
+        }
+        if (status == null) {
+            throw new IllegalArgumentException("TaskStatus cannot be null");
+        }
+
+        notificationService.handelRequestNotification(userId, notificationId, status);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

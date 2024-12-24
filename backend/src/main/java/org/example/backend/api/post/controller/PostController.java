@@ -1,11 +1,11 @@
 package org.example.backend.api.post.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.backend.api.post.model.dto.*;
 import org.example.backend.api.post.service.PostService;
+import org.example.backend.exceptions.TradeRequestHandleException;
 import org.example.backend.exceptions.UserIdNullException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -73,15 +73,17 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @GetMapping("/{postId}/request")
-    public ResponseEntity<Void> createTradeRequest(HttpServletRequest request,
-                                                   @PathVariable("postId") Long postId) {
+    @PostMapping("/{postId}/request")
+    public ResponseEntity<Void> handleTradeRequest(HttpServletRequest request,
+                                                   @PathVariable("postId") Long postId,
+                                                   @RequestBody ActionRequest actionRequest) {
         Long userId = (Long) request.getAttribute("userId");
-        log.info("PostController.createTradeRequest userId: {}", userId);
+        log.info("PostController.handleTradeRequest userId: {}", userId);
         if (userId == null) {
             throw new UserIdNullException("userId not found");
         }
-        postService.createTradeRequest(userId, postId);
+        String action = actionRequest.getAction();
+        postService.handleTradeRequest(userId, postId, action);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
