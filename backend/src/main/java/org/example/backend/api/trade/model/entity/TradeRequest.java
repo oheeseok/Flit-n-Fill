@@ -44,6 +44,14 @@ public class TradeRequest {
   @NotNull
   private LocalDateTime requestCreatedDate;
 
+  public TradeRequest(Long tradeRequestId, Post post, User proposer, TaskStatus tradeTaskStatus, LocalDateTime requestCreatedDate) {
+    this.tradeRequestId = tradeRequestId;
+    this.post = post;
+    this.proposer = proposer;
+    this.tradeTaskStatus = tradeTaskStatus;
+    this.requestCreatedDate = requestCreatedDate;
+  }
+
   @OneToMany(mappedBy = "tradeRequest", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
   private List<Notification> notificationList;
 }
