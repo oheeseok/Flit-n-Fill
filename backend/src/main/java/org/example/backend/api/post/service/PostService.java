@@ -266,6 +266,18 @@ public class PostService {
           }
           // 요청 삭제
           tradeRequestRepository.delete(tradeRequest);
+
+
+          // push 알림
+          log.info("2. send push noti");
+          String message = String.format("[%s 요청 취소 알림] %s님께서 %s을 취소하셨습니다.",
+              post.getTradeType().getDescription(),
+              proposer.getUserNickname(),
+              post.getTradeType().getDescription()
+          );
+          log.info("message: {}", message);
+          pushNotificationService.sendPushNotification(writer.getUserId(), message);
+          log.info("2. send push --- done");
         }
         else {
           log.info("> 요청 취소가 불가능합니다. tradeTaskStatus = {}", tradeTaskStatus.getDescription());
