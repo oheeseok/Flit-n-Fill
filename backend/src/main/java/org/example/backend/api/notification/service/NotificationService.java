@@ -109,18 +109,18 @@ public class NotificationService {
 
         if (tradeRequest.getTradeTaskStatus().equals(TaskStatus.DENIED)) {  // 거절
             // email 전송(#54)
-            content.append("<h3>회원님께서 요청하신 " + stat + " 요청이 상대방에 의해 거절되었습니다.</h3><br>" +
-                    stat + " 요청한 게시글 : " + "<strong><a href=\"http://" + host + ":" + port + "/api/posts/" + postId + "\">게시글 보러가기</a></strong>");
+            content.append("<h3>회원님께서 요청하신 " + stat + "이 상대방에 의해 거절되었습니다.</h3><br>" +
+                    stat + "한 게시글 : " + "<strong><a href=\"http://" + host + ":" + port + "/api/posts/" + postId + "\">게시글 보러가기</a></strong><br><br>");
             content.append("아쉽게도 요청이 거절되었지만, 재요청 하시거나 다른 거래를 시도해 보실 수 있습니다.<br>" +
-                    "다른 게시글에 교환 요청을 보내보세요!<br>" +
+                    "다른 게시글에도 교환 요청을 보내보세요!<br>" +
                     "<strong><a href=\"http://" + host + ":" + port + "/api/posts\">게시글 둘러보기</a></strong>");
 
             emailService.sendEmail(proposer.getUserEmail(), subject, content.toString());
             // push 알림(#55)
             log.info("2. send push noti");
             String message = String.format("[%s 결과 알림] 회원님께서 요청하신 %s이 거절되었습니다.",
-                notification.getNotificationType().getDescription(),
-                notification.getNotificationType().getDescription()
+                    stat,
+                    stat
                 );
             log.info("message: {}", message);
             pushNotificationService.sendPushNotification(proposer.getUserId(), message);
@@ -131,28 +131,28 @@ public class NotificationService {
                 saveTradeRequestNotification(
                         proposer,
                         NotificationType.TRADE_REQUEST_RESULT,
-                        notification.getNotificationType().getDescription() + " : 거절되었습니다!",
+                        stat + " : 거절되었습니다!",
                         tradeRequestId);
             } else if (notification.getNotificationType().equals(NotificationType.SHARE_REQUEST)) {     // 나눔 요청
                 saveTradeRequestNotification(
                         proposer,
                         NotificationType.SHARE_REQUEST_RESULT,
-                        notification.getNotificationType().getDescription() + " : 거절되었습니다!",
+                        stat + " : 거절되었습니다!",
                         tradeRequestId);
             } else {
                 throw new TradeRequestHandleException("요청에 대한 결과가 아닙니다.");
             }
         } else if (tradeRequest.getTradeTaskStatus().equals(TaskStatus.ACCEPTED)) {    // 수락
             // email 전송(#54)
-            content.append("<h3>회원님께서 요청하신 " + stat + " 요청이 상대방에 수락되었습니다!</h3><br>" +
-                    stat + " 요청한 게시글 : " + "<strong><a href=\"http://" + host + ":" + port + "/api/posts/" + postId + "\">게시글 보러가기</a></strong>");
+            content.append("<h3>회원님께서 요청하신 " + stat + "이 수락되었습니다!</h3><br>" +
+                    stat + "한 게시글 : " + "<strong><a href=\"http://" + host + ":" + port + "/api/posts/" + postId + "\">게시글 보러가기</a></strong>");
 
             emailService.sendEmail(proposer.getUserEmail(), subject, content.toString());
             // push 알림(#55)
             log.info("2. send push noti");
             String message = String.format("[%s 결과 알림] 회원님께서 요청하신 %s이 수락되었습니다.",
-                notification.getNotificationType().getDescription(),
-                notification.getNotificationType().getDescription()
+                    stat,
+                    stat
             );
             log.info("message: {}", message);
             pushNotificationService.sendPushNotification(proposer.getUserId(), message);
@@ -163,13 +163,13 @@ public class NotificationService {
                 saveTradeRequestNotification(
                         proposer,
                         NotificationType.TRADE_REQUEST_RESULT,
-                        notification.getNotificationType().getDescription() + " : 수락되었습니다!",
+                        stat + " : 수락되었습니다!",
                         tradeRequestId);
             } else if (notification.getNotificationType().equals(NotificationType.SHARE_REQUEST)) {     // 나눔 요청
                 saveTradeRequestNotification(
                         proposer,
                         NotificationType.SHARE_REQUEST_RESULT,
-                        notification.getNotificationType().getDescription() + " : 수락되었습니다!",
+                        stat + " : 수락되었습니다!",
                         tradeRequestId);
             } else {
                 throw new TradeRequestHandleException("요청에 대한 결과가 아닙니다.");
