@@ -51,4 +51,11 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.NOT_FOUND)
                 .body(ex.getMessage());
     }
+
+    @ExceptionHandler(TradeRequestHandleException.class)
+    public ResponseEntity<String> handleTradeRequestHandleException(TradeRequestHandleException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
+    }
 }
