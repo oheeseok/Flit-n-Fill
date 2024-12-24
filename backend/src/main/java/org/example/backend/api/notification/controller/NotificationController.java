@@ -70,6 +70,4 @@ public class NotificationController {
         emailService.sendExpirationEmail();
         return "메일 전송 완료";
     }
-
-
 }
