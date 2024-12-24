@@ -273,6 +273,17 @@ public class PostService {
           content.append("<h3>" + proposer.getUserNickname() + "님이 " + post.getTradeType().getDescription() + " 요청을 취소하였습니다.</h3><br>");
           
           emailService.sendEmail(writer.getUserEmail(), subject, content.toString());
+
+          // push 알림
+          log.info("2. send push noti");
+          String message = String.format("[%s 요청 취소 알림] %s님이 %s 요청을 취소하였습니다.",
+              post.getTradeType().getDescription(),
+              proposer.getUserNickname(),
+              post.getTradeType().getDescription()
+          );
+          log.info("message: {}", message);
+          pushNotificationService.sendPushNotification(writer.getUserId(), message);
+          log.info("2. send push --- done");
         }
         else {
           log.info("> 요청 취소가 불가능합니다. tradeTaskStatus = {}", tradeTaskStatus.getDescription());
