@@ -137,7 +137,7 @@ public class EmailService {
             content.append("<h3>회원님의 게시글에 대해 나눔 요청이 접수되었습니다.</h3>" +
                     "<h3>자세한 내용은 아래 정보를 확인해 주세요!</h3><br>");
         }
-        content.append("<strong><a href=\"http://" + host + ":" + port + "/api/post/" + postId + "\">게시글 보러가기</a></strong>");
+        content.append("<strong><a href=\"http://" + host + ":" + port + "/api/posts/" + postId + "\">게시글 보러가기</a></strong>");
         content.append("<br>요청자 : " + proposer.getUserNickname() + "님");
 
         sendEmail(writer.getUserEmail(), subject, content.toString());
