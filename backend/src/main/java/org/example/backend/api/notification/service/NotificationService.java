@@ -11,8 +11,10 @@ import org.example.backend.api.notification.repository.NotificationRepository;
 import org.example.backend.api.notification.model.entity.Notification;
 import org.example.backend.api.post.model.entity.Post;
 import org.example.backend.api.post.repository.PostRepository;
+import org.example.backend.api.trade.model.entity.Trade;
 import org.example.backend.api.trade.model.entity.TradeRequest;
 import org.example.backend.api.trade.repository.TradeRequestRepository;
+import org.example.backend.api.trade.service.TradeService;
 import org.example.backend.api.user.model.entity.Request;
 import org.example.backend.api.user.model.entity.User;
 import org.example.backend.api.user.repository.RequestRepository;
@@ -54,6 +56,7 @@ public class NotificationService {
     private final TradeRequestRepository tradeRequestRepository;
     private final EmailService emailService;
     private final PushNotificationService pushNotificationService;
+    private final TradeService tradeService;
 
     @Value("${server.host}")
     private String host;
@@ -165,12 +168,16 @@ public class NotificationService {
                         NotificationType.TRADE_REQUEST_RESULT,
                         stat + " : 수락되었습니다!",
                         tradeRequestId);
+                Trade newTrade = tradeService.createNewTrade(notification);
+                tradeService.createNewTradeRoom(newTrade);
             } else if (notification.getNotificationType().equals(NotificationType.SHARE_REQUEST)) {     // 나눔 요청
                 saveTradeRequestNotification(
                         proposer,
                         NotificationType.SHARE_REQUEST_RESULT,
                         stat + " : 수락되었습니다!",
                         tradeRequestId);
+                Trade newTrade = tradeService.createNewTrade(notification);
+                tradeService.createNewTradeRoom(newTrade);
             } else {
                 throw new TradeRequestHandleException("요청에 대한 결과가 아닙니다.");
             }
