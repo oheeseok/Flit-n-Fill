@@ -92,6 +92,8 @@ public class TokenManagementService {
                 log.info("둘다 만료");
                 clearCookie(response, "accessToken");
                 clearCookie(response, "refreshToken");
+                clearCookie(response, "userEmail");
+                clearCookie(response, "userId");
                 response.sendRedirect("/login");
                 return null;
             } else {
@@ -127,5 +129,7 @@ public class TokenManagementService {
         }
         clearCookie(response, "accessToken");
         clearCookie(response, "refreshToken");
+        clearCookie(response, "userEmail");
+        clearCookie(response, "userId");
     }
 }
