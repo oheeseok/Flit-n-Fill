@@ -10,7 +10,8 @@ public enum NotificationType {
   SHARE_CANCEL("나눔 취소"),
   FOOD_REQUEST_RESULT("재료 추가 요청 결과"),
   REPORT_AGAINST_ME("신고 당함"),
-  REPORT_RESULT("신고 결과");
+  REPORT_RESULT("신고 결과"),
+  NEW_COMMENT("새 댓글");
 
   private final String description;
 
