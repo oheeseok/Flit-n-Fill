@@ -101,9 +101,21 @@ public class NotificationService {
 
         User proposer = userRepository.findById(tradeRequest.getProposer().getUserId())
                 .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
+
+        Long postId = tradeRequest.getPost().getPostId();
+        String stat = notification.getNotificationType().getDescription();
+        String subject = "[" + stat + " 결과 알림]";
+        StringBuilder content = new StringBuilder();
+
         if (tradeRequest.getTradeTaskStatus().equals(TaskStatus.DENIED)) {  // 거절
             // email 전송(#54)
+            content.append("<h3>회원님께서 요청하신 " + stat + " 요청이 상대방에 의해 거절되었습니다.</h3><br>" +
+                    stat + " 요청한 게시글 : " + "<strong><a href=\"http://" + host + ":" + port + "/api/posts/" + postId + "\">게시글 보러가기</a></strong>");
+            content.append("아쉽게도 요청이 거절되었지만, 재요청 하시거나 다른 거래를 시도해 보실 수 있습니다.<br>" +
+                    "다른 게시글에 교환 요청을 보내보세요!<br>" +
+                    "<strong><a href=\"http://" + host + ":" + port + "/api/posts\">게시글 둘러보기</a></strong>");
 
+            emailService.sendEmail(proposer.getUserEmail(), subject, content.toString());
             // push 알림(#55)
 
             // db 저장
@@ -124,7 +136,10 @@ public class NotificationService {
             }
         } else if (tradeRequest.getTradeTaskStatus().equals(TaskStatus.ACCEPTED)) {    // 수락
             // email 전송(#54)
+            content.append("<h3>회원님께서 요청하신 " + stat + " 요청이 상대방에 수락되었습니다!</h3><br>" +
+                    stat + " 요청한 게시글 : " + "<strong><a href=\"http://" + host + ":" + port + "/api/posts/" + postId + "\">게시글 보러가기</a></strong>");
 
+            emailService.sendEmail(proposer.getUserEmail(), subject, content.toString());
             // push 알림(#55)
 
             // db 저장
