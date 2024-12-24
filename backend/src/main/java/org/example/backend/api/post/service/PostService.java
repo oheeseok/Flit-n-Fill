@@ -266,6 +266,13 @@ public class PostService {
           }
           // 요청 삭제
           tradeRequestRepository.delete(tradeRequest);
+
+          // email 알림
+          String subject = "[" + post.getTradeType().getDescription() + "요청 취소 알림]";
+          StringBuilder content = new StringBuilder();
+          content.append("<h3>" + proposer.getUserNickname() + "님이 " + post.getTradeType().getDescription() + " 요청을 취소하였습니다.</h3><br>");
+          
+          emailService.sendEmail(writer.getUserEmail(), subject, content.toString());
         }
         else {
           log.info("> 요청 취소가 불가능합니다. tradeTaskStatus = {}", tradeTaskStatus.getDescription());
