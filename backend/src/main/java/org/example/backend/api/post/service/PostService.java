@@ -267,10 +267,16 @@ public class PostService {
           // 요청 삭제
           tradeRequestRepository.delete(tradeRequest);
 
+          // email 알림
+          String subject = "[" + post.getTradeType().getDescription() + "요청 취소 알림]";
+          StringBuilder content = new StringBuilder();
+          content.append("<h3>" + proposer.getUserNickname() + "님이 " + post.getTradeType().getDescription() + " 요청을 취소하였습니다.</h3><br>");
+          
+          emailService.sendEmail(writer.getUserEmail(), subject, content.toString());
 
           // push 알림
           log.info("2. send push noti");
-          String message = String.format("[%s 요청 취소 알림] %s님께서 %s을 취소하셨습니다.",
+          String message = String.format("[%s 요청 취소 알림] %s님이 %s 요청을 취소하였습니다.",
               post.getTradeType().getDescription(),
               proposer.getUserNickname(),
               post.getTradeType().getDescription()
