@@ -19,6 +19,5 @@ public class FoodUpdateDto {
     private LocalDate foodProDate;
     private LocalDate foodExpDate;
     private FoodStorage foodStorage;
-    private boolean foodIsThaw;
     private String foodDescription;
 }
