@@ -163,7 +163,7 @@ public class MyfridgeService {
         return FoodDetailDto.of(food);
     }
 
-    public void updateExpDate(Long userId, Long foodId, FoodUpdateDto foodUpdateDto) {
+    public void updateExpDate(Long userId, Long foodId, LocalDate expDate) {
         Food food = myfridgeRepository.findByFoodId(foodId);
         if (food == null) {
             throw new NoSuchElementException("해당 재료가 존재하지 않습니다.");
@@ -173,7 +173,7 @@ public class MyfridgeService {
             throw new IllegalArgumentException("해당 재료에 대한 조회 권한이 없습니다.");
         }
 
-        food.setFoodExpDate(foodUpdateDto.getFoodExpDate());
+        food.setFoodExpDate(expDate);
         myfridgeRepository.save(food);
     }
 
