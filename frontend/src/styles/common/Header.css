@@ -23,6 +23,9 @@
   font-weight: 400;
   line-height: normal;
   margin-left: 730px;
+
+  list-style: none; /* 동그라미 제거 */
+  
 }
 
 /* 반응형 디자인: 화면 크기 조정 */

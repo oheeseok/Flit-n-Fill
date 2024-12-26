@@ -23,7 +23,7 @@ const SignIn: React.FC = () => {
       alert(response.data); // 로그인 성공 메시지
 
       // 로그인 후 대시보드로 리디렉션
-      window.location.href = "/home"; // 홈 페이지로 리디렉션
+      window.location.href = "/SignInhome"; // 홈 페이지로 리디렉션
 
     } catch (error: any) {
       // 에러 처리
@@ -83,7 +83,7 @@ const SignIn: React.FC = () => {
           <button onClick={() => window.location.href = "http://localhost:8080/oauth2/authorization/google"}>구글 로그인</button>
           <button onClick={() => window.location.href = "http://localhost:8080/oauth2/authorization/kakao"}>카카오 로그인</button>
 
-          <div>Don't have an account? Sign In</div>
+          <div>Don't have an account? <a href="/signUp">Sign Up</a></div>
         </div>
 
         <div className="signin-image"></div>

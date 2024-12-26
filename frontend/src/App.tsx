@@ -16,6 +16,7 @@ import RecipeDetail from "./pages/recipe/RecipeDetail";
 import { GlobalProvider } from "./context/GlobalProvider";
 import Layout from "./components/Layout";
 import "./App.css";
+import SignInHome from "./pages/SignInHome";  // 새로운 페이지 import
 
 function App() {
   return (
@@ -39,6 +40,16 @@ function App() {
             element={
               <Layout>
                 <Home />
+              </Layout>
+            }
+          />
+
+          {/* 로그인한 사용자 전용 홈 경로 */}
+          <Route
+            path="/signinhome"
+            element={
+              <Layout>
+                <SignInHome />  {/* 로그인 후 보여줄 페이지 */}
               </Layout>
             }
           />
