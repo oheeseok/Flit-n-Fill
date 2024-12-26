@@ -230,6 +230,7 @@ public class TradeService {
         User me = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다."));
 
+        kindness.setTradeRoomId(tradeRoomId);
         kindness.setReviewer(me);
         kindness.setReviewee(otherUser);
         kindness.setKindnessType(KindnessType.valueOf(kindnessType));
