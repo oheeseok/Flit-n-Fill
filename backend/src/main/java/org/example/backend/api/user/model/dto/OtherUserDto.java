@@ -15,7 +15,7 @@ public class OtherUserDto {
     private String userNickname;
     private String userAddress;
     private String userProfile;
-    private double userKindness;
+    private int userKindness;
 
     public static OtherUserDto of(User user) {
         return new OtherUserDto(

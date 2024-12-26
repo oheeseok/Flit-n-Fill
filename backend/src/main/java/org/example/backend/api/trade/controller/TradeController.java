@@ -62,12 +62,15 @@ public class TradeController {
 
         return ResponseEntity.noContent().build(); // 기본적으로 204 반환
     }
-//
-//    @PostMapping("/{tradeRoomId}/kindness")
-//    public ResponseEntity<?> radeKindness(HttpServletRequest request, @PathVariable("tradeRoomId") String tradeRoomId,
-//                                          ) {
-//        // kindness points ���가
-//        tradeService.addKindness(tradeRoomId);
-//        return ResponseEntity.noContent().build();
-//    }
+
+    @PostMapping("/{tradeRoomId}/kindness")
+    public ResponseEntity<?> radeKindness(HttpServletRequest request, @PathVariable("tradeRoomId") String tradeRoomId,
+                                          @RequestBody String kindness) {
+        Long userId = (Long) request.getAttribute("userId");
+        if (userId == null) {
+            throw new UserIdNullException("userId not found");
+        }
+        tradeService.addKindness(tradeRoomId, userId, kindness);
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -50,10 +50,15 @@ public class User {
 
   private String userProfile;
 
-  @Column(columnDefinition = "DECIMAL(5,1)", nullable = false)
-  @ColumnDefault("0")
+  @Column(columnDefinition = "TINYINT", nullable = false)
+  @ColumnDefault("1")
   @NotNull
-  private double userKindness;
+  private int userKindness;
+
+  @Column(columnDefinition = "INT", nullable = false)
+  @ColumnDefault("50")
+  @NotNull
+  private int userExp;
 
   private String refreshToken;
 
@@ -79,7 +84,9 @@ public class User {
     }
   }
   // 생성자
-  public User(String userName, String userEmail, String userNickname, String userPassword, String userPhone, String userAddress, String userProfile, double userKindness, AuthProvider authProvider) {
+  public User(String userName, String userEmail, String userNickname, String userPassword,
+              String userPhone, String userAddress, String userProfile, int userKindness, int userExp,
+              AuthProvider authProvider) {
     this.userName = userName;
     this.userEmail = userEmail;
     this.userNickname = userNickname;
@@ -88,6 +95,7 @@ public class User {
     this.userAddress = userAddress;
     this.userProfile = userProfile;
     this.userKindness = userKindness;
+    this.userExp = userExp;
     this.authProvider = authProvider;
   }
 

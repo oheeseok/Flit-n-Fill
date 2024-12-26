@@ -12,16 +12,20 @@ import org.example.backend.api.post.repository.PostRepository;
 import org.example.backend.api.trade.model.dto.TradeRoomDetailDto;
 import org.example.backend.api.trade.model.dto.TradeRoomMessageDto;
 import org.example.backend.api.trade.model.dto.TradeRoomSimpleDto;
+import org.example.backend.api.trade.model.entity.Kindness;
 import org.example.backend.api.trade.model.entity.Trade;
 import org.example.backend.api.trade.model.entity.TradeRoom;
+import org.example.backend.api.trade.repository.KindnessRepository;
 import org.example.backend.api.trade.repository.TradeRepository;
 import org.example.backend.api.trade.repository.TradeRoomRepository;
 import org.example.backend.api.user.model.dto.OtherUserDto;
 import org.example.backend.api.user.model.entity.User;
 import org.example.backend.api.user.repository.UserRepository;
+import org.example.backend.enums.KindnessType;
 import org.example.backend.enums.NotificationType;
 import org.example.backend.enums.Progress;
 import org.example.backend.exceptions.TradeNotFoundException;
+import org.example.backend.exceptions.TradeRoomNotFoundException;
 import org.example.backend.exceptions.UserNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,9 +43,9 @@ public class TradeService {
     private final TradeRepository tradeRepository;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
+    private final KindnessRepository kindnessRepository;
     private final PushNotificationService pushNotificationService;
     private final NotificationRepository notificationRepository;
-
     public List<TradeRoomSimpleDto> getAllTrades(Long userId) {
         List<TradeRoom> tradeRoomList = tradeRoomRepository.findByWriterIdOrProposerId(userId, userId);
         List<TradeRoomSimpleDto> tradeRoomDtos = new ArrayList<>();
@@ -200,6 +204,64 @@ public class TradeService {
 
         tradeRepository.save(trade);
         postRepository.save(post);
+    }
+
+    public void addKindness(String tradeRoomId, Long userId, String kindnessType) {
+        Kindness kindness = new Kindness();
+        kindness.setTradeRoomId(tradeRoomId);
+
+        TradeRoom tradeRoom = tradeRoomRepository.findById(tradeRoomId)
+                .orElseThrow(() -> new TradeRoomNotFoundException("해당하는 거래를 찾을 수 없습니다."));
+
+        // 상대방 정보 조회
+        Long otherUserId = tradeRoom.getProposerId().equals(userId) ? tradeRoom.getWriterId() : tradeRoom.getProposerId();
+        User otherUser = userRepository.findById(otherUserId).orElseThrow(() -> new UserNotFoundException("탈퇴 유저에 대해 평가할 수 없습니다."));
+        User me = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다."));
+
+        KindnessType type = KindnessType.valueOf(kindnessType);
+
+        kindness.setReviewer(me);
+        kindness.setReviewee(otherUser);
+        kindness.setKindnessType(KindnessType.valueOf(kindnessType));
+
+        kindnessRepository.save(kindness);
+        calculateKindness(me, null);
+        calculateKindness(otherUser, type);
+    }
+
+    private void calculateKindness(User user, KindnessType kindnessType) {
+        int exp = user.getUserExp();
+        int level = user.getUserKindness();
+
+        // 경험치 변경
+        if (kindnessType == null) { // 만족도 평가 시 2점
+            exp += 2;
+        } else if (kindnessType.equals(KindnessType.GREAT)) { // 좋아요 평가 시 10점
+            exp += 10;
+        } else { // 별로예요 평가 시 -5점
+            exp -= 5;
+        }
+
+        // 레벨 계산
+        int newLevel = calculateLevel(exp);
+
+        // 유저 정보 업데이트
+        user.setUserExp(exp);
+        user.setUserKindness(newLevel);
+        userRepository.save(user);
+    }
+
+    // 레벨 계산 로직
+    private int calculateLevel(int exp) {
+        if (exp < 50) return 0; // 레벨 0: 경험치 50 미만
+        if (exp < 100) return 1; // 레벨 1: 경험치 50-99
+        if (exp < 175) return 2; // 레벨 2: 경험치 100-174
+        if (exp < 275) return 3; // 레벨 3: 경험치 175-274
+        if (exp < 400) return 4; // 레벨 4: 경험치 275-399
+        if (exp < 550) return 5; // 레벨 5: 경험치 400-549
+        if (exp < 725) return 6; // 레벨 6: 경험치 550-724
+        return 7; // 레벨 7: 경험치 725 이상
     }
 
     public void saveMessageNotification(User user, NotificationType type, String tradeRoomId, String message) {     // 거래방 새 댓글 알림

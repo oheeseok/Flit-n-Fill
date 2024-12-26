@@ -17,7 +17,7 @@ public class UserInfoDto {
     private String userPhone;
     private String userAddress;
     private String userProfile;
-    private double userKindness;
+    private int userKindness;
 
     public static UserInfoDto of(User user) {
         return new UserInfoDto(
