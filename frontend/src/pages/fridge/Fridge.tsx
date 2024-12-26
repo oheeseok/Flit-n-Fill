@@ -1,4 +1,4 @@
-import ToResisterButton from "../../components/fridge/ToResisterButton";
+import ToRegisterButton from "../../components/fridge/ToRegisterButton";
 import ToRecipeButton from "../../components/fridge/ToRecipeButton";
 import ToCommunityButton from "../../components/fridge/ToCommunityButton";
 import "../../styles/fridge/Fridge.css";
@@ -6,8 +6,8 @@ import "../../styles/fridge/Fridge.css";
 const Fridge = () => {
   return (
     <>
-      <div className="fridge-toresister-button-container">
-        <ToResisterButton></ToResisterButton>
+      <div className="fridge-toregister-button-container">
+        <ToRegisterButton></ToRegisterButton>
       </div>
       <div className="fridgebody">
         <div className="fridge-container">

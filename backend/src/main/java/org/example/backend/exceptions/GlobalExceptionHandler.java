@@ -58,4 +58,18 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ex.getMessage());
     }
+
+    @ExceptionHandler(TradeNotFoundException.class)
+    public ResponseEntity<String> handleTradeNotFoundException(TradeNotFoundException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(TradeRoomNotFoundException.class)
+    public ResponseEntity<String> handleTradeRoomNotFoundException(TradeRoomNotFoundException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
+    }
 }

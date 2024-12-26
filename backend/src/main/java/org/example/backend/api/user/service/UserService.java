@@ -60,7 +60,8 @@ public class UserService {
                 userRegisterDto.getUserPhone(),
                 userRegisterDto.getUserAddress(),
                 "default profile url",
-                0,
+                1,
+                50,
                 AuthProvider.LOCAL
         );
         userRepository.save(user);

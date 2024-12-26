@@ -15,6 +15,7 @@ public class NotificationViewDto {
     private NotificationType notificationType;
     private String notificationMessage;
     private Long tradeRequestId;
+    private String tradeRoomId;
     private boolean notificationIsRead;
 
     public static NotificationViewDto of(Notification n) {
@@ -26,6 +27,10 @@ public class NotificationViewDto {
             dto.setTradeRequestId(n.getTradeRequest().getTradeRequestId());
         } else {
             dto.setTradeRequestId(null);
+        if (n.getTradeRoomId != null) {
+          dto.setTradeRoomId(n.getTradeRoomId());
+        } else {
+          dto.setTradeRoomId(null);
         }
 
         return dto;

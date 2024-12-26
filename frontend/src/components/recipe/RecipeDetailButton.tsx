@@ -1,5 +1,5 @@
 import React from "react";
-import "../../styles/recipe/RecipeResisterButton.css";
+import "../../styles/recipe/RecipeRegisterButton.css";
 
 interface RecipeDetailButtonProps {
   onClick: () => void; // 클릭 이벤트 핸들러를 props로 전달

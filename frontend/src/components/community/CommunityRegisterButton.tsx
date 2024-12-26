@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
-import "../../styles/community/CommunityResisterButton.css";
+import "../../styles/community/CommunityRegisterButton.css";
 
-const CommunityResisterButton = () => {
+const CommunityRegisterButton = () => {
   return (
     <div>
-      <Link to="/community/resister">
-        <button className="coummunity-resister-button">
+      <Link to="/community/register">
+        <button className="coummunity-register-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -32,4 +32,4 @@ const CommunityResisterButton = () => {
     </div>
   );
 };
-export default CommunityResisterButton;
+export default CommunityRegisterButton;

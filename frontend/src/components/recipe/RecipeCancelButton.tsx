@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import "../../styles/recipe/RecipeResisterButton.css";
+import "../../styles/recipe/RecipeRegisterButton.css";
 
 const RecipeCancelButton = () => {
   return (
