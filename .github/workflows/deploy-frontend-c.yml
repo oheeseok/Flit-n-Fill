@@ -1,0 +1,76 @@
+#name: Deploy Frontend to EC2-c
+#
+#on:
+#  push:
+#    branches:
+#      - main  # main 브랜치에 push될 때 실행
+#
+#jobs:
+#  frontend-c:
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      # 1. 코드 체크아웃
+#      - name: Checkout code
+#        uses: actions/checkout@v2
+#
+#      # 2. 디렉토리 구조 확인 (디버깅)
+#      - name: Check directory structure
+#        run: |
+#          ls -la  # 현재 디렉토리의 구조 확인
+#
+#      # 3. Node.js 및 NPM 설치
+#      - name: Set up Node.js
+#        uses: actions/setup-node@v3
+#        with:
+#          node-version: '18'  # Node.js 버전 18로 변경
+#
+#      # 4. 의존성 설치 및 빌드
+#      - name: Install dependencies and build
+#        run: |
+#          cd frontend  # cicdtest4/ 디렉토리 안에 있는 frontend로 이동
+#          npm install  # 의존성 설치
+#          npm run build  # 빌드 실행
+#
+#      # 5. Docker 이미지 빌드
+#      - name: Build Docker Image
+#        run: |
+#          cd frontend  # 정확한 경로로 이동
+#          docker build -t ckdgkim/frontendproject:front-1 .  # Docker 이미지 빌드
+#
+#      # 6. Docker Hub에 푸시
+#      - name: Push Docker Image to Docker Hub
+#        run: |
+#          echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+#          docker push ckdgkim/frontendproject:front-1  # Docker Hub에 푸시
+#
+#      # 2. SSH 키 설정
+#      - name: Set up SSH
+#        run: |
+#          mkdir -p ~/.ssh
+#          echo "${{ secrets.QWE_PEM }}" > ~/.ssh/qwe.pem
+#          chmod 600 ~/.ssh/qwe.pem
+#
+#      # 3. EC2에 배포
+#      - name: Deploy to EC2
+#        run: |
+#          echo "Step 1: Connecting to EC2 instance ("${{ vars.PUB_IP_C }}")"
+#          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.ssh/qwe.pem ec2-user@"${{ vars.PUB_IP_C }}" << EOF
+#            echo "Connected to EC2 ("${{ vars.PUB_IP_C }}")"
+#
+#            # Docker 이미지 가져오기
+#            docker pull ckdgkim/frontendproject:front-1
+#
+#            # 네트워크 생성 (이미 존재하면 무시)
+#            docker network create mynetwork || true
+#
+#            # 기존 컨테이너 종료 및 삭제
+#            docker stop frontend-container-c || true
+#            docker rm frontend-container-c || true
+#
+#            # 새 컨테이너 실행
+#            docker run -d  --name frontend-container-c \
+#              --network mynetwork \
+#              -p 80:80 \
+#              ckdgkim/frontendproject:front-1
+#          EOF

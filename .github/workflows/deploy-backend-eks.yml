@@ -1,0 +1,103 @@
+name: deploy-backend-eks.yml
+
+on:
+  push:
+    branches:
+      - main  # main 브랜치에 push될 때 실행
+
+jobs:
+  backend-a:
+    runs-on: ubuntu-latest  # 실행 환경을 Ubuntu로 설정 (Windows 환경에서 Java 17을 설치하는 방법도 있지만, Ubuntu에서 설정하는 방법이 더 일반적입니다)
+
+    steps:
+      # 1. 코드 체크아웃
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          path: cicdtest4  # 경로를 정확하게 확인
+
+      # 2. Java 17 설치 (Temurin JDK 사용)
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'  # Java 17 버전 설치
+          distribution: 'temurin'  # JDK 배포판 지정 (Temurin)
+
+      # 3. Gradle 실행 권한 부여
+      - name: Grant execute permission to gradlew
+        run: chmod +x cicdtest4/backend/gradlew  # gradlew에 실행 권한 부여
+
+      # 4. Gradle로 빌드
+      - name: Build with Gradle
+        run: |
+          cd cicdtest4/backend  # 정확한 경로로 이동
+          ls -la  # 디렉토리 내용 확인
+          ./gradlew clean build  # gradlew로 빌드 실행
+          
+
+      # 5. Docker 이미지 태그 생성
+      - name: Generate Docker Image Tag
+        id: docker_tag
+        run: |
+          # 시간 기반 + SHA 앞 7자리 태그 생성
+          tag=$(date +'%Y%m%d%H%M%S')-$(echo "${{ github.sha }}" | cut -c1-7)
+          echo "TAG=${tag}" >> $GITHUB_ENV
+
+      # 6. Docker 이미지 빌드 및 푸시
+      - name: Build and Push Docker Image
+        run: |
+          cd cicdtest4/backend
+          docker build -t ckdgkim/backendproject:back-${{ env.TAG }} .
+          echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+          docker push ckdgkim/backendproject:back-${{ env.TAG }}
+
+      # 7. Kubernetes 파일 업데이트
+      - name: Update Kubernetes Deployment YAML
+        run: |
+          cd cicdtest4/backend  # backend 폴더로 이동
+          sed -i "s|ckdgkim/backendproject:back-PLACEHOLDER_TAG|ckdgkim/backendproject:back-${{ env.TAG }}|g" backend-eks.yml
+
+      
+      
+      
+      
+      
+      
+
+#              # 3. Docker 이미지 빌드 및 Docker Hub에 푸시
+#      - name: Build and Push Docker Image
+#        run: |
+#          cd cicdtest4/backend
+#          docker build -t ckdgkim/backendproject:back-1 .
+#          echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+#          docker push ckdgkim/backendproject:back-1
+
+
+
+
+      # 5. AWS CLI 설치 및 EKS 인증 구성
+      - name: Configure AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2  # 사용 중인 AWS 리전
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Update kubeconfig for EKS
+        run: |
+          aws eks update-kubeconfig --region ap-northeast-2 --name mycluster
+
+      # 6. Kubernetes 배포 적용
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f cicdtest4/backend/backend-eks.yml
+
+      # 7. 배포 확인
+      - name: Check Deployment Status
+        run: |
+          kubectl rollout status deployment/backend-deployment
