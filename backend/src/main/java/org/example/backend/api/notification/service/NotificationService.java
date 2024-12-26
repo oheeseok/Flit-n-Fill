@@ -20,6 +20,7 @@ import org.example.backend.api.user.model.entity.User;
 import org.example.backend.api.user.repository.RequestRepository;
 import org.example.backend.api.user.repository.UserRepository;
 import org.example.backend.enums.NotificationType;
+import org.example.backend.enums.Progress;
 import org.example.backend.enums.TaskStatus;
 import org.example.backend.enums.TradeType;
 import org.example.backend.exceptions.RequestNotFoundException;
@@ -57,6 +58,7 @@ public class NotificationService {
     private final EmailService emailService;
     private final PushNotificationService pushNotificationService;
     private final TradeService tradeService;
+    private final PostRepository postRepository;
 
     @Value("${server.host}")
     private String host;
@@ -168,19 +170,22 @@ public class NotificationService {
                         NotificationType.TRADE_REQUEST_RESULT,
                         stat + " : 수락되었습니다!",
                         tradeRequestId);
-                Trade newTrade = tradeService.createNewTrade(notification);
-                tradeService.createNewTradeRoom(newTrade);
             } else if (notification.getNotificationType().equals(NotificationType.SHARE_REQUEST)) {     // 나눔 요청
                 saveTradeRequestNotification(
                         proposer,
                         NotificationType.SHARE_REQUEST_RESULT,
                         stat + " : 수락되었습니다!",
                         tradeRequestId);
-                Trade newTrade = tradeService.createNewTrade(notification);
-                tradeService.createNewTradeRoom(newTrade);
             } else {
                 throw new TradeRequestHandleException("요청에 대한 결과가 아닙니다.");
             }
+
+            Trade newTrade = tradeService.createNewTrade(notification);
+            tradeService.createNewTradeRoom(newTrade);
+
+            Post post = tradeRequest.getPost();
+            post.setProgress(Progress.IN_PROGRESS);
+            postRepository.save(tradeRequest.getPost());
         } else {
             throw new TradeRequestHandleException("요청 대기 중입니다.");
         }

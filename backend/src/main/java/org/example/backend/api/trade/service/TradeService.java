@@ -121,6 +121,7 @@ public class TradeService {
         trade.setProposer(notification.getTradeRequest().getProposer());
         trade.setTradeCreatedDate(LocalDateTime.now());
         trade.setTradeUpdatedDate(LocalDateTime.now());
+        trade.setProgress(Progress.IN_PROGRESS);
 
         return tradeRepository.save(trade);
     }

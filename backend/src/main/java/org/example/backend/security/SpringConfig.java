@@ -61,11 +61,10 @@ public class SpringConfig {
 
                 // OAuth2 로그인 추가
                 .oauth2Login(oauth2 ->
-                        oauth2.userInfoEndpoint(c -> c.userService(oAuth2UserService)
-                                        .and()
-                                        .successHandler(oAuth2LoginSuccessHandler)))// 로그인 성공시 이동할 URL
+                        oauth2.userInfoEndpoint(c -> c.userService(oAuth2UserService))
+                                .successHandler(oAuth2LoginSuccessHandler))// 로그인 성공시 이동할 URL
 
-                // jwt token filter
+        // jwt token filter
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
