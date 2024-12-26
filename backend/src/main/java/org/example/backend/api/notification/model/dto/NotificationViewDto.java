@@ -21,7 +21,7 @@ public class NotificationViewDto {
         NotificationViewDto dto = new NotificationViewDto(
                 n.getNotificationType(),
                 n.getNotificationMessage(),
-                null,
+                n.getTradeRequest().getTradeRequestId(),
                 n.isNotificationIsRead()
         );
         return dto;
