@@ -1,15 +1,15 @@
-import SearchBar from "../../components/common/SearchBar";
+import RecipeSearchBar from "../../components/recipe/RecipeSearchBar";
 import NearExpirationRecipe from "../../components/recipe/NearExpirationRecipe";
 import RecipeCarousel from "../../components/main/RecipeCarousel";
-import RecipeResisterButton from "../../components/recipe/RecipeResisterButton";
+import RecipeRegisterButton from "../../components/recipe/RecipeRegisterButton";
 import "../../styles/recipe/Recipe.css";
 
 const Recipe = () => {
   return (
     <>
       <div className="recipebody">
-        <SearchBar></SearchBar>
-        <RecipeResisterButton></RecipeResisterButton>
+        <RecipeSearchBar></RecipeSearchBar>
+        <RecipeRegisterButton></RecipeRegisterButton>
         <div className="recipe-container">
           <div className="near-expiration-recipe">
             <NearExpirationRecipe />

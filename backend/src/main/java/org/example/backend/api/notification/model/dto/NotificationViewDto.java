@@ -15,13 +15,15 @@ public class NotificationViewDto {
     private NotificationType notificationType;
     private String notificationMessage;
     private Long tradeRequestId;
+    private String tradeRoomId;
     private boolean notificationIsRead;
 
     public static NotificationViewDto of(Notification n) {
         NotificationViewDto dto = new NotificationViewDto(
                 n.getNotificationType(),
                 n.getNotificationMessage(),
-                null,
+                n.getTradeRequest().getTradeRequestId(),
+                n.getTradeRoomId(),
                 n.isNotificationIsRead()
         );
         return dto;

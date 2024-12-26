@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.backend.api.trade.model.entity.TradeRequest;
+import org.example.backend.api.trade.model.entity.TradeRoom;
 import org.example.backend.api.user.model.entity.Request;
 import org.example.backend.api.user.model.entity.User;
 import org.example.backend.enums.NotificationType;
@@ -47,6 +48,8 @@ public class Notification {
   @JoinColumn(name = "request_id")
   @OnDelete(action = OnDeleteAction.CASCADE)
   private Request request;
+
+  private String tradeRoomId;
 
   @Column(nullable = false)
   @ColumnDefault("false")

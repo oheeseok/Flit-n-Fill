@@ -1,7 +1,11 @@
 package org.example.backend.api.trade.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.backend.api.notification.model.entity.Notification;
+import org.example.backend.api.notification.repository.NotificationRepository;
+import org.example.backend.api.notification.service.NotificationService;
+import org.example.backend.api.notification.service.PushNotificationService;
 import org.example.backend.api.post.model.dto.PostSimpleDto;
 import org.example.backend.api.post.model.entity.Post;
 import org.example.backend.api.post.repository.PostRepository;
@@ -18,6 +22,7 @@ import org.example.backend.api.user.model.dto.OtherUserDto;
 import org.example.backend.api.user.model.entity.User;
 import org.example.backend.api.user.repository.UserRepository;
 import org.example.backend.enums.KindnessType;
+import org.example.backend.enums.NotificationType;
 import org.example.backend.enums.Progress;
 import org.example.backend.exceptions.TradeNotFoundException;
 import org.example.backend.exceptions.TradeRoomNotFoundException;
@@ -32,13 +37,15 @@ import java.util.List;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class TradeService {
     private final TradeRoomRepository tradeRoomRepository;
     private final TradeRepository tradeRepository;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final KindnessRepository kindnessRepository;
-
+    private final PushNotificationService pushNotificationService;
+    private final NotificationRepository notificationRepository;
     public List<TradeRoomSimpleDto> getAllTrades(Long userId) {
         List<TradeRoom> tradeRoomList = tradeRoomRepository.findByWriterIdOrProposerId(userId, userId);
         List<TradeRoomSimpleDto> tradeRoomDtos = new ArrayList<>();
@@ -152,6 +159,24 @@ public class TradeService {
         tradeRoom.getTradeRoomMessage().add(messageDto);
         tradeRoomRepository.save(tradeRoom);
 
+        // 상대방 정보 조회
+        Long otherUserId = tradeRoom.getProposerId().equals(userId) ? tradeRoom.getWriterId() : tradeRoom.getProposerId();
+        User otherUser = userRepository.findById(otherUserId).orElse(null);
+        User me = userRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다."));
+
+        // push 알림
+        log.info("2. send push noti");
+        String notificationMessage = String.format("[%s] 거래방에 새 댓글이 작성되었습니다.",
+            NotificationType.NEW_COMMENT.getDescription()
+        );
+        log.info("notificationMessage: {}", notificationMessage);
+        pushNotificationService.sendPushNotification(otherUserId, notificationMessage);
+        log.info("2. send push --- done");
+
+        // db 저장
+        saveMessageNotification(otherUser, NotificationType.NEW_COMMENT, tradeRoomId,"거래방에 새 댓글이 작성되었습니다.");
+
         return messageDto;
     }
 
@@ -237,5 +262,15 @@ public class TradeService {
         if (exp < 550) return 5; // 레벨 5: 경험치 400-549
         if (exp < 725) return 6; // 레벨 6: 경험치 550-724
         return 7; // 레벨 7: 경험치 725 이상
+    }
+
+    public void saveMessageNotification(User user, NotificationType type, String tradeRoomId, String message) {     // 거래방 새 댓글 알림
+        Notification notification = new Notification();
+        notification.setUser(user);
+        notification.setNotificationType(type);
+        notification.setNotificationMessage(message);
+        notification.setTradeRoomId(tradeRoomId);
+
+        notificationRepository.save(notification);
     }
 }
