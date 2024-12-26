@@ -34,7 +34,7 @@
 }
 
 /* 등록 버튼 */
-.community-toresister-button {
+.community-toregister-button {
   display: flex;
   flex-direction: row;
   justify-content: end;

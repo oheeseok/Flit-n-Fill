@@ -1,11 +1,11 @@
-.fridge-toresister-button-container {
+.fridge-toregister-button-container {
   display: flex;
   flex-direction: row;
   justify-content: end;
   margin-right: 20px;
 }
 
-.fridgetoresister {
+.fridgetoregister {
   display: flex;
   flex-direction: row;
   justify-content: end;

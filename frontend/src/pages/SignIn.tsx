@@ -1,6 +1,16 @@
 import "../styles/common/SignIn.css";
 
 const SignIn = () => {
+  const handleGoogleLogin = () => {
+    // 백엔드에서 설정한 Google OAuth2 인증 엔드포인트로 리디렉션
+    window.location.href = "http://localhost:8080/oauth2/authorization/google";
+  };
+
+  const handleKakaoLogin = () => {
+    // 백엔드에서 설정한 Kakao OAuth2 인증 엔드포인트로 리디렉션
+    window.location.href = "http://localhost:8080/oauth2/authorization/kakao";
+  };
+
   return (
     <>
       <div className="signinbody">
@@ -17,7 +27,7 @@ const SignIn = () => {
           />
           <div className="signin-text">Password</div>
           <input
-            type="text"
+            type="password"
             className="signin-input"
             placeholder="Enter your password"
           />
@@ -27,13 +37,14 @@ const SignIn = () => {
           </label>
           <button>Log In</button>
           <div>---------or---------</div>
-          <button>구글로그인</button>
-          <button>카카오로그인</button>
-          <div>Don't have an acccount? Sign In</div>
+          <button onClick={handleGoogleLogin}>Google Login</button>
+          <button onClick={handleKakaoLogin}>Kakao Login</button>
+          <div>Don't have an account? Sign Up</div>
         </div>
         <div className="signin-image"></div>
       </div>
     </>
   );
 };
+
 export default SignIn;

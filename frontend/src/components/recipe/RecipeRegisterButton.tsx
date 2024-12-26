@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
-import "../../styles/recipe/RecipeResisterButton.css";
+import "../../styles/recipe/RecipeRegisterButton.css";
 
-const RecipeResisterButton = () => {
+const RecipeRegisterButton = () => {
   return (
     <div>
-      <Link to="/recipe/resister">
-        <button className="recipe-resister-button">
+      <Link to="/recipe/register">
+        <button className="recipe-register-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -44,4 +44,4 @@ const RecipeResisterButton = () => {
     </div>
   );
 };
-export default RecipeResisterButton;
+export default RecipeRegisterButton;

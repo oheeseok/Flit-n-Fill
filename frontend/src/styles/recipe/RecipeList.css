@@ -2,6 +2,14 @@
   margin-bottom: 40px;
 }
 
+.recipe-list-option-container {
+  display: flex;
+  gap: 20px;
+  font-family: Ubuntu;
+  justify-content: end;
+  margin-right: 40px;
+}
+
 .recipelistbody {
   width: 100%;
   margin: 0 auto; /* 가운데 정렬 */
@@ -122,4 +130,25 @@
   font-weight: 600;
   line-height: normal;
   margin: 10px auto 20px auto;
+}
+
+.recipe-list-box-card-profile-container-star {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  background-color: transparent;
+
+  justify-content: center;
+  align-items: center;
+}
+
+.recipe-list-box-card-profile-container-star::before {
+  content: "☆";
+  font-size: 36px;
+  color: #fdd835;
+}
+
+.recipe-list-box-card-profile-container-star.star-filled::before {
+  content: "★";
+  color: #fdd835;
 }

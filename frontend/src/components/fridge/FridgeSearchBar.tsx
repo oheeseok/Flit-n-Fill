@@ -1,11 +1,11 @@
 import { useRecipe } from "../../context/RecipeContext";
 import { useNavigate } from "react-router-dom";
 import "../../styles/common/SearchBar.css";
-import SearchIcon from "./SearchIcon";
+import SearchIcon from "../common/SearchIcon";
 import { useState } from "react";
 import Swal from "sweetalert2";
 
-const SearchBar = () => {
+const FridgeSearchBar = () => {
   const { setSearchQuery } = useRecipe(); // Context에서 setSearchQuery만 사용
   const [inputValue, setInputValue] = useState("");
   const navigate = useNavigate();
@@ -52,4 +52,4 @@ const SearchBar = () => {
   );
 };
 
-export default SearchBar;
+export default FridgeSearchBar;
