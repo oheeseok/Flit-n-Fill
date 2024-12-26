@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
-import "../../styles/fridge/ToResisterButton.css";
+import "../../styles/fridge/ToRegisterButton.css";
 
-const ToResisterButton = () => {
+const ToRegisterButton = () => {
   return (
     <div>
-      <Link className="to-fridge-resister" to="/fridge/resister">
-        <button className="to-resister-button">
+      <Link className="to-fridge-register" to="/fridge/register">
+        <button className="to-register-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
@@ -24,4 +24,4 @@ const ToResisterButton = () => {
     </div>
   );
 };
-export default ToResisterButton;
+export default ToRegisterButton;

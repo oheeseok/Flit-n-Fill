@@ -1,10 +1,10 @@
-.reciperesisterbody {
+.reciperegisterbody {
   width: 100%;
   margin: 0 auto; /* 가운데 정렬 */
   display: flex;
   flex-wrap: wrap; /* 자식 요소들이 넘칠 경우 새 줄로 내려가도록 설정 */
 }
-.recipe-resister-title-container {
+.recipe-register-title-container {
   width: 48%;
   display: flex;
   flex-direction: column; /* 수직 방향으로 배치 */
@@ -12,8 +12,14 @@
   justify-content: center;
   margin-left: 40px;
 }
-.recipe-resister-title {
-  color: #000;
+.recipe-register-title {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.recipe-register-title-text {
+  color: #3c3c3c;
   text-align: start;
   font-family: Ubuntu;
   font-size: 38px;
@@ -21,7 +27,21 @@
   font-weight: 700;
   line-height: normal;
 }
-.recipe-resister-title-input {
+.recipe-register-isvisibility {
+  color: #3c3c3c;
+  font-family: Ubuntu;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  margin-left: 70%;
+}
+.recipe-register-isvisibility-checkbox {
+  width: 18px;
+  height: 18px;
+}
+
+.recipe-register-title-input {
   display: flex;
   width: 89%;
   height: 42px;
@@ -41,7 +61,7 @@
   margin-top: 4px;
 }
 
-.recipe-resister-ingredients-container {
+.recipe-register-ingredients-container {
   width: 46.4%;
   height: 655px;
   border-radius: 30px;
@@ -57,7 +77,7 @@
   align-items: center; /* 수직 가운데 정렬 */
   margin-right: 40px;
 }
-.recipe-resister-ingredients-title {
+.recipe-register-ingredients-title {
   color: #3c3c3c;
   text-align: center;
   font-family: Ubuntu;
@@ -67,7 +87,7 @@
   line-height: normal;
   margin-top: 16px;
 }
-.recipe-resister-ingredients-textbox {
+.recipe-register-ingredients-textbox {
   width: 92%;
   height: 550px;
   flex-shrink: 0;
@@ -77,7 +97,7 @@
   background: #fff;
   margin-top: 10px;
 }
-.recipe-resister-method-container {
+.recipe-register-method-container {
   width: 100%;
   height: 100%;
   margin: 40px 40px;
@@ -92,7 +112,7 @@
   align-items: center; /* 수직 가운데 정렬 */
 }
 
-.recipe-resister-method-title {
+.recipe-register-method-title {
   color: #3c3c3c;
   text-align: center;
   font-family: Ubuntu;
@@ -102,7 +122,7 @@
   line-height: normal;
   margin-top: 16px;
 }
-.recipe-resister-method-box {
+.recipe-register-method-box {
   width: 96%;
   height: auto;
   border-radius: 30px;
@@ -114,7 +134,7 @@
   display: flex;
   align-items: center; /* 수직 가운데 정렬 */
 }
-.recipe-resister-method-box-num {
+.recipe-register-method-box-num {
   font-family: Ubuntu;
   font-size: 22px;
   width: 48px;
@@ -125,11 +145,11 @@
   stroke: var(--light-purple, #ebd0ef);
   margin: 0 20px;
 }
-.recipe-resister-method-box-button {
+.recipe-register-method-box-button {
   display: flex;
   gap: 20px;
 }
-.recipe-resister-method-box-add-button {
+.recipe-register-method-box-add-button {
   margin: 20px 0;
   border-right: 4px solid var(--light-pink, #ffcbc3);
   border-bottom: 4px solid var(--light-pink, #ffcbc3);
@@ -139,7 +159,7 @@
   font-size: 22px;
 }
 
-.recipe-resister-method-box-remove {
+.recipe-register-method-box-remove {
   margin: 20px;
   border-right: 4px solid var(--light-pink, #ffcbc3);
   border-bottom: 4px solid var(--light-pink, #ffcbc3);
@@ -148,7 +168,7 @@
   font-family: Ubuntu;
   font-size: 22px;
 }
-.recipe-resister-ingredients-textbox textarea {
+.recipe-register-ingredients-textbox textarea {
   width: 95%;
   height: 95%;
   padding: 10px;
@@ -160,7 +180,7 @@
   line-height: 1.5;
 }
 
-.recipe-resister-method-box textarea {
+.recipe-register-method-box textarea {
   width: 90%;
   height: 220px;
   padding: 10px;
@@ -172,14 +192,14 @@
   line-height: 1.5;
 }
 
-.recipe-resister-ingredients-textbox textarea:focus,
-.recipe-resister-method-box textarea:focus {
+.recipe-register-ingredients-textbox textarea:focus,
+.recipe-register-method-box textarea:focus {
   border-color: #ffcbc3;
   outline: none;
   box-shadow: 0 0 10px rgba(255, 203, 195, 1);
 }
 
-.recipe-resister-to-recipedetail-button-container {
+.recipe-register-to-recipedetail-button-container {
   width: 100%;
   display: flex;
   gap: 20px;

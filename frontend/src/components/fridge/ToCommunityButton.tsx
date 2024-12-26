@@ -4,7 +4,7 @@ import "../../styles/fridge/ToCommunityButton.css";
 const ToCommunityButton = () => {
   return (
     <div>
-      <Link className="to-coummunity-resister" to="/community">
+      <Link className="to-coummunity-register" to="/community">
         <button className="to-coummunity-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"

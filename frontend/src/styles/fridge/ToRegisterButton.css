@@ -1,19 +1,14 @@
-.coummunity-resister-button {
+.to-register-button {
   font-family: ubuntu;
   font-weight: 700;
-  width: 142px;
+  width: 130px;
   height: 48px;
   flex-shrink: 0;
   display: inline-flex;
   padding: 12px 16px;
   justify-content: center;
   align-items: center;
-  gap: 6px;
+  gap: 10px;
   border-radius: 8px;
-  background: var(--light-sky, #d4efc7);
-}
-
-.coummunity-resister-button:hover {
-  background-color: #85b573;
-  transform: scale(1.05);
+  background: var(--light-sky, #c7efe6);
 }
