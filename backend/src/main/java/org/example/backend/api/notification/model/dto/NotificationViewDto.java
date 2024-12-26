@@ -27,7 +27,8 @@ public class NotificationViewDto {
             dto.setTradeRequestId(n.getTradeRequest().getTradeRequestId());
         } else {
             dto.setTradeRequestId(null);
-        if (n.getTradeRoomId != null) {
+        }
+        if (n.getTradeRoomId() != null) {
           dto.setTradeRoomId(n.getTradeRoomId());
         } else {
           dto.setTradeRoomId(null);
