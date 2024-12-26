@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -76,13 +77,13 @@ public class MyfridgeController {
     }
 
     @PatchMapping("/{foodId}/exp-date")
-    public ResponseEntity<Void> updateExpDate(HttpServletRequest request, @PathVariable("foodId") Long foodId, @RequestBody FoodUpdateDto foodUpdateDto) {    // 냉장고 재료 소비기한 수정
+    public ResponseEntity<Void> updateExpDate(HttpServletRequest request, @PathVariable("foodId") Long foodId, @RequestBody LocalDate expDate) {    // 냉장고 재료 소비기한 수정
         Long userId = (Long) request.getAttribute("userId");
         if (userId == null) {
             throw new UserIdNullException("userId not found");
         }
 
-        myfridgeService.updateExpDate(userId, foodId, foodUpdateDto);
+        myfridgeService.updateExpDate(userId, foodId, expDate);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
