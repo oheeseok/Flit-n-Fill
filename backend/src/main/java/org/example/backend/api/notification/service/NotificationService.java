@@ -151,6 +151,8 @@ public class NotificationService {
             // email 전송(#54)
             content.append("<h3>회원님께서 요청하신 " + stat + "이 수락되었습니다!</h3><br>" +
                     stat + "한 게시글 : " + "<strong><a href=\"http://" + host + ":" + port + "/api/posts/" + postId + "\">게시글 보러가기</a></strong>");
+            content.append("<br>지금 거래방에서 대화를 나눠보세요!" +
+                    "<br><strong><a href=\"http://" + host + ":" + port + "/api/trade/" + notification.getTradeRoomId() + "\">거래방 바로가기</a></strong>");
 
             emailService.sendEmail(proposer.getUserEmail(), subject, content.toString());
             // push 알림(#55)
