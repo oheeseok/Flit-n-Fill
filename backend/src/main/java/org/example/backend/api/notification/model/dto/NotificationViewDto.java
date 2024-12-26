@@ -18,12 +18,16 @@ public class NotificationViewDto {
     private boolean notificationIsRead;
 
     public static NotificationViewDto of(Notification n) {
-        NotificationViewDto dto = new NotificationViewDto(
-                n.getNotificationType(),
-                n.getNotificationMessage(),
-                n.getTradeRequest().getTradeRequestId(),
-                n.isNotificationIsRead()
-        );
+        NotificationViewDto dto = new NotificationViewDto();
+        dto.setNotificationType(n.getNotificationType());
+        dto.setNotificationMessage(n.getNotificationMessage());
+        dto.setNotificationIsRead(n.isNotificationIsRead());
+        if (n.getTradeRequest() != null) {
+            dto.setTradeRequestId(n.getTradeRequest().getTradeRequestId());
+        } else {
+            dto.setTradeRequestId(null);
+        }
+
         return dto;
     }
 }
