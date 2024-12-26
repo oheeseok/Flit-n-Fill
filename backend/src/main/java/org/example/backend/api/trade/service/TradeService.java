@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -206,11 +207,10 @@ public class TradeService {
 
     public void addKindness(String tradeRoomId, Long userId, String kindnessType) {
         Kindness kindness = new Kindness();
-        kindness = kindnessRepository.findByTradeRoomId(tradeRoomId);
 
-        if (kindness == null) {
-            kindness.setTradeRoomId(tradeRoomId);
-        } else if (kindness.getTradeRoomId().equals(tradeRoomId) && kindness.getReviewer().getUserId() == userId) {
+        Optional<Kindness> existingKindness = kindnessRepository.findByTradeRoomIdAndReviewer_UserId(tradeRoomId, userId);
+
+        if (existingKindness.isPresent()) {
             throw new KindnessAlreadyReviewedException("이미 만족도 평가를 완료하였습니다.");
         }
 
