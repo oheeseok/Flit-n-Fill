@@ -111,6 +111,7 @@ public class EmailService {
                         "냉장고에서 확인해주세요",
                         null,
                         null,
+                        null,
                         false
                 );
                 notificationRepository.save(notification);
