@@ -31,6 +31,18 @@ function App() {
               </Layout>
             }
           />
+
+                 
+          {/* /home 경로 추가 */}
+          <Route
+            path="/home"
+            element={
+              <Layout>
+                <Home />
+              </Layout>
+            }
+          />
+
           <Route
             path="/fridge"
             element={
