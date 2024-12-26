@@ -1,6 +1,6 @@
 package org.example.backend.api.user.repository;
 
-import io.lettuce.core.dynamic.annotation.Param;
+import org.springframework.data.repository.query.Param;
 import org.example.backend.api.user.model.entity.BookmarkedRecipe;
 import org.example.backend.api.user.model.entity.RecipeUserId;
 import org.springframework.data.jpa.repository.JpaRepository;
