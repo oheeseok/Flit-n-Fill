@@ -24,9 +24,7 @@ import org.example.backend.api.user.repository.UserRepository;
 import org.example.backend.enums.KindnessType;
 import org.example.backend.enums.NotificationType;
 import org.example.backend.enums.Progress;
-import org.example.backend.exceptions.TradeNotFoundException;
-import org.example.backend.exceptions.TradeRoomNotFoundException;
-import org.example.backend.exceptions.UserNotFoundException;
+import org.example.backend.exceptions.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -208,10 +206,23 @@ public class TradeService {
 
     public void addKindness(String tradeRoomId, Long userId, String kindnessType) {
         Kindness kindness = new Kindness();
-        kindness.setTradeRoomId(tradeRoomId);
+        kindness = kindnessRepository.findByTradeRoomId(tradeRoomId);
+
+        if (kindness == null) {
+            kindness.setTradeRoomId(tradeRoomId);
+        } else if (kindness.getTradeRoomId().equals(tradeRoomId) && kindness.getReviewer().getUserId() == userId) {
+            throw new KindnessAlreadyReviewedException("이미 만족도 평가를 완료하였습니다.");
+        }
 
         TradeRoom tradeRoom = tradeRoomRepository.findById(tradeRoomId)
                 .orElseThrow(() -> new TradeRoomNotFoundException("해당하는 거래를 찾을 수 없습니다."));
+
+        Trade trade = tradeRepository.findById(tradeRoom.getTradeId())
+                .orElseThrow(() -> new TradeNotFoundException("해당하는 거래를 찾을 수 없습니다."));
+
+        if (!trade.getProgress().equals(Progress.COMPLETED)) {
+            throw new TradeNotCompletedException("거래가 완료되지 않아 Kindness를 추가할 수 없습니다.");
+        }
 
         // 상대방 정보 조회
         Long otherUserId = tradeRoom.getProposerId().equals(userId) ? tradeRoom.getWriterId() : tradeRoom.getProposerId();
@@ -219,15 +230,13 @@ public class TradeService {
         User me = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다."));
 
-        KindnessType type = KindnessType.valueOf(kindnessType);
-
         kindness.setReviewer(me);
         kindness.setReviewee(otherUser);
         kindness.setKindnessType(KindnessType.valueOf(kindnessType));
 
         kindnessRepository.save(kindness);
         calculateKindness(me, null);
-        calculateKindness(otherUser, type);
+        calculateKindness(otherUser, KindnessType.valueOf(kindnessType));
     }
 
     private void calculateKindness(User user, KindnessType kindnessType) {
@@ -245,6 +254,27 @@ public class TradeService {
 
         // 레벨 계산
         int newLevel = calculateLevel(exp);
+        if (level < newLevel) {
+            // push 알림
+            String notificationMessage = String.format("[F-evel Up!] %s님이 %d f-evel 을 달성하였습니다!",
+                user.getUserNickname(), newLevel);
+            log.info("notificationMessage: {}", notificationMessage);
+            pushNotificationService.sendPushNotification(user.getUserId(), notificationMessage);
+            log.info("3. send push --- done");
+
+            // db 저장
+            saveMessageNotification(user, NotificationType.LEVEL_CHANGE, null, "f-evel이 상승했습니다!");
+        } else if (level > newLevel) {
+            // push 알림
+            String notificationMessage = String.format("[F-evel Down] %s님이 %d f-evel 로 하락하였습니다. 후기를 남겨 f-evel을 올려보세요!",
+                    user.getUserNickname(), newLevel);
+            log.info("notificationMessage: {}", notificationMessage);
+            pushNotificationService.sendPushNotification(user.getUserId(), notificationMessage);
+            log.info("3. send push --- done");
+
+            // db 저장
+            saveMessageNotification(user, NotificationType.LEVEL_CHANGE, null, "f-evel이 하락했습니다ㅠㅠ");
+        }
 
         // 유저 정보 업데이트
         user.setUserExp(exp);

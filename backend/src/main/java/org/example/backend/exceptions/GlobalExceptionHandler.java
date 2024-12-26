@@ -72,4 +72,18 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ex.getMessage());
     }
+
+    @ExceptionHandler(TradeNotCompletedException.class)
+    public ResponseEntity<String> handleTradeNotCompletedException(TradeNotCompletedException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(KindnessAlreadyReviewedException.class)
+    public ResponseEntity<String> handleKindnessAlreadyReviewedException(KindnessAlreadyReviewedException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
+    }
 }
