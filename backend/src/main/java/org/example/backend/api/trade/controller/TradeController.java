@@ -27,7 +27,7 @@ public class TradeController {
         return ResponseEntity.status(HttpStatus.OK).body(tradeService.getAllTrades(userId));
     }
 
-    @GetMapping("/{tradeRoodId}")
+    @GetMapping("/{tradeRoomId}")
     public ResponseEntity<?> getTradeRoomDetail(HttpServletRequest request, @PathVariable("tradeRoomId") String tradeRoomId) {
         Long userId = (Long) request.getAttribute("userId");
         if (userId == null) {
@@ -62,4 +62,12 @@ public class TradeController {
 
         return ResponseEntity.noContent().build(); // 기본적으로 204 반환
     }
+//
+//    @PostMapping("/{tradeRoomId}/kindness")
+//    public ResponseEntity<?> radeKindness(HttpServletRequest request, @PathVariable("tradeRoomId") String tradeRoomId,
+//                                          ) {
+//        // kindness points ���가
+//        tradeService.addKindness(tradeRoomId);
+//        return ResponseEntity.noContent().build();
+//    }
 }
