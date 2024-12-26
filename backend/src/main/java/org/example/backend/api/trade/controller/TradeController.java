@@ -39,7 +39,7 @@ public class TradeController {
 
     @PostMapping("/{tradeRoomId}")
     public ResponseEntity<?> addMessage(HttpServletRequest request, @PathVariable("tradeRoomId") String tradeRoomId,
-                                        String message) {
+                                        @RequestBody String message) {
         Long userId = (Long) request.getAttribute("userId");
         if (userId == null) {
             throw new UserIdNullException("userId not found");
@@ -50,7 +50,7 @@ public class TradeController {
 
     @PatchMapping("/{tradeRoomId}")
     public ResponseEntity<?> changeTradeStatus(@PathVariable("tradeRoomId") String tradeRoomId,
-                                                   String status) {
+                                                   @RequestBody String status) {
         // 상태 변경 처리
         tradeService.changeTradeStatus(tradeRoomId, status);
 
