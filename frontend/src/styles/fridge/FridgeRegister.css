@@ -1,0 +1,147 @@
+/* Fridge Register Main Container */
+.fridge-register-body {
+  font-family: Ubuntu, sans-serif;
+  padding: 20px;
+}
+
+.fridge-register-container {
+  width: 60%;
+  margin: 40px auto;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.fridge-register-dropdown-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.fridge-register-dropdown {
+  flex: 1;
+  margin: 0 10px;
+}
+
+.fridge-register-dropdown label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.fridge-register-dropdown select {
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+/* Icon Display */
+.fridge-register-icon {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.fridge-register-icon img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+  background-color: #f3f3f3;
+}
+
+/* Additional Fields */
+.fridge-register-additional-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin: 0 10px;
+  margin-bottom: 20px;
+}
+
+.fridge-register-form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.fridge-register-form-group label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.fridge-register-form-group input,
+.fridge-register-form-group textarea,
+.fridge-register-form-group select {
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.fridge-register-form-group textarea {
+  resize: none;
+  height: 80px;
+}
+
+.fridge-register-quantity-input {
+  display: flex;
+  align-items: center;
+}
+
+.fridge-register-quantity-input input {
+  flex: 1;
+  margin-right: 10px;
+}
+
+/* Radio Group */
+.fridge-register-radio-group {
+  display: flex;
+  gap: 10px;
+}
+
+.fridge-register-radio-group label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Buttons */
+.fridge-register-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.fridge-register-button {
+  background-color: #c7efe6;
+  display: inline-flex;
+  padding: 10px 12px;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  border-radius: 8px;
+  color: var(--light-black, #3c3c3c);
+  font-family: Ubuntu;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 20px; /* 125% */
+}
+
+.fridge-register-cancel-button {
+  background-color: #c7efe6;
+  display: inline-flex;
+  padding: 10px 12px;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  border-radius: 8px;
+  color: var(--light-black, #3c3c3c);
+  font-family: Ubuntu;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 20px; /* 125% */
+}
