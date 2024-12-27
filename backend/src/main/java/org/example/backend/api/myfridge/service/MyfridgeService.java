@@ -16,6 +16,7 @@ import org.example.backend.api.user.repository.CartItemRepository;
 import org.example.backend.api.user.repository.RequestRepository;
 import org.example.backend.api.user.repository.UserCartRepository;
 import org.example.backend.api.user.repository.UserRepository;
+import org.example.backend.enums.FoodCategory;
 import org.example.backend.enums.FoodStorage;
 import org.example.backend.enums.RequestType;
 import org.example.backend.enums.TaskStatus;
@@ -64,14 +65,12 @@ public class MyfridgeService {
     }
 
     public void addFood(Long userId, FoodAddDto foodDto) {
-        FoodList foodList = foodListRepository.findById(foodDto.getFoodListId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid FoodList ID: " + foodDto.getFoodListId()));
-
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
 
         LocalDate registDate = foodDto.getFoodRegistDate();
         LocalDate expDate;
+        FoodCategory foodCategory = foodDto.getFoodCategory();
 
         if (foodDto.getFoodExpDate() != null) {
             expDate = foodDto.getFoodExpDate();
@@ -84,26 +83,33 @@ public class MyfridgeService {
             }
         }
 
-        String foodListName = foodList.getFoodListType();
-        if (foodListName == null) {
-            foodListName = foodList.getFoodListProduct();
-        }
+        Food food = new Food();
+        food.setUser(user);
+        food.setFoodRegistDate(LocalDate.now());
+        food.setFoodCount(foodDto.getFoodCount());
+        food.setFoodUnit(foodDto.getFoodUnit());
+        food.setFoodProDate(foodDto.getFoodProDate());
+        food.setFoodExpDate(expDate);
+        food.setFoodStorage(foodDto.getFoodStorage());
+        food.setFoodIsThaw(false);
+        food.setFoodDescription(foodDto.getFoodDescription());
 
-        Food food = new Food(
-                null,
-                user,
-                foodList,
-                foodListName,
-                foodDto.getFoodCategory(),
-                LocalDate.now(),
-                foodDto.getFoodCount(),
-                foodDto.getFoodUnit(),
-                foodDto.getFoodProDate(),
-                expDate,
-                foodDto.getFoodStorage(),
-                false,
-                foodDto.getFoodDescription()
-        );
+        if (foodCategory.equals(FoodCategory.COOKED)) {     // 완제품
+            food.setFoodListName(foodDto.getFoodListName());
+            food.setFoodCategory(FoodCategory.COOKED);
+        } else if (foodCategory.equals(FoodCategory.INGREDIENT)) {      // 재료
+            FoodList foodList = foodListRepository.findById(foodDto.getFoodListId())
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid FoodList ID: " + foodDto.getFoodListId()));
+
+            String foodListName = foodList.getFoodListType();
+            if (foodListName == null) {
+                foodListName = foodList.getFoodListProduct();
+            }
+
+            food.setFoodList(foodList);
+            food.setFoodListName(foodListName);
+            food.setFoodCategory(FoodCategory.INGREDIENT);
+        }
 
         myfridgeRepository.save(food);
     }
