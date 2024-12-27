@@ -30,7 +30,7 @@ public class UserController {
     private final RecipeService recipeService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody UserRegisterDto userRegisterDto) {
+    public ResponseEntity<?> registerUser(@RequestBody UserRegisterDto userRegisterDto) {
         if (userService.existsByUserEmail(userRegisterDto.getUserEmail())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 가입된 이메일입니다.");
         }
@@ -100,7 +100,7 @@ public class UserController {
     }
 
     @GetMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         // 쿠키에서 토큰 가져오기
         Cookie[] cookies = request.getCookies();
         String token = null;
@@ -127,7 +127,7 @@ public class UserController {
     }
 
     @DeleteMapping("/info")
-    public ResponseEntity<String> deleteUser(Authentication authentication, @RequestBody UserLoginDto loginDto) {
+    public ResponseEntity<?> deleteUser(Authentication authentication, @RequestBody UserLoginDto loginDto) {
         loginDto.setUserEmail(authentication.getName());
 
         try {
@@ -140,6 +140,14 @@ public class UserController {
         }
     }
 
+    @PostMapping("/report")
+    public ResponseEntity<?> reportUser(HttpServletRequest request, @RequestBody UserReportDto userReportDto) {
+
+        RequestDetailDto requestDetailDto = userService.reportUser(userId, userReportDto);
+        return ResponseEntity.status(HttpStatus.OK).body(requestDetailDto);
+    
+    }
+  
     @GetMapping("/my-recipes")
     public ResponseEntity<List<RecipeSimpleDto>> getMyRecipes(HttpServletRequest request) {
         Long userId = (Long) request.getAttribute("userId");
