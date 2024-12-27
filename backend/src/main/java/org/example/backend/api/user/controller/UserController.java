@@ -5,15 +5,20 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.backend.api.recipe.model.dto.RecipeSimpleDto;
+import org.example.backend.api.recipe.service.RecipeService;
 import org.example.backend.api.user.model.dto.*;
 import org.example.backend.api.user.service.UserService;
 import org.example.backend.exceptions.LoginFailedException;
+import org.example.backend.exceptions.UserIdNullException;
 import org.example.backend.exceptions.UserNotFoundException;
 import org.example.backend.security.PrincipalDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
@@ -22,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final RecipeService recipeService;
 
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody UserRegisterDto userRegisterDto) {
@@ -57,8 +63,8 @@ public class UserController {
         Object principal = authentication.getPrincipal();
 
         PrincipalDetails principalDetails = (PrincipalDetails) principal;
-        log.info("princiaplDetails : {}",principalDetails.getUsername());
-        log.info("princiaplDetails : {}",principalDetails.getUserId());
+        log.info("princiaplDetails : {}", principalDetails.getUsername());
+        log.info("princiaplDetails : {}", principalDetails.getUserId());
         try {
             return ResponseEntity.status(HttpStatus.OK).body(userService.getUserInfoByEmail(userEmail));
         } catch (Exception e) {
@@ -86,10 +92,9 @@ public class UserController {
     public ResponseEntity<?> getUserInfo(@PathVariable("userId") Long userId) {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(userService.getOtherUserInfo(userId));
-        } catch(UserNotFoundException e){
+        } catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("존재하지 않는 회원입니다.");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원 조회 중 오류가 발생했습니다.");
         }
     }
@@ -133,5 +138,23 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원 탈퇴 중 오류가 발생했습니다.");
         }
+    }
+
+    @GetMapping("/my-recipes")
+    public ResponseEntity<List<RecipeSimpleDto>> getMyRecipes(HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        if (userId == null) {
+            throw new UserIdNullException("userId not found");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(recipeService.getMyRecipes(userId));
+    }
+
+    @GetMapping("/bookmarked-recipes")
+    public ResponseEntity<List<RecipeSimpleDto>> getBookmarkedRecipes(HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        if (userId == null) {
+            throw new UserIdNullException("userId not found");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(recipeService.getBookmarkedRecipes(userId));
     }
 }
