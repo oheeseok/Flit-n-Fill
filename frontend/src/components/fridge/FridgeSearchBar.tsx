@@ -1,16 +1,20 @@
-import { useRecipe } from "../../context/RecipeContext";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import "../../styles/common/SearchBar.css";
 import SearchIcon from "../common/SearchIcon";
-import { useState } from "react";
 import Swal from "sweetalert2";
+import { CATEGORY_DATA } from "../../data/categoryData";
 
-const FridgeSearchBar = () => {
-  const { setSearchQuery } = useRecipe(); // Context에서 setSearchQuery만 사용
+interface FridgeSearchBarProps {
+  onSearch: (
+    mainCategory: string,
+    subCategory?: string,
+    detailCategory?: string
+  ) => void;
+}
+
+const FridgeSearchBar: React.FC<FridgeSearchBarProps> = ({ onSearch }) => {
   const [inputValue, setInputValue] = useState("");
-  const navigate = useNavigate();
 
-  // 검색 실행 함수
   const handleSearch = () => {
     if (inputValue.trim() === "") {
       Swal.fire({
@@ -21,18 +25,42 @@ const FridgeSearchBar = () => {
       return;
     }
 
-    setSearchQuery(inputValue); // Context에 검색어 업데이트
-    navigate(`/recipe/list?query=${inputValue}`); // 검색 결과 페이지로 이동
-  };
-  // 엔터 키를 눌렀을 때
-  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") {
-      handleSearch(); // 검색 실행
+    const searchResults = Object.entries(CATEGORY_DATA).find(
+      ([mainCategory, data]) => {
+        if (data.중분류.includes(inputValue)) {
+          onSearch(mainCategory, inputValue);
+          return true;
+        }
+        if (
+          Object.values(data.소분류).some((details) =>
+            details.includes(inputValue)
+          )
+        ) {
+          const subCategory = Object.keys(data.소분류).find((key) =>
+            data.소분류[key].includes(inputValue)
+          );
+          if (subCategory) {
+            onSearch(mainCategory, subCategory, inputValue);
+          }
+          return true;
+        }
+        return false;
+      }
+    );
+
+    if (!searchResults) {
+      Swal.fire({
+        icon: "error",
+        title: "검색 결과가 없습니다.",
+        confirmButtonText: "확인",
+      });
     }
   };
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(event.target.value); // 입력 상태 업데이트트
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      handleSearch();
+    }
   };
 
   return (
@@ -42,11 +70,11 @@ const FridgeSearchBar = () => {
         placeholder="Search"
         className="searchbar"
         value={inputValue}
-        onChange={handleInputChange}
-        onKeyPress={handleKeyPress} // 엔터 키 이벤트
+        onChange={(e) => setInputValue(e.target.value)}
+        onKeyPress={handleKeyPress}
       />
       <div onClick={handleSearch} className="search-icon-container">
-        <SearchIcon /> {/* 아이콘 클릭 시 검색 실행 */}
+        <SearchIcon />
       </div>
     </div>
   );
