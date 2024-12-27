@@ -142,7 +142,10 @@ public class UserController {
 
     @PostMapping("/report")
     public ResponseEntity<?> reportUser(HttpServletRequest request, @RequestBody UserReportDto userReportDto) {
-
+        Long userId = (Long) request.getAttribute("userId");
+        if (userId == null) {
+            throw new UserIdNullException("userId not found");
+        }
         RequestDetailDto requestDetailDto = userService.reportUser(userId, userReportDto);
         return ResponseEntity.status(HttpStatus.OK).body(requestDetailDto);
     
