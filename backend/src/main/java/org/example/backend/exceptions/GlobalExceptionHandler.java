@@ -1,11 +1,22 @@
 package org.example.backend.exceptions;
 
+import org.example.backend.api.admin.controller.AdminController;
+import org.example.backend.api.foodlist.controller.FoodListController;
+import org.example.backend.api.myfridge.controller.MyfridgeController;
+import org.example.backend.api.notification.controller.NotificationController;
+import org.example.backend.api.notification.controller.PushNotificationController;
+import org.example.backend.api.post.controller.PostController;
+import org.example.backend.api.recipe.controller.RecipeController;
+import org.example.backend.api.trade.controller.TradeController;
+import org.example.backend.api.user.controller.UserController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@RestControllerAdvice
+@RestControllerAdvice(annotations = { RestController.class}, basePackageClasses = { AdminController.class, FoodListController.class, MyfridgeController.class,
+NotificationController.class, PostController.class, PushNotificationController.class, RecipeController.class, TradeController.class, UserController.class })
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
