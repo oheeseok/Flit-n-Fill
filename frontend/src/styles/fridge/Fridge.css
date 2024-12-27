@@ -47,7 +47,7 @@
 }
 .cold-side {
   font-family: Ubuntu;
-  font-size: 22px;
+  font-size: 18px;
   width: 760px;
   height: 560px;
   flex-shrink: 0;
@@ -59,6 +59,11 @@
   align-items: center;
 }
 .cold-back {
+  display: flex;
+  flex-wrap: wrap; /* 넘칠 경우 새 줄로 이동 */
+  justify-content: flex-start; /* 왼쪽 정렬 */
+  align-items: flex-start;
+  gap: 14px; /* 아이템 간격 추가 */
   width: 600px;
   height: 480px;
   flex-shrink: 0;
@@ -98,6 +103,8 @@
   border-radius: 0px 0px 60px 60px;
   background: var(--light-green, #d4efc7);
   position: relative;
+  font-family: Ubuntu;
+  font-size: 22px;
 }
 
 .freeze-side {
@@ -109,17 +116,23 @@
   height: 560px;
   flex-shrink: 0;
   border-radius: 58px;
+  font-size: 18px;
   background: rgba(63, 126, 112, 0.3);
 }
 
 .freeze-back {
   font-family: Ubuntu;
-  font-size: 22px;
+  font-size: 18px;
   width: 600px;
   height: 480px;
   flex-shrink: 0;
   border-radius: 0px 0px 56px 56px;
   background: rgba(63, 126, 112, 0.6);
+  display: flex;
+  flex-wrap: wrap; /* 넘칠 경우 새 줄로 이동 */
+  justify-content: flex-start; /* 왼쪽 정렬 */
+  align-items: flex-start;
+  gap: 14px; /* 아이템 간격 추가 */
 }
 .freeze-door {
   width: 80px;
@@ -160,14 +173,26 @@
 .out-side {
   display: flex;
   flex-direction: column;
-  justify-content: start;
+  justify-content: center;
   align-items: center;
   width: 480px;
   height: 860px;
   border-radius: 35px;
   background: #f1d3d0;
+  font-family: Ubuntu;
+  font-size: 18px;
 }
-
+.out-back {
+  width: 380px;
+  height: 740px;
+  border-radius: 30px;
+  background: #eebfbb;
+  display: flex;
+  flex-wrap: wrap; /* 넘칠 경우 새 줄로 이동 */
+  justify-content: flex-start; /* 왼쪽 정렬 */
+  align-items: flex-start;
+  gap: 14px; /* 아이템 간격 추가 */
+}
 .out-area1 {
   font-family: Ubuntu;
   font-size: 22px;
@@ -217,6 +242,8 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  font-family: Ubuntu;
+  font-size: 18px;
 }
 
 .bucket-area {
@@ -226,9 +253,148 @@
   height: 440px;
   background: #ebe298;
   border-radius: 160px;
+  display: flex;
+  flex-wrap: wrap; /* 넘칠 경우 새 줄로 이동 */
+  justify-content: flex-start; /* 왼쪽 정렬 */
+  align-items: flex-start;
+  gap: 14px; /* 아이템 간격 추가 */
 }
 .button-container {
   position: absolute;
   right: 20px;
   bottom: 90px;
+}
+.fridge-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 74px;
+}
+
+.fridge-item-icon {
+  width: 62px;
+}
+.fridge-item-name {
+  color: #000;
+  font-family: Ubuntu;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 20px; /* 166.667% */
+  margin-bottom: -4px;
+}
+.fridge-item-expiration {
+  color: #000;
+  font-family: Ubuntu;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 20px; /* 166.667% */
+}
+.fridge-item-actions {
+  position: absolute;
+  top: 10px;
+  left: 64px;
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fridge-item:hover .fridge-item-actions {
+  display: flex;
+}
+
+
+
+
+/* 말풍선 에딧딧 */
+.edit-popup {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  width: 320px; /* 팝업 크기 살짝 늘림 */
+  z-index: 1000; /* 다른 요소들 위에 나타나도록 설정 */
+}
+
+.edit-popup h3 {
+  font-size: 20px; /* 조금 더 강조 */
+  font-weight: bold;
+  margin-bottom: 20px; /* 헤더와 입력 사이 간격 조정 */
+  color: #333;
+}
+
+.edit-popup label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #555; /* 텍스트 색상 약간 더 부드럽게 */
+}
+
+.edit-popup input,
+.edit-popup select,
+.edit-popup textarea {
+  width: calc(100% - 16px); /* 양옆 여백 고려 */
+  padding: 8px;
+  margin-bottom: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.edit-popup .edit-quantity-group {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* 간격 조정 */
+  margin-bottom: 16px;
+}
+
+.edit-popup .edit-quantity-group input {
+  flex: 1; /* 입력 칸 더 좁게 */
+}
+
+.edit-popup .edit-quantity-group select {
+  width: 70px; /* 드롭다운 칸 좁힘 */
+  padding: 6px; /* 여백 조정 */
+}
+
+/* Radio 버튼 스타일 */
+.edit-popup .edit-radio-group {
+  display: flex;
+  gap: 20px; /* 각 버튼 간 간격 */
+  align-items: center;
+  margin-bottom: 16px;
+  justify-content: center;
+  align-items: center;
+}
+
+.edit-popup .edit-radio-group label {
+  font-weight: 500;
+  color: #555;
+}
+
+.edit-popup button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-right: 10px;
+  background-color: #c7efe6; /* 버튼 배경색 */
+  color: #000;
+  transition: background-color 0.3s ease;
+}
+
+.edit-popup button:hover {
+  background-color: #b2e3d5; /* 버튼 호버 시 색상 */
+}
+
+.edit-popup button:last-child {
+  margin-right: 0; /* 마지막 버튼 간격 제거 */
 }

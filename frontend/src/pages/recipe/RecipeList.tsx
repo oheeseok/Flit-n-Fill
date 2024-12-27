@@ -1,22 +1,26 @@
 import { useRecipe } from "../../context/RecipeContext";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import RecipeSearchBar from "../../components/recipe/RecipeSearchBar";
 import "../../styles/recipe/RecipeList.css";
 import { useState, useEffect } from "react";
 
 const RecipeList = () => {
   const { recipes, toggleBookmark, searchQuery, fetchRecipes } = useRecipe();
+  const [searchParams] = useSearchParams();
   const [showBookmarksOnly, setShowBookmarksOnly] = useState(false);
   const [sortOrder, setSortOrder] = useState("popular");
 
   useEffect(() => {
-    console.log("Search Query:", searchQuery);
+    console.log("Search Query received in RecipeList:", searchQuery);
 
-    fetchRecipes({
-      sort: sortOrder,
-      search: searchQuery,
-    });
-  }, [sortOrder, searchQuery, fetchRecipes]);
+    const query = searchParams.get("query");
+    if (query) {
+      fetchRecipes({
+        sort: sortOrder,
+        search: query,
+      });
+    }
+  }, [sortOrder, searchParams, searchQuery, fetchRecipes]);
 
   const filteredRecipes = recipes.filter(
     (recipe) => !showBookmarksOnly || recipe.isBookmarked
@@ -49,7 +53,7 @@ const RecipeList = () => {
       </div>
       <div className="recipelistbody">
         {filteredRecipes.map((recipe, index) => (
-          <div className="recipe-list-container" key={index}>
+          <div className="recipe-list-container" key={recipe.id}>
             <div className="recipe-list-box-name-title">
               {recipe.recipeTitle}
             </div>
