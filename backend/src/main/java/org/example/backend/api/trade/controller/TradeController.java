@@ -1,7 +1,6 @@
 package org.example.backend.api.trade.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.example.backend.api.trade.model.dto.TradeRoomMessageDto;
 import org.example.backend.api.trade.service.TradeService;
@@ -64,7 +63,7 @@ public class TradeController {
     }
 
     @PostMapping("/{tradeRoomId}/kindness")
-    public ResponseEntity<?> radeKindness(HttpServletRequest request, @PathVariable("tradeRoomId") String tradeRoomId,
+    public ResponseEntity<?> rateKindness(HttpServletRequest request, @PathVariable("tradeRoomId") String tradeRoomId,
                                           @RequestBody String kindness) {
         Long userId = (Long) request.getAttribute("userId");
         if (userId == null) {

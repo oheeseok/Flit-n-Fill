@@ -67,7 +67,7 @@ public class EmailService {
         }
     }
 
-    @Scheduled(cron = "0 15 10 * * *")
+    @Scheduled(cron = "0 0 6 * * *")
     public void sendExpirationEmail() {
         List<User> userList = userRepository.findAll();
 

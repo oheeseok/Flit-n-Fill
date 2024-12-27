@@ -63,8 +63,8 @@ public class UserController {
         Object principal = authentication.getPrincipal();
 
         PrincipalDetails principalDetails = (PrincipalDetails) principal;
-        log.info("princiaplDetails : {}", principalDetails.getUsername());
-        log.info("princiaplDetails : {}", principalDetails.getUserId());
+        log.info("principalDetails : {}", principalDetails.getUsername());
+        log.info("principalDetails : {}", principalDetails.getUserId());
         try {
             return ResponseEntity.status(HttpStatus.OK).body(userService.getUserInfoByEmail(userEmail));
         } catch (Exception e) {
