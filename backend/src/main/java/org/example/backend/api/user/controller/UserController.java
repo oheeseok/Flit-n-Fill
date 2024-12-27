@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.backend.api.user.model.dto.*;
 import org.example.backend.api.user.service.UserService;
 import org.example.backend.exceptions.LoginFailedException;
+import org.example.backend.exceptions.UserIdNullException;
 import org.example.backend.exceptions.UserNotFoundException;
 import org.example.backend.security.PrincipalDetails;
 import org.springframework.http.HttpStatus;
@@ -24,7 +25,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody UserRegisterDto userRegisterDto) {
+    public ResponseEntity<?> registerUser(@RequestBody UserRegisterDto userRegisterDto) {
         if (userService.existsByUserEmail(userRegisterDto.getUserEmail())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 가입된 이메일입니다.");
         }
@@ -95,7 +96,7 @@ public class UserController {
     }
 
     @GetMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         // 쿠키에서 토큰 가져오기
         Cookie[] cookies = request.getCookies();
         String token = null;
@@ -122,7 +123,7 @@ public class UserController {
     }
 
     @DeleteMapping("/info")
-    public ResponseEntity<String> deleteUser(Authentication authentication, @RequestBody UserLoginDto loginDto) {
+    public ResponseEntity<?> deleteUser(Authentication authentication, @RequestBody UserLoginDto loginDto) {
         loginDto.setUserEmail(authentication.getName());
 
         try {
@@ -133,5 +134,16 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원 탈퇴 중 오류가 발생했습니다.");
         }
+    }
+
+    @PostMapping("/report")
+    public ResponseEntity<?> reportUser(HttpServletRequest request, @RequestBody UserReportDto userReportDto) {
+        // TODO: userReportDto로 userReportService.reportUser() 호출
+        Long userId = (Long) request.getAttribute("userId");
+        if (userId == null) {
+            throw new UserIdNullException("userId not found");
+        }
+        RequestDetailDto requestDetailDto = userService.reportUser(userId, userReportDto);
+        return ResponseEntity.status(HttpStatus.OK).body(requestDetailDto);
     }
 }

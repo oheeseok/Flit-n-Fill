@@ -1,30 +1,29 @@
 package org.example.backend.api.user.service;
 
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.backend.api.recipe.service.RecipeService;
 import org.example.backend.api.user.model.dto.*;
+import org.example.backend.api.user.model.entity.Request;
 import org.example.backend.api.user.model.entity.User;
 import org.example.backend.api.user.model.entity.UserCart;
+import org.example.backend.api.user.repository.RequestRepository;
 import org.example.backend.api.user.repository.UserCartRepository;
 import org.example.backend.api.user.repository.UserRepository;
 import org.example.backend.enums.AuthProvider;
+import org.example.backend.enums.RequestType;
+import org.example.backend.enums.TaskStatus;
 import org.example.backend.exceptions.LoginFailedException;
 import org.example.backend.exceptions.PasswordMismatchException;
-import org.example.backend.exceptions.UnauthorizedException;
 import org.example.backend.exceptions.UserNotFoundException;
 import org.example.backend.security.JwtTokenProvider;
 import org.example.backend.security.PrincipalDetails;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Service
 @Transactional
@@ -37,6 +36,7 @@ public class UserService {
     private final RecipeService recipeService;
     private final BCryptPasswordEncoder passwordEncoder;
     private final TokenManagementService tokenManagementService;
+    private final RequestRepository requestRepository;
 
     // userEmail 중복 검사
     public boolean existsByUserEmail(String userEmail) {
@@ -187,5 +187,22 @@ public class UserService {
                .orElseThrow(() -> new UserNotFoundException("존재하지 않는 회원입니다."));
 
         return new PrincipalDetails(user);
+    }
+
+    public RequestDetailDto reportUser(Long userId, UserReportDto userReportDto) {
+        // TODO: user Report request 생성해서 저장
+        Request request = new Request();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("존재하지 않는 회원입니다."));
+        User reportedUser = userRepository.findById(userReportDto.getUserId())
+                        .orElseThrow(() -> new UserNotFoundException("존재하지 않는 회원은 신고가 불가능합니다."));
+        request.setRequestUser(user);
+        request.setRequestContent(userReportDto.getReportReason());
+        request.setRequestDate(LocalDateTime.now());
+        request.setRequestType(RequestType.REPORT);
+        request.setResponseStatus(TaskStatus.PENDING);
+        request.setReportedUser(reportedUser);
+
+        return RequestDetailDto.of(requestRepository.save(request));
     }
 }

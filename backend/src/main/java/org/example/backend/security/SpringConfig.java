@@ -43,7 +43,7 @@ public class SpringConfig {
         // 인증 요청 페이지 설정
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/user/register", "/api/user/login", "/oauth2/**", "/api/subscribe/**").permitAll()
+                        .requestMatchers("/api/user/register", "/api/user/login", "/oauth2/**", "/api/subscribe/**", "/api/admin/login").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().permitAll())
