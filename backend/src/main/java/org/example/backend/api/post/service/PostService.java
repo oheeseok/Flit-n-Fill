@@ -232,7 +232,8 @@ public class PostService {
               writer,
               notificationType,
               post.getTradeType().getDescription() + " 요청이 왔습니다!",
-              tradeRequest.getTradeRequestId());
+              tradeRequest.getTradeRequestId(),
+              null);
       log.info("3. save data to db --- done");
   }
 

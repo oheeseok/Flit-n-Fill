@@ -238,7 +238,7 @@ public class TradeService {
                 .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
 
         Long postId = tradeRequest.getPost().getPostId();
-        String stat = notification.getNotificationType().getDescription();
+        String stat = notification.getNotificationType().getDescription();  // "교환 요청", "나눔 요청"
         String subject = "[" + stat + " 결과 알림]";
         StringBuilder content = new StringBuilder();
 
@@ -267,13 +267,15 @@ public class TradeService {
                         proposer,
                         NotificationType.TRADE_REQUEST_RESULT,
                         stat + " : 거절되었습니다!",
-                        tradeRequestId);
+                        tradeRequestId,
+                        null);
             } else if (notification.getNotificationType().equals(NotificationType.SHARE_REQUEST)) {     // 나눔 요청
                 notificationService.saveTradeRequestNotification(
                         proposer,
                         NotificationType.SHARE_REQUEST_RESULT,
                         stat + " : 거절되었습니다!",
-                        tradeRequestId);
+                        tradeRequestId,
+                        null);
             } else {
                 throw new TradeRequestHandleException("요청에 대한 결과가 아닙니다.");
             }
@@ -296,24 +298,28 @@ public class TradeService {
             log.info("2. send push --- done");
 
             // db 저장
+            Trade newTrade = createNewTrade(notification);
+            TradeRoom newTradeRoom = createNewTradeRoom(newTrade);
+
             if (notification.getNotificationType().equals(NotificationType.TRADE_REQUEST)) {    // 교환 요청
                 notificationService.saveTradeRequestNotification(
                         proposer,
                         NotificationType.TRADE_REQUEST_RESULT,
-                        stat + " : 수락되었습니다!",
-                        tradeRequestId);
+                        stat + " : 수락되었습니다. 거래방에서 대화를 나눠보세요!",
+                        tradeRequestId,
+                        newTradeRoom.getTradeRoomId());
             } else if (notification.getNotificationType().equals(NotificationType.SHARE_REQUEST)) {     // 나눔 요청
                 notificationService.saveTradeRequestNotification(
                         proposer,
                         NotificationType.SHARE_REQUEST_RESULT,
-                        stat + " : 수락되었습니다!",
-                        tradeRequestId);
+                        stat + " : 수락되었습니다. 거래방에서 대화를 나눠보세요!",
+                        tradeRequestId,
+                        newTradeRoom.getTradeRoomId());
             } else {
                 throw new TradeRequestHandleException("요청에 대한 결과가 아닙니다.");
             }
 
-            Trade newTrade = createNewTrade(notification);
-            createNewTradeRoom(newTrade);
+
 
             Post post = tradeRequest.getPost();
             post.setProgress(Progress.IN_PROGRESS);
@@ -327,7 +333,7 @@ public class TradeService {
         Long postId = trade.getPost().getPostId();
         List<TradeRequest> tradeRequests = tradeRequestRepository.findByPost_PostId(postId);
         Post post = trade.getPost();
-        String stat = post.getTradeType().getDescription();
+        String stat = post.getTradeType().getDescription();     // "교환", "나눔"
 
         for (TradeRequest tradeRequest : tradeRequests) {
             if (!tradeRequest.getProposer().getUserId().equals(trade.getProposer().getUserId())) {
@@ -343,14 +349,14 @@ public class TradeService {
 
                 // email 전송
                 content.append("<h3>회원님께서 요청하신 " + stat + " 요청이 상대방에 의해 거절되었습니다.</h3><br>" +
-                    stat + "한 게시글 : " + "<strong><a href=\"http://" + host + ":" + port + "/api/posts/" + postId + "\">게시글 보러가기</a></strong><br><br>");
+                    stat + " 요청한 게시글 : " + "<strong><a href=\"http://" + host + ":" + port + "/api/posts/" + postId + "\">게시글 보러가기</a></strong><br><br>");
                 content.append("아쉽게도 요청이 거절되었지만, 재요청 하시거나 다른 거래를 시도해 보실 수 있습니다.<br>" +
-                    "다른 게시글에도 교환 요청을 보내보세요!<br>" +
+                    "다른 게시글에도 요청을 보내보세요!<br>" +
                     "<strong><a href=\"http://" + host + ":" + port + "/api/posts\">게시글 둘러보기</a></strong>");
                 emailService.sendEmail(user.getUserEmail(), subject, content.toString());
 
                 // push 알림
-                String message = String.format("[%s 결과 알림] 회원님께서 요청하신 %s이 거절되었습니다.",
+                String message = String.format("[%s 결과 알림] 회원님께서 요청하신 %s 요청이 거절되었습니다.",
                     stat,
                     stat
                 );
@@ -362,13 +368,15 @@ public class TradeService {
                         user,
                         NotificationType.TRADE_REQUEST_RESULT,
                         stat + " 요청 : 거절되었습니다!",
-                        tradeRequest.getTradeRequestId());
+                        tradeRequest.getTradeRequestId(),
+                            null);
                 } else {    // 나눔
                     notificationService.saveTradeRequestNotification(
                         user,
                         NotificationType.TRADE_REQUEST_RESULT,
                         stat + " 요청 : 거절되었습니다!",
-                        tradeRequest.getTradeRequestId());
+                        tradeRequest.getTradeRequestId(),
+                            null);
                 }
             }
         }
