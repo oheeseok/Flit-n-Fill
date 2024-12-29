@@ -55,10 +55,6 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final RequestRepository requestRepository;
     private final TradeRequestRepository tradeRequestRepository;
-    private final EmailService emailService;
-    private final PushNotificationService pushNotificationService;
-    private final TradeService tradeService;
-    private final PostRepository postRepository;
 
     @Value("${server.host}")
     private String host;
@@ -88,109 +84,6 @@ public class NotificationService {
         notification.setRequest(request);
 
         notificationRepository.save(notification);
-    }
-
-    public void handelRequestNotification(Long userId, Long notificationId, String status) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
-
-        // Notification -> TradeRequest -> TradeTaskStatus 변경
-        Notification notification = notificationRepository.findByNotificationId(notificationId);
-        Long tradeRequestId = notification.getTradeRequest().getTradeRequestId();
-        TradeRequest tradeRequest = tradeRequestRepository.findById(tradeRequestId)
-                .orElseThrow(() -> new RequestNotFoundException("tradeRequest not found"));
-
-        TaskStatus taskStatus = TaskStatus.valueOf(status);
-        tradeRequest.setTradeTaskStatus(taskStatus);    // ACCEPTED or DENIED
-        tradeRequestRepository.save(tradeRequest);
-
-        User proposer = userRepository.findById(tradeRequest.getProposer().getUserId())
-                .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
-
-        Long postId = tradeRequest.getPost().getPostId();
-        String stat = notification.getNotificationType().getDescription();
-        String subject = "[" + stat + " 결과 알림]";
-        StringBuilder content = new StringBuilder();
-
-        if (tradeRequest.getTradeTaskStatus().equals(TaskStatus.DENIED)) {  // 거절
-            // email 전송(#54)
-            content.append("<h3>회원님께서 요청하신 " + stat + "이 상대방에 의해 거절되었습니다.</h3><br>" +
-                    stat + "한 게시글 : " + "<strong><a href=\"http://" + host + ":" + port + "/api/posts/" + postId + "\">게시글 보러가기</a></strong><br><br>");
-            content.append("아쉽게도 요청이 거절되었지만, 재요청 하시거나 다른 거래를 시도해 보실 수 있습니다.<br>" +
-                    "다른 게시글에도 교환 요청을 보내보세요!<br>" +
-                    "<strong><a href=\"http://" + host + ":" + port + "/api/posts\">게시글 둘러보기</a></strong>");
-
-            emailService.sendEmail(proposer.getUserEmail(), subject, content.toString());
-            // push 알림(#55)
-            log.info("2. send push noti");
-            String message = String.format("[%s 결과 알림] 회원님께서 요청하신 %s이 거절되었습니다.",
-                    stat,
-                    stat
-                );
-            log.info("message: {}", message);
-            pushNotificationService.sendPushNotification(proposer.getUserId(), message);
-            log.info("2. send push --- done");
-
-            // db 저장
-            if (notification.getNotificationType().equals(NotificationType.TRADE_REQUEST)) {    // 교환 요청
-                saveTradeRequestNotification(
-                        proposer,
-                        NotificationType.TRADE_REQUEST_RESULT,
-                        stat + " : 거절되었습니다!",
-                        tradeRequestId);
-            } else if (notification.getNotificationType().equals(NotificationType.SHARE_REQUEST)) {     // 나눔 요청
-                saveTradeRequestNotification(
-                        proposer,
-                        NotificationType.SHARE_REQUEST_RESULT,
-                        stat + " : 거절되었습니다!",
-                        tradeRequestId);
-            } else {
-                throw new TradeRequestHandleException("요청에 대한 결과가 아닙니다.");
-            }
-        } else if (tradeRequest.getTradeTaskStatus().equals(TaskStatus.ACCEPTED)) {    // 수락
-            // email 전송(#54)
-            content.append("<h3>회원님께서 요청하신 " + stat + "이 수락되었습니다!</h3><br>" +
-                    stat + "한 게시글 : " + "<strong><a href=\"http://" + host + ":" + port + "/api/posts/" + postId + "\">게시글 보러가기</a></strong>");
-            content.append("<br>지금 거래방에서 대화를 나눠보세요!" +
-                    "<br><strong><a href=\"http://" + host + ":" + port + "/api/trade/" + notification.getTradeRoomId() + "\">거래방 바로가기</a></strong>");
-
-            emailService.sendEmail(proposer.getUserEmail(), subject, content.toString());
-            // push 알림(#55)
-            log.info("2. send push noti");
-            String message = String.format("[%s 결과 알림] 회원님께서 요청하신 %s이 수락되었습니다.",
-                    stat,
-                    stat
-            );
-            log.info("message: {}", message);
-            pushNotificationService.sendPushNotification(proposer.getUserId(), message);
-            log.info("2. send push --- done");
-
-            // db 저장
-            if (notification.getNotificationType().equals(NotificationType.TRADE_REQUEST)) {    // 교환 요청
-                saveTradeRequestNotification(
-                        proposer,
-                        NotificationType.TRADE_REQUEST_RESULT,
-                        stat + " : 수락되었습니다!",
-                        tradeRequestId);
-            } else if (notification.getNotificationType().equals(NotificationType.SHARE_REQUEST)) {     // 나눔 요청
-                saveTradeRequestNotification(
-                        proposer,
-                        NotificationType.SHARE_REQUEST_RESULT,
-                        stat + " : 수락되었습니다!",
-                        tradeRequestId);
-            } else {
-                throw new TradeRequestHandleException("요청에 대한 결과가 아닙니다.");
-            }
-
-            Trade newTrade = tradeService.createNewTrade(notification);
-            tradeService.createNewTradeRoom(newTrade);
-
-            Post post = tradeRequest.getPost();
-            post.setProgress(Progress.IN_PROGRESS);
-            postRepository.save(tradeRequest.getPost());
-        } else {
-            throw new TradeRequestHandleException("요청 대기 중입니다.");
-        }
     }
 
     public List<NotificationViewDto> getAllNotifications(Long userId) {

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.backend.api.notification.model.entity.Notification;
 import org.example.backend.api.notification.repository.NotificationRepository;
+import org.example.backend.api.notification.service.EmailService;
 import org.example.backend.api.notification.service.NotificationService;
 import org.example.backend.api.notification.service.PushNotificationService;
 import org.example.backend.api.post.model.dto.PostSimpleDto;
@@ -14,17 +15,18 @@ import org.example.backend.api.trade.model.dto.TradeRoomMessageDto;
 import org.example.backend.api.trade.model.dto.TradeRoomSimpleDto;
 import org.example.backend.api.trade.model.entity.Kindness;
 import org.example.backend.api.trade.model.entity.Trade;
+import org.example.backend.api.trade.model.entity.TradeRequest;
 import org.example.backend.api.trade.model.entity.TradeRoom;
 import org.example.backend.api.trade.repository.KindnessRepository;
 import org.example.backend.api.trade.repository.TradeRepository;
+import org.example.backend.api.trade.repository.TradeRequestRepository;
 import org.example.backend.api.trade.repository.TradeRoomRepository;
 import org.example.backend.api.user.model.dto.OtherUserDto;
 import org.example.backend.api.user.model.entity.User;
 import org.example.backend.api.user.repository.UserRepository;
-import org.example.backend.enums.KindnessType;
-import org.example.backend.enums.NotificationType;
-import org.example.backend.enums.Progress;
+import org.example.backend.enums.*;
 import org.example.backend.exceptions.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,11 +42,21 @@ import java.util.Optional;
 public class TradeService {
     private final TradeRoomRepository tradeRoomRepository;
     private final TradeRepository tradeRepository;
+    private final TradeRequestRepository tradeRequestRepository;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final KindnessRepository kindnessRepository;
     private final PushNotificationService pushNotificationService;
     private final NotificationRepository notificationRepository;
+    private final NotificationService notificationService;
+    private final EmailService emailService;
+
+    @Value("${server.host}")
+    private String host;
+
+    @Value("${server.port}")
+    private String port;
+
     public List<TradeRoomSimpleDto> getAllTrades(Long userId) {
         List<TradeRoom> tradeRoomList = tradeRoomRepository.findByWriterIdOrProposerId(userId, userId);
         List<TradeRoomSimpleDto> tradeRoomDtos = new ArrayList<>();
@@ -204,6 +216,162 @@ public class TradeService {
 
         tradeRepository.save(trade);
         postRepository.save(post);
+
+        notifyOtherProposers(trade);
+    }
+
+    public void handelRequestNotification(Long userId, Long notificationId, String status) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
+
+        // Notification -> TradeRequest -> TradeTaskStatus 변경
+        Notification notification = notificationRepository.findByNotificationId(notificationId);
+        Long tradeRequestId = notification.getTradeRequest().getTradeRequestId();
+        TradeRequest tradeRequest = tradeRequestRepository.findById(tradeRequestId)
+                .orElseThrow(() -> new RequestNotFoundException("tradeRequest not found"));
+
+        TaskStatus taskStatus = TaskStatus.valueOf(status);
+        tradeRequest.setTradeTaskStatus(taskStatus);    // ACCEPTED or DENIED
+        tradeRequestRepository.save(tradeRequest);
+
+        User proposer = userRepository.findById(tradeRequest.getProposer().getUserId())
+                .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
+
+        Long postId = tradeRequest.getPost().getPostId();
+        String stat = notification.getNotificationType().getDescription();
+        String subject = "[" + stat + " 결과 알림]";
+        StringBuilder content = new StringBuilder();
+
+        if (tradeRequest.getTradeTaskStatus().equals(TaskStatus.DENIED)) {  // 거절
+            // email 전송(#54)
+            content.append("<h3>회원님께서 요청하신 " + stat + "이 상대방에 의해 거절되었습니다.</h3><br>" +
+                    stat + "한 게시글 : " + "<strong><a href=\"http://" + host + ":" + port + "/api/posts/" + postId + "\">게시글 보러가기</a></strong><br><br>");
+            content.append("아쉽게도 요청이 거절되었지만, 재요청 하시거나 다른 거래를 시도해 보실 수 있습니다.<br>" +
+                    "다른 게시글에도 교환 요청을 보내보세요!<br>" +
+                    "<strong><a href=\"http://" + host + ":" + port + "/api/posts\">게시글 둘러보기</a></strong>");
+
+            emailService.sendEmail(proposer.getUserEmail(), subject, content.toString());
+            // push 알림(#55)
+            log.info("2. send push noti");
+            String message = String.format("[%s 결과 알림] 회원님께서 요청하신 %s이 거절되었습니다.",
+                    stat,
+                    stat
+            );
+            log.info("message: {}", message);
+            pushNotificationService.sendPushNotification(proposer.getUserId(), message);
+            log.info("2. send push --- done");
+
+            // db 저장
+            if (notification.getNotificationType().equals(NotificationType.TRADE_REQUEST)) {    // 교환 요청
+                notificationService.saveTradeRequestNotification(
+                        proposer,
+                        NotificationType.TRADE_REQUEST_RESULT,
+                        stat + " : 거절되었습니다!",
+                        tradeRequestId);
+            } else if (notification.getNotificationType().equals(NotificationType.SHARE_REQUEST)) {     // 나눔 요청
+                notificationService.saveTradeRequestNotification(
+                        proposer,
+                        NotificationType.SHARE_REQUEST_RESULT,
+                        stat + " : 거절되었습니다!",
+                        tradeRequestId);
+            } else {
+                throw new TradeRequestHandleException("요청에 대한 결과가 아닙니다.");
+            }
+        } else if (tradeRequest.getTradeTaskStatus().equals(TaskStatus.ACCEPTED)) {    // 수락
+            // email 전송(#54)
+            content.append("<h3>회원님께서 요청하신 " + stat + "이 수락되었습니다!</h3><br>" +
+                    stat + "한 게시글 : " + "<strong><a href=\"http://" + host + ":" + port + "/api/posts/" + postId + "\">게시글 보러가기</a></strong>");
+            content.append("<br>지금 거래방에서 대화를 나눠보세요!" +
+                    "<br><strong><a href=\"http://" + host + ":" + port + "/api/trade/" + notification.getTradeRoomId() + "\">거래방 바로가기</a></strong>");
+
+            emailService.sendEmail(proposer.getUserEmail(), subject, content.toString());
+            // push 알림(#55)
+            log.info("2. send push noti");
+            String message = String.format("[%s 결과 알림] 회원님께서 요청하신 %s이 수락되었습니다.",
+                    stat,
+                    stat
+            );
+            log.info("message: {}", message);
+            pushNotificationService.sendPushNotification(proposer.getUserId(), message);
+            log.info("2. send push --- done");
+
+            // db 저장
+            if (notification.getNotificationType().equals(NotificationType.TRADE_REQUEST)) {    // 교환 요청
+                notificationService.saveTradeRequestNotification(
+                        proposer,
+                        NotificationType.TRADE_REQUEST_RESULT,
+                        stat + " : 수락되었습니다!",
+                        tradeRequestId);
+            } else if (notification.getNotificationType().equals(NotificationType.SHARE_REQUEST)) {     // 나눔 요청
+                notificationService.saveTradeRequestNotification(
+                        proposer,
+                        NotificationType.SHARE_REQUEST_RESULT,
+                        stat + " : 수락되었습니다!",
+                        tradeRequestId);
+            } else {
+                throw new TradeRequestHandleException("요청에 대한 결과가 아닙니다.");
+            }
+
+            Trade newTrade = createNewTrade(notification);
+            createNewTradeRoom(newTrade);
+
+            Post post = tradeRequest.getPost();
+            post.setProgress(Progress.IN_PROGRESS);
+            postRepository.save(tradeRequest.getPost());
+        } else {
+            throw new TradeRequestHandleException("요청 대기 중입니다.");
+        }
+    }
+
+    public void notifyOtherProposers(Trade trade) {     // 거래완료된 post에 대해 요청을 보냈던 요청자들 처리
+        Long postId = trade.getPost().getPostId();
+        List<TradeRequest> tradeRequests = tradeRequestRepository.findByPost_PostId(postId);
+        Post post = trade.getPost();
+        String stat = post.getTradeType().getDescription();
+
+        for (TradeRequest tradeRequest : tradeRequests) {
+            if (!tradeRequest.getProposer().getUserId().equals(trade.getProposer().getUserId())) {
+                // 상태 변경
+                tradeRequest.setTradeTaskStatus(TaskStatus.DENIED);
+                tradeRequestRepository.save(tradeRequest);
+
+                // 알림 전송
+                User user = userRepository.findById(tradeRequest.getProposer().getUserId())
+                    .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
+                String subject = "[" + stat + " 요청 결과 알림]";
+                StringBuilder content = new StringBuilder();
+
+                // email 전송
+                content.append("<h3>회원님께서 요청하신 " + stat + " 요청이 상대방에 의해 거절되었습니다.</h3><br>" +
+                    stat + "한 게시글 : " + "<strong><a href=\"http://" + host + ":" + port + "/api/posts/" + postId + "\">게시글 보러가기</a></strong><br><br>");
+                content.append("아쉽게도 요청이 거절되었지만, 재요청 하시거나 다른 거래를 시도해 보실 수 있습니다.<br>" +
+                    "다른 게시글에도 교환 요청을 보내보세요!<br>" +
+                    "<strong><a href=\"http://" + host + ":" + port + "/api/posts\">게시글 둘러보기</a></strong>");
+                emailService.sendEmail(user.getUserEmail(), subject, content.toString());
+
+                // push 알림
+                String message = String.format("[%s 결과 알림] 회원님께서 요청하신 %s이 거절되었습니다.",
+                    stat,
+                    stat
+                );
+                pushNotificationService.sendPushNotification(user.getUserId(), message);
+
+                // db 저장
+                if (stat.equals(TradeType.EXCHANGE)) {  // 교환
+                    notificationService.saveTradeRequestNotification(
+                        user,
+                        NotificationType.TRADE_REQUEST_RESULT,
+                        stat + " 요청 : 거절되었습니다!",
+                        tradeRequest.getTradeRequestId());
+                } else {    // 나눔
+                    notificationService.saveTradeRequestNotification(
+                        user,
+                        NotificationType.TRADE_REQUEST_RESULT,
+                        stat + " 요청 : 거절되었습니다!",
+                        tradeRequest.getTradeRequestId());
+                }
+            }
+        }
     }
 
     public void addKindness(String tradeRoomId, Long userId, String kindnessType) {
