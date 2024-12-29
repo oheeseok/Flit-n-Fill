@@ -72,17 +72,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         log.info("[JwtAuthenticationFilter] cookie accessToken : {}", token);
 
         if (token != null && userEmail != null) {
-<<<<<<< Updated upstream
-//            if (!userEmail.equals(jwtTokenProvider.getUserEmailFromToken(token))) {
-//                log.error("[JwtAuthenticationFilter] User email mismatch: token={}, request={}",
-//                        jwtTokenProvider.getUserEmailFromToken(token), userEmail);
-//                response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403 Forbidden
-//                response.getWriter().write("User email mismatch");
-//                return;
-//            }
-
-=======
->>>>>>> Stashed changes
             try {
                 token = tokenManagementService.isTokenExpired(userEmail, token, response);
                 if (token == null) {
