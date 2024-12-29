@@ -97,4 +97,11 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ex.getMessage());
     }
+
+    @ExceptionHandler(PostCannotBeDeletedException.class)
+    public ResponseEntity<String> handlePostCannotBeDeletedException(PostCannotBeDeletedException ex) {
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(ex.getMessage());
+    }
 }
