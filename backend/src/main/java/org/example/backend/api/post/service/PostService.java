@@ -173,7 +173,7 @@ public class PostService {
     } else if (tradeType.equals(TradeType.SHARING)) {
       notificationType = NotificationType.SHARE_CANCEL;
     }
-    List<TradeRequest> tradeRequestList = tradeRequestRepository.findByPostId(postId);
+    List<TradeRequest> tradeRequestList = tradeRequestRepository.findByPost_PostId(postId);
     // 게시글에 대한 요청자가 없는 경우: 바로 삭제
     // 게시글에 대한 요청자들이 있는 경우: TradeRequest trade_task_status = 거절 🡪 요청자들에게 알림(TRADE_CANCEL / SHARE_CANCEL) 전송 후 삭제
     if (tradeRequestList == null) {
