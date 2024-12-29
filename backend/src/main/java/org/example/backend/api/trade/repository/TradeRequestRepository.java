@@ -11,5 +11,5 @@ import java.util.Optional;
 public interface TradeRequestRepository extends JpaRepository<TradeRequest, Long> {
     // postId와 userId를 기준으로 TradeRequest 찾기
     Optional<TradeRequest> findFirstByPostAndProposerOrderByRequestCreatedDateDesc(Post post, User proposer);
-    List<TradeRequest> findByPostId(Long postId);
+    List<TradeRequest> findByPost_PostId(Long postId);
 }
