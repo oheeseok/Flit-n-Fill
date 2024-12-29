@@ -1,18 +1,20 @@
 package org.example.backend.api.recipe.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.backend.api.recipe.model.dto.RecipeDetailDto;
-import org.example.backend.api.recipe.model.dto.RecipeRegisterDto;
-import org.example.backend.api.recipe.model.dto.RecipeSimpleDto;
-import org.example.backend.api.recipe.model.dto.RecipeUpdateDto;
+import org.example.backend.api.recipe.model.dto.*;
 import org.example.backend.api.recipe.service.RecipeService;
+import org.example.backend.api.s3.S3Service;
 import org.example.backend.exceptions.UserIdNullException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -21,6 +23,7 @@ import java.util.List;
 @Slf4j
 public class RecipeController {
     private final RecipeService recipeService;
+    private final S3Service s3Service;
 
     @GetMapping
     public ResponseEntity<Object> getAllRecipes(HttpServletRequest request,
@@ -33,7 +36,7 @@ public class RecipeController {
         }
 
         Object result;
-        if (keyword != null && ! keyword.isEmpty()) {
+        if (keyword != null && !keyword.isEmpty()) {
             // src이 null이 아니면 src와 keyword를 모두 사용하여 검색
             if ("youtube".equals(src)) {
                 result = recipeService.searchYoutubeRecipes(keyword);
@@ -57,12 +60,35 @@ public class RecipeController {
         return ResponseEntity.status(HttpStatus.OK).body(recipe);
     }
 
-    @PostMapping
-    public ResponseEntity<RecipeDetailDto> addRecipe(HttpServletRequest request, @RequestBody RecipeRegisterDto recipeRegisterDto) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<RecipeDetailDto> addRecipe(HttpServletRequest request,
+                                                     @RequestPart("recipeRegisterDto") String  recipeRegisterDtoJson,
+                                                     @RequestPart("mainPhoto") MultipartFile mainPhoto,
+                                                     @RequestPart("stepPhotos") List<MultipartFile> stepPhotos) throws IOException {
+        // RecipeRegisterDto를 JSON에서 객체로 변환
+        ObjectMapper objectMapper = new ObjectMapper();
+        RecipeRegisterDto recipeRegisterDto = objectMapper.readValue(recipeRegisterDtoJson, RecipeRegisterDto.class);
+
         Long userId = (Long) request.getAttribute("userId");
         if (userId == null) {
             throw new UserIdNullException("userId not found");
         }
+        // 메인 사진 업로드
+        String mainPhotoUrl = s3Service.uploadFile(mainPhoto, "recipes/main");
+
+        // 단계 사진 업로드
+        List<RecipeStepDto> steps = recipeRegisterDto.getRecipeSteps();
+        log.info("steps = {}", steps);
+        for (int i = 0; i < steps.size(); i++) {
+            String stepPhotoUrl = s3Service.uploadFile(stepPhotos.get(i), "recipes/steps");
+            steps.get(i).setPhoto(stepPhotoUrl);
+        }
+
+        // 업로드된 URL을 DTO에 반영
+        recipeRegisterDto.setRecipeMainPhoto(mainPhotoUrl);
+        recipeRegisterDto.setRecipeSteps(steps);
+
+        // 레시피 생성
         RecipeDetailDto recipe = recipeService.addRecipe(userId, recipeRegisterDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(recipe);
     }
