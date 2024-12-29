@@ -63,6 +63,7 @@ public class NotificationService {
     private String port;
 
     public void saveTradeRequestNotification(User user, NotificationType type, String message, Long tradeRequestId, String tradeRoomId) {   // 교환, 나눔 요청 시 알림
+
         Notification notification = new Notification();
         notification.setUser(user);
         notification.setNotificationType(type);
