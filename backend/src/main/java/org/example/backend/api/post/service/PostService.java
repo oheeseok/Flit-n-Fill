@@ -254,7 +254,7 @@ public class PostService {
 
     // email 전송
     log.info("1. send email");
-//    emailService.sendTradeRequestEmail(writer.getUserId(), proposerId, postId);
+    emailService.sendTradeRequestEmail(writer.getUserId(), proposerId, postId);
     log.info("1. send email --- done");
 
     // push 알림 전송
