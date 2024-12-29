@@ -2,6 +2,11 @@ import React, { useState, ChangeEvent } from "react";
 import axios from "axios";
 import "../styles/common/SignIn.css"; // 스타일 파일 경로는 프로젝트에 맞게 설정하세요.
 
+
+interface UserLoginResponse {
+  accessToken: string;
+}
+
 const SignIn: React.FC = () => {
   // 상태 관리
   const [email, setEmail] = useState<string>("");
@@ -10,17 +15,20 @@ const SignIn: React.FC = () => {
   // 로그인 처리 함수
   const handleLogin = async () => {
     try {
-      // 절대 경로로 API 요청을 보냄 (localhost:8080)
-      const response = await axios.post<string>("http://localhost:8080/api/user/login", {
-        userEmail: email,
-        userPassword: password,
-      });
+      // API 요청을 보냄 (localhost:8080)
+      const response = await axios.post<UserLoginResponse>(
+        "http://localhost:8080/api/user/login",
+        {
+          userEmail: email,
+          userPassword: password,
+        }
+      );
 
       // 로그인 성공 시 받은 토큰을 로컬 스토리지에 저장
-      localStorage.setItem("accessToken", response.data);
+      localStorage.setItem("accessToken", response.data.accessToken);
 
       console.log(response);
-      alert(response.data); // 로그인 성공 메시지
+      alert("로그인 성공"); // 로그인 성공 메시지
 
       // 로그인 후 대시보드로 리디렉션
       window.location.href = "/SignInhome"; // 홈 페이지로 리디렉션
