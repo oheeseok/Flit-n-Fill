@@ -163,8 +163,8 @@ public class PostService {
       throw new UnauthorizedException("게시글 삭제 권한이 없습니다.");
     }
 
+    String postTitle = post.getPostTitle();
     TradeType tradeType = post.getTradeType();
-    String stat = tradeType.getDescription();
     NotificationType notificationType = null;
     Progress progress = post.getProgress();
 
@@ -184,25 +184,20 @@ public class PostService {
         throw new PostCannotBeDeletedException("진행중인 거래가 있으므로 게시글을 삭제할 수 없습니다.");
       } else {
         for (TradeRequest tradeRequest : tradeRequestList) {
-          User proposer = tradeRequest.getProposer();// 요청자 ID
-
-          // 이메일 알림
-          String subject = "[" + notificationType.getDescription() + "알림]";
-          StringBuilder content = new StringBuilder();
-          content.append("<h3>회원님께서 요청하신 " + stat + " 게시글이 삭제되었습니다.</h3><br>");
-          content.append("아쉽게도 게시글이 삭제되었지만, 다른 거래를 시도해 보실 수 있습니다.<br>" +
-              "다른 게시글에도 거래 요청을 보내보세요!<br>");
-
-          emailService.sendEmail(proposer.getUserEmail(), subject, content.toString());
-
+          User proposer = tradeRequest.getProposer(); // 요청자
+          if (tradeRequest.getTradeTaskStatus().equals(TaskStatus.ACCEPTED)) {
+            continue; // 거래 완료된 회원에게는 알림 전송 X
+          }
           // db 저장
           notificationService.saveTradeRequestNotification(
               proposer,
               notificationType,
-              stat + " 게시글이 삭제되었습니다!",
-              tradeRequest.getTradeRequestId()
+              "[" + postTitle + "] 게시글이 삭제되었습니다!",
+              null,
+              null
           );
         }
+        postRepository.deleteById(postId);
       }
     }
   }
@@ -218,12 +213,14 @@ public class PostService {
     User writer = userRepository.findById(post.getUser().getUserId())
         .orElseThrow(() -> new UserNotFoundException("회원(작성자)을 찾을 수 없습니다."));
 
+    // 하나의 회원은 하나의 post에 요청하기를 한번만 할 수 있다.
+    // 하나의 post는 여러 회원들에게서 요청을 받을 수 있다.
+
     // TradeRequest 테이블에 (post, proposer) 에 대한 행이 존재하는지 확인하고 최신 행 가져오기
     Optional<TradeRequest> byPostAndProposer = tradeRequestRepository.findFirstByPostAndProposerOrderByRequestCreatedDateDesc(post, proposer);
-
     TradeRequest tradeRequest = null;
 
-    if (byPostAndProposer.isPresent()) {
+    if (byPostAndProposer.isPresent()) { // proposer가 이미 요청한 경우
       // trade_task_status가 ACCEPTED 또는 PENDING 이면 요청 불가능. return
       TaskStatus tradeTaskStatus = byPostAndProposer.get().getTradeTaskStatus();
       if (tradeTaskStatus.equals(TaskStatus.ACCEPTED) || tradeTaskStatus.equals(TaskStatus.PENDING)) {
@@ -234,7 +231,15 @@ public class PostService {
         tradeRequest = byPostAndProposer.get();
         tradeRequest.setTradeTaskStatus(TaskStatus.PENDING);
       }
-    } else {
+    } else { // proposer가 요청하지 않은 경우
+      List<TradeRequest> byPostPostId = tradeRequestRepository.findByPost_PostId(postId);
+      for (TradeRequest request : byPostPostId) {
+        if (request.getTradeTaskStatus().equals(TaskStatus.ACCEPTED)) {
+          log.info("> 이미 수락된 거래여서 요청 전송이 불가능합니다.");
+          throw new TradeRequestHandleException("요청 전송이 불가능합니다. tradeTaskStatus = " + request.getTradeTaskStatus().getDescription());
+        }
+      }
+
       // 첫 요청인 경우, 요청 전송 가능
       // TradeRequest 생성
       tradeRequest = new TradeRequest(
@@ -249,7 +254,7 @@ public class PostService {
 
     // email 전송
     log.info("1. send email");
-    emailService.sendTradeRequestEmail(writer.getUserId(), proposerId, postId);
+//    emailService.sendTradeRequestEmail(writer.getUserId(), proposerId, postId);
     log.info("1. send email --- done");
 
     // push 알림 전송
@@ -270,7 +275,8 @@ public class PostService {
         writer,
         notificationType,
         post.getTradeType().getDescription() + " 요청이 왔습니다!",
-        tradeRequest.getTradeRequestId());
+        tradeRequest.getTradeRequestId(),
+        null);
     log.info("3. save data to db --- done");
   }
 
@@ -330,13 +336,9 @@ public class PostService {
 
   public void handleTradeRequest(Long userId, Long postId, String action) {
     if (action.toLowerCase().equals("request")) {
-      log.info(">> 게시글 - 요청하기");
       createTradeRequest(userId, postId);
     } else if (action.toLowerCase().equals("cancel")) {
-      log.info(">> 게시글 - 요청 취소하기");
       cancelTradeRequest(userId, postId);
     }
   }
-
-
 }
