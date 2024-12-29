@@ -23,7 +23,7 @@ public class FoodSimpleDto {
     private int foodListIcon;
 
     public static FoodSimpleDto of(Food food) {
-        int foodListIcon = food.getFoodList().getFoodListIcon();
+        int foodListIcon = food.getFoodList() != null ? food.getFoodList().getFoodListIcon() : 0; // 기본 값 0
 
         FoodSimpleDto dto = new FoodSimpleDto(
                 food.getFoodId(),

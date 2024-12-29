@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.backend.api.notification.model.dto.NotificationViewDto;
 import org.example.backend.api.notification.service.EmailService;
 import org.example.backend.api.notification.service.NotificationService;
+import org.example.backend.api.trade.service.TradeService;
 import org.example.backend.enums.NotificationType;
 import org.example.backend.enums.TaskStatus;
 import org.example.backend.exceptions.UserIdNullException;
@@ -22,6 +23,7 @@ import java.util.List;
 public class NotificationController {
     private final NotificationService notificationService;
     private final EmailService emailService;
+    private final TradeService tradeService;
 
     @GetMapping
     public ResponseEntity<List<NotificationViewDto>> getAllNotifications(HttpServletRequest request) {  // 알림 전체 조회
@@ -77,7 +79,7 @@ public class NotificationController {
             throw new IllegalArgumentException("TaskStatus cannot be null");
         }
 
-        notificationService.handelRequestNotification(userId, notificationId, status);
+        tradeService.handelRequestNotification(userId, notificationId, status);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
