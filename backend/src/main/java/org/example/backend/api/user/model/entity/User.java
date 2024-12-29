@@ -100,14 +100,20 @@ public class User {
   }
 
   // 연관관계 및 cascade 설정
-  @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-  private BlackList blackList;
+//  @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+//  private BlackList blackList;
 
   @OneToMany(mappedBy = "requestUser", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
   private List<Request> requestUserList;  // 신고한 회원
 
   @OneToMany(mappedBy = "reportedUser", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
   private List<Request> reportedUserList;  // 신고 받은 회원
+
+  @OneToMany(mappedBy = "reporter", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+  private List<BlackList> reporterUserList;  // 신고한 회원
+
+  @OneToMany(mappedBy = "reported", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+  private List<BlackList> reportedList;  // 신고 받은 회원
 
   @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
   private UserCart userCart;

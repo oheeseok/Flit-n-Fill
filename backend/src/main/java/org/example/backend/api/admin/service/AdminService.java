@@ -1,6 +1,7 @@
 package org.example.backend.api.admin.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.backend.api.notification.service.EmailService;
 import org.example.backend.api.notification.service.NotificationService;
 import org.example.backend.api.notification.service.PushNotificationService;
@@ -17,16 +18,22 @@ import org.example.backend.enums.RequestType;
 import org.example.backend.enums.TaskStatus;
 import org.example.backend.exceptions.RequestNotFoundException;
 import org.example.backend.exceptions.UserNotFoundException;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
-import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class AdminService {
     private final RequestRepository requestRepository;
     private final UserRepository userRepository;
@@ -34,6 +41,7 @@ public class AdminService {
     private final NotificationService notificationService;
     private final PushNotificationService pushNotificationService;
     private final BlackListRepository blackListRepository;
+    private final StringRedisTemplate redisTemplate;
 
     public List<RequestDetailDto> findAllRequests() {
         List<Request> requests = requestRepository.findAll();
@@ -114,11 +122,10 @@ public class AdminService {
                     "신고 내용 : " + request.getRequestContent() +
                     "<br><br>운영 정책에 따라 적절히 조치하였습니다.<br>" +
                     "처리 결과에 대한 문의는 고객센터를 통해 가능합니다.");
-            message = subject + " 신고가 처리되었습니다.";
+            message = subject + "신고가 처리되었습니다.";
 
             // 신고 유저 처리
-
-
+            addUserReport(request);
         } else if (taskStatus.equals(TaskStatus.DENIED)) {      // 신고 거절
             content.append("<h3>회원님께서 신고하신 <strong>내용</strong>에 대한 처리 결과를 안내드립니다.</h3><br>" +
                     "신고 내용 : " + request.getRequestContent() +
@@ -140,13 +147,49 @@ public class AdminService {
         );
     }
 
-    public void addBlackList(User reportedUser) {
-        Optional<BlackList> byUser = blackListRepository.findByUser(reportedUser);
+    private void addUserReport(Request request) {
+        BlackList blackList = new BlackList();
+        blackList.setReporter(request.getRequestUser());
+        blackList.setReported(request.getReportedUser());
+        blackList.setReportedDate(LocalDate.now());
+        blackList.setReportReason(request.getResponseMessage());
 
-        if (byUser.isPresent()) {
-            BlackList blackList = byUser.get();
-            blackList.setUserReportedCount(blackList.getUserReportedCount() + 1);
+        blackListRepository.save(blackList);
 
+        List<BlackList> byReportedUser = blackListRepository.findByReported_UserId(request.getReportedUser().getUserId());
+        int count = byReportedUser.size();
+
+        if (count == 5) {
+            // redis 임시 정지 추가
+            addBlackListUser(request.getReportedUser().getUserEmail(), 7);
+
+        } else if (count == 10) {
+            addBlackListUser(request.getReportedUser().getUserEmail(), 30);
+        } else if (count >= 15) {
+            // 영구 정지 처리 (탈퇴)
+            // email 발송
         }
+    }
+
+    private void addBlackListUser(String userEmail, int days) {
+        log.info("일시정지 시킬 유저: {}", userEmail);
+
+        // 현재 시간 기준으로 만료 날짜 계산
+        LocalDateTime expirationDateTime = LocalDateTime.now().plusDays(days);
+        long expirationTimestamp = expirationDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+
+        // 현재 시간으로부터 남은 시간 계산
+        long expirationMillis = expirationTimestamp - System.currentTimeMillis();
+
+        // Redis에 만료 날짜를 저장
+        ValueOperations<String, String> ops = redisTemplate.opsForValue();
+        ops.set(
+                "BlackUser:" + userEmail,
+                String.valueOf(expirationTimestamp), // 만료 날짜를 타임스탬프로 저장
+                expirationMillis,
+                TimeUnit.MILLISECONDS
+        );
+
+        log.info("블랙리스트 추가: {} (만료 날짜: {})", userEmail, expirationDateTime);
     }
 }
