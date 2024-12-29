@@ -14,6 +14,8 @@ import org.example.backend.api.post.model.entity.Post;
 import org.example.backend.api.trade.model.entity.Kindness;
 import org.example.backend.api.trade.model.entity.Trade;
 import org.example.backend.api.trade.model.entity.TradeRequest;
+import org.example.backend.enums.AuthProvider;
+import org.example.backend.enums.Role;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.util.List;
@@ -33,7 +35,7 @@ public class User {
   @Column(length = 50, unique = true)
   private String userEmail;
 
-  @Column(length = 20, unique = true)
+  @Column(length = 20)
   private String userNickname;
 
   @Size(min = 10, max = 15, message = "비밀번호의 길이는 10자에서 15자 사이입니다.")
@@ -55,8 +57,29 @@ public class User {
 
   private String refreshToken;
 
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, length = 10)
+  @NotNull
+  @ColumnDefault("'USER'")
+  private Role role;
+
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, length = 10)
+  @NotNull
+  @ColumnDefault("'LOCAL'")
+  private AuthProvider authProvider;
+
+  @PrePersist
+  public void prePersist() {
+    if (authProvider == null) {
+      this.authProvider = AuthProvider.LOCAL;
+    }
+    if (role == null) {
+      this.role = Role.USER;  // 기본값 설정
+    }
+  }
   // 생성자
-  public User(String userName, String userEmail, String userNickname, String userPassword, String userPhone, String userAddress, String userProfile, double userKindness) {
+  public User(String userName, String userEmail, String userNickname, String userPassword, String userPhone, String userAddress, String userProfile, double userKindness, AuthProvider authProvider) {
     this.userName = userName;
     this.userEmail = userEmail;
     this.userNickname = userNickname;
@@ -65,6 +88,7 @@ public class User {
     this.userAddress = userAddress;
     this.userProfile = userProfile;
     this.userKindness = userKindness;
+    this.authProvider = authProvider;
   }
 
   // 연관관계 및 cascade 설정

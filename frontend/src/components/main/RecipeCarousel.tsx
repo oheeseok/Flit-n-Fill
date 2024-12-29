@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import steak from "../../assets/images/steak.jpg";
 import pizza from "../../assets/images/pizza.png";
 import pasta from "../../assets/images/pasta.png";
@@ -24,12 +24,16 @@ const todayrecipeimages: RecipeImages[] = [
 const RecipeCarousel: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
 
-  const nextSlide = () => {
-    setCurrentIndex(
-      (prevIndex) =>
-        (prevIndex + 1 + todayrecipeimages.length) % todayrecipeimages.length
-    );
-  };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex(
+        (prevIndex) =>
+          (prevIndex + 1 + todayrecipeimages.length) % todayrecipeimages.length
+      );
+    }, 5000); // 3초마다 자동 슬라이드
+
+    return () => clearInterval(interval);
+  }, []);
 
   const prevSlide = () => {
     setCurrentIndex(
@@ -38,42 +42,75 @@ const RecipeCarousel: React.FC = () => {
     );
   };
 
-  const prevIndex =
-    (currentIndex - 1 + todayrecipeimages.length) % todayrecipeimages.length;
-  const nextIndex =
-    (currentIndex + 1 + todayrecipeimages.length) % todayrecipeimages.length;
+  const nextSlide = () => {
+    setCurrentIndex(
+      (prevIndex) =>
+        (prevIndex + 1 + todayrecipeimages.length) % todayrecipeimages.length
+    );
+  };
 
   return (
     <div className="carousel-container">
       <div className="carousel-title">Today's Recipes</div>
 
       <div className="carousel-images">
-        <img
-          src={todayrecipeimages[prevIndex].img}
-          alt={todayrecipeimages[prevIndex].name}
-        />
-        <img
-          src={todayrecipeimages[currentIndex].img}
-          alt={todayrecipeimages[currentIndex].name}
-        />
-        <img
-          src={todayrecipeimages[nextIndex].img}
-          alt={todayrecipeimages[nextIndex].name}
-        />
+        <div style={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
+          <img
+            src={
+              todayrecipeimages[
+                (currentIndex - 1 + todayrecipeimages.length) %
+                  todayrecipeimages.length
+              ].img
+            }
+            alt={
+              todayrecipeimages[
+                (currentIndex - 1 + todayrecipeimages.length) %
+                  todayrecipeimages.length
+              ].name
+            }
+            className="carousel-image-prev"
+          />
+        </div>
+        <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
+          <img
+            src={todayrecipeimages[currentIndex].img}
+            alt={todayrecipeimages[currentIndex].name}
+            className="carousel-image-current"
+          />
+        </div>
+        <div style={{ flex: 1, display: "flex", justifyContent: "flex-start" }}>
+          <img
+            src={
+              todayrecipeimages[(currentIndex + 1) % todayrecipeimages.length]
+                .img
+            }
+            alt={
+              todayrecipeimages[(currentIndex + 1) % todayrecipeimages.length]
+                .name
+            }
+            className="carousel-image-next"
+          />
+        </div>
       </div>
 
-      <div className="carousel-buttons">
-        <button onClick={prevSlide} className="btn">
-          이전
+      <div className="carousel-navigation">
+        <button className="carousel-button" onClick={prevSlide}>
+          &#10094;
         </button>
-        <button onClick={nextSlide} className="btn">
-          다음
+        <button className="carousel-button" onClick={nextSlide}>
+          &#10095;
         </button>
       </div>
 
-      <div className="todayrecipedot">
-        <h1>.....</h1>
-      </div>
+      {/* <div className="carousel-dots">
+        {todayrecipeimages.map((_, index) => (
+          <span
+            key={index}
+            className={`dot ${index === currentIndex ? "active" : ""}`}
+            onClick={() => setCurrentIndex(index)}
+          ></span>
+        ))}
+      </div> */}
     </div>
   );
 };

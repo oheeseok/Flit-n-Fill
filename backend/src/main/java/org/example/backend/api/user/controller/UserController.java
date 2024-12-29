@@ -9,8 +9,10 @@ import org.example.backend.api.user.model.dto.*;
 import org.example.backend.api.user.service.UserService;
 import org.example.backend.exceptions.LoginFailedException;
 import org.example.backend.exceptions.UserNotFoundException;
+import org.example.backend.security.PrincipalDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -38,26 +40,10 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserLoginDto userLoginDto, HttpServletResponse response) {
         try {
-            UserLoginResponse login = userService.login(userLoginDto);
-            // 쿠키에 토큰 저장 (Access Token)
-            Cookie accessTokenCookie = new Cookie("accessToken", login.getAccessToken());
-            accessTokenCookie.setHttpOnly(true); // JavaScript에서 접근 불가
-            accessTokenCookie.setSecure(false); // HTTPS 연결에서만 전송
-            accessTokenCookie.setPath("/"); // 모든 경로에서 접근 가능
-            accessTokenCookie.setMaxAge(3600); // 쿠키 만료 시간 (1시간)
+            UserLoginResponse login = userService.login(userLoginDto, response);
 
-            // 쿠키에 Refresh Token 저장
-            Cookie refreshTokenCookie = new Cookie("refreshToken", login.getRefreshToken());
-            refreshTokenCookie.setHttpOnly(true);
-            refreshTokenCookie.setSecure(false);
-            refreshTokenCookie.setPath("/");
-            refreshTokenCookie.setMaxAge(3600); // 1시간
-
-            // 응답에 쿠키 추가
-            response.addCookie(accessTokenCookie);
-            response.addCookie(refreshTokenCookie);
-
-            return ResponseEntity.status(HttpStatus.OK).body("로그인에 성공하였습니다.");
+//            return ResponseEntity.status(HttpStatus.OK).body("로그인에 성공하였습니다.");
+            return ResponseEntity.status(HttpStatus.OK).body(login);
         } catch (LoginFailedException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
@@ -66,10 +52,14 @@ public class UserController {
     }
 
     @GetMapping("/info")
-    public ResponseEntity<?> getUserInfo(HttpServletRequest request) {
-        String userEmail = (String) request.getAttribute("userEmail");
-        log.info(userEmail);
+    public ResponseEntity<?> getUserInfo(Authentication authentication) {
+        String userEmail = authentication.getName();
+//        log.info(userEmail);
+        Object principal = authentication.getPrincipal();
 
+        PrincipalDetails principalDetails = (PrincipalDetails) principal;
+        log.info("princiaplDetails : {}",principalDetails.getUsername());
+        log.info("princiaplDetails : {}",principalDetails.getUserId());
         try {
             return ResponseEntity.status(HttpStatus.OK).body(userService.getUserInfoByEmail(userEmail));
         } catch (Exception e) {
@@ -78,8 +68,8 @@ public class UserController {
     }
 
     @PutMapping("/info")
-    public ResponseEntity<?> updateUserInfo(HttpServletRequest request, @RequestBody UserUpdateDto updateDto) throws Exception {
-        String userEmail = (String) request.getAttribute("userEmail");
+    public ResponseEntity<?> updateUserInfo(Authentication authentication, @RequestBody UserUpdateDto updateDto) throws Exception {
+        String userEmail = authentication.getName();
         log.info("logined email: {}", userEmail);
 
         if (userService.existsByUserNickname(updateDto.getUserNickname())) {
@@ -106,7 +96,7 @@ public class UserController {
     }
 
     @GetMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletRequest request) {
+    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         // 쿠키에서 토큰 가져오기
         Cookie[] cookies = request.getCookies();
         String token = null;
@@ -120,12 +110,11 @@ public class UserController {
             }
         }
 
-        if (token == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("유효하지 않은 토큰입니다.");
-        }
+        String userEmail = authentication.getName();
+
         try {
             // 로그아웃 처리
-            userService.logout(token);
+            userService.logout(token, userEmail, response);
             return ResponseEntity.ok("로그아웃되었습니다.");
         } catch (Exception e) {
             // 잘못된 토큰이나 사용자 정보가 없는 경우
@@ -134,8 +123,8 @@ public class UserController {
     }
 
     @DeleteMapping("/info")
-    public ResponseEntity<String> deleteUser(HttpServletRequest request, @RequestBody UserLoginDto loginDto) {
-        loginDto.setUserEmail((String) request.getAttribute("userEmail"));
+    public ResponseEntity<String> deleteUser(Authentication authentication, @RequestBody UserLoginDto loginDto) {
+        loginDto.setUserEmail(authentication.getName());
 
         try {
             userService.deleteUserByUserEmail(loginDto);

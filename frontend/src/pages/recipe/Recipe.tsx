@@ -14,8 +14,9 @@ const Recipe = () => {
           <div className="near-expiration-recipe">
             <NearExpirationRecipe />
           </div>
-          <div className="recipe-text"></div>
-          <RecipeCarousel></RecipeCarousel>
+          <div className="recipe-text">
+            <RecipeCarousel></RecipeCarousel>
+          </div>
         </div>
       </div>
     </>

@@ -23,6 +23,7 @@ import RecipeEdit from "./pages/recipe/RecipeEdit";
 import { GlobalProvider } from "./context/GlobalProvider";
 import Layout from "./components/Layout";
 import "./App.css";
+import SignInHome from "./pages/SignInHome"; // 새로운 페이지 import
 
 function App() {
   return (
@@ -38,6 +39,27 @@ function App() {
               </Layout>
             }
           />
+
+          {/* /home 경로 추가 */}
+          {/* <Route
+            path="/home"
+            element={
+              <Layout>
+                <Home />
+              </Layout>
+            }
+          /> */}
+
+          {/* 로그인한 사용자 전용 홈 경로 */}
+          {/* <Route
+            path="/signinhome"
+            element={
+              <Layout>
+                <SignInHome /> 
+              </Layout>
+            }
+          /> */}
+
           <Route
             path="/mypage"
             element={

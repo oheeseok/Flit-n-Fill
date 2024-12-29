@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SSE Test</title>
+</head>
+<body>
+<h1>SSE Test</h1>
+<ul id="notifications"></ul>
+
+<script>
+    // 사용자 ID를 예시로 설정
+    const userId = 1;
+
+    // SSE 연결
+    const eventSource = new EventSource(`/api/subscribe/${userId}`);
+
+    // 알림 수신 처리
+    eventSource.addEventListener("notification", function (event) {
+        const notifications = document.getElementById("notifications");
+        const newNotification = document.createElement("li");
+        newNotification.textContent = event.data;
+        notifications.appendChild(newNotification);
+    });
+
+    // 오류 처리
+    eventSource.onerror = function (error) {
+        console.error("SSE 연결 오류:", error);
+        // 연결 오류가 발생하면 EventSource 종료
+        eventSource.close();
+    };
+
+    // 페이지를 벗어나거나 새로고침할 때 연결 종료
+    window.addEventListener('beforeunload', () => {
+        eventSource.close();
+        console.log("SSE connection closed.");
+    });
+
+    // 연결이 정상적으로 종료된 경우
+    eventSource.onclose = function() {
+        console.log("SSE connection closed by server.");
+    };
+</script>
+</body>
+</html>

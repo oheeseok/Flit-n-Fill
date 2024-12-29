@@ -19,7 +19,6 @@ import java.util.Map;
 @Slf4j
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private final UserRepository userRepository;
-    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -52,16 +51,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         // DB에서 userEmail, userNickname, userProfileUrl, registrationId, attributes (third-party id)로 사용자 ��기
         User user = userRepository.findByUserEmail(userEmail)
                 .orElseGet(() -> registerNewUser(oAuthUserAttributes, registrationId));
-        // JWT 토큰 생성
-        String accessToken = jwtTokenProvider.generateAccessToken(user.getUserEmail(), user.getUserId());
-        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getUserEmail(), user.getUserId());
-
-        // Refresh Token DB 저장
-        user.setRefreshToken(refreshToken);
-        userRepository.save(user);
 
         // JWT를 PrincipalDetails 객체에 추가
-        return new PrincipalDetails(user, oAuthUserAttributes, accessToken, refreshToken);
+        return new PrincipalDetails(user, oAuthUserAttributes);
     }
 
     // 새로운 사용자 등록

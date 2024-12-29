@@ -6,10 +6,8 @@ import org.example.backend.api.foodlist.model.entity.FoodList;
 import org.example.backend.api.foodlist.repository.FoodListRepository;
 import org.example.backend.api.myfridge.model.entity.Food;
 import org.example.backend.api.myfridge.repository.MyfridgeRepository;
-import org.example.backend.api.post.model.dto.PostDetailDto;
-import org.example.backend.api.post.model.dto.PostRegisterDto;
-import org.example.backend.api.post.model.dto.PostSimpleDto;
-import org.example.backend.api.post.model.dto.PostUpdateDto;
+import org.example.backend.api.notification.service.PushNotificationService;
+import org.example.backend.api.post.model.dto.*;
 import org.example.backend.api.post.model.entity.Post;
 import org.example.backend.api.post.repository.PostRepository;
 import org.example.backend.api.user.model.entity.User;
@@ -34,6 +32,7 @@ public class PostService {
   private final UserRepository userRepository;
   private final MyfridgeRepository myfridgeRepository;
   private final FoodListRepository foodListRepository;
+  private final PushNotificationService pushNotificationService;
 
   public List<PostSimpleDto> getAllPosts() {
     List<Post> posts = postRepository.findAllByOrderByPostCreatedDateDesc();
@@ -88,11 +87,11 @@ public class PostService {
 
   public PostDetailDto getPostDetail(Long postId) {
     Post post = postRepository.findById(postId)
-            .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
+        .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
 
     Long userId = post.getUser().getUserId();
     User user = userRepository.findById(userId)
-            .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
+        .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
 
     return PostDetailDto.of(post, post.getUser());
   }
@@ -100,9 +99,9 @@ public class PostService {
 
   public PostDetailDto updatePost(Long userId, Long postId, PostUpdateDto postUpdateDto) {
     Post post = postRepository.findById(postId)
-           .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
+        .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
 
-    if (!post.getUser().getUserId().equals(userId)) {
+    if (! post.getUser().getUserId().equals(userId)) {
       throw new UnauthorizedException("게시글 수정 권한이 없습니다.");
     }
 
@@ -151,5 +150,35 @@ public class PostService {
     }
 
     postRepository.deleteById(postId);
+  }
+
+  public void createTradeRequest(Long proposerId, Long postId) {
+    // email 전송, push 알림 전송, notification 테이블에 데이터 저장
+    Optional<Post> post = postRepository.findById(postId);
+    if (! post.isPresent()) {
+      throw new NoSuchElementException("Post does not exist with ID: " + postId);
+    }
+
+    User proposer = userRepository.findById(proposerId)
+        .orElseThrow(() -> new UserNotFoundException("회원(요청자)을 찾을 수 없습니다."));
+
+    User writer = userRepository.findById(post.get().getUser().getUserId())
+        .orElseThrow(() -> new UserNotFoundException("회원(나눔자)을 찾을 수 없습니다."));
+
+    // email 전송
+    log.info("1. send email");
+
+    // push 알림 전송
+    log.info("2. send push noti");
+
+    String message = String.format("[%s 요청 알림] %s 님이 %s을 요청합니다.",
+        post.get().getTradeType().getDescription(),
+        proposer.getUserNickname(),
+        post.get().getTradeType().getDescription());
+    log.info("message: {}", message);
+    pushNotificationService.sendPushNotification(writer.getUserId(), message);
+
+    // notification 테이블에 데이터 저장
+    log.info("3. save data to db");
   }
 }

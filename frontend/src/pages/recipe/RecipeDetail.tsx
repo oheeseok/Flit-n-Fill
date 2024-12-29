@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useRecipe } from "../../context/RecipeContext";
 import "../../styles/recipe/RecipeDetail.css";
 import Swal from "sweetalert2";
-import Sampleimage from "../../assets/images/samplerecipemethod.jpg";
+import Sampleimage from "../../assets/images/samplerecipe2.png";
 
 const RecipeDetail = () => {
   const { id } = useParams<{ id: string }>();

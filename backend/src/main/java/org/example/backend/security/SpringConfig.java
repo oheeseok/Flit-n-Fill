@@ -1,11 +1,14 @@
 package org.example.backend.security;
 
 import lombok.RequiredArgsConstructor;
-import org.example.backend.api.user.service.TokenBlacklistService;
+import org.example.backend.api.user.repository.UserRepository;
+import org.example.backend.api.user.service.TokenManagementService;
+import org.example.backend.api.user.service.UserService;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.core.aggregation.ArithmeticOperators;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -13,21 +16,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+@RequiredArgsConstructor
 @Configuration
 public class SpringConfig {
     private final JwtTokenProvider jwtTokenProvider;
-    private final TokenBlacklistService tokenBlacklistService;
+    private final TokenManagementService tokenManagementService;
     private final CustomOAuth2UserService oAuth2UserService;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
-
-    public SpringConfig(JwtTokenProvider jwtTokenProvider,
-                        TokenBlacklistService tokenBlacklistService,
-                        CustomOAuth2UserService oAuth2UserService, OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler) {
-        this.jwtTokenProvider = jwtTokenProvider;
-        this.tokenBlacklistService = tokenBlacklistService;
-        this.oAuth2UserService = oAuth2UserService;
-        this.oAuth2LoginSuccessHandler = oAuth2LoginSuccessHandler;
-    }
+    private final CustomUserDetailsService customUserDetailsService;
 
     // password encoder
     @Bean
@@ -47,9 +43,9 @@ public class SpringConfig {
         // 인증 요청 페이지 설정
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/user/register", "/api/user/login", "/oauth2/**").permitAll()
+                        .requestMatchers("/api/user/register", "/api/user/login", "/oauth2/**", "/api/subscribe/**").permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/**").authenticated()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().permitAll())
 
                 // REST API 이기 때문에 basic auth 및 csrf 보안 미사용
@@ -77,7 +73,7 @@ public class SpringConfig {
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter(jwtTokenProvider, tokenBlacklistService); // JwtTokenProvider 주입
+        return new JwtAuthenticationFilter(jwtTokenProvider, tokenManagementService, customUserDetailsService); // JwtTokenProvider 주입
     }
 
     @Bean
@@ -85,5 +81,10 @@ public class SpringConfig {
         FilterRegistrationBean<JwtAuthenticationFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(jwtAuthenticationFilter); // 필터에 JwtAuthenticationFilter 주입
         return registrationBean;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 }

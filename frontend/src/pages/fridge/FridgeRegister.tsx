@@ -98,6 +98,7 @@ const FridgeRegister = () => {
 
   return (
     <div className="fridge-register-body">
+      {/* 완제품,  */}
       <div className="fridge-register-container">
         {/* 아이콘 표시 */}
         {icon && (

@@ -9,18 +9,17 @@
 
 .signup-container {
   display: inline-flex;
-  width: 560px;
+  width: 40%;
   height: 720px;
-  padding-bottom: 62.894px;
-  gap: 9.827px;
+  padding-bottom: 62px;
+  gap: 10px;
   flex-shrink: 0;
-  border: 1px solid;
   display: flex;
   flex-direction: column; /* 수직 방향으로 배치 */
-  justify-content: flex-start; /* 위에서부터 차례대로 배치 */
+  justify-content: center; /* 위에서부터 차례대로 배치 */
   position: relative;
   align-items: flex-start;
-  margin: 200px 110px;
+  margin: 180px 90px 180px 140px;
 }
 
 .signup-title {
@@ -30,6 +29,158 @@
   font-style: normal;
   font-weight: 700;
   line-height: normal;
+  margin-bottom: 10px;
+}
+
+.signup-text-name {
+  display: flex;
+  font-family: Ubuntu;
+  font-size: 22px;
+  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+
+.signup-text-name-input {
+  display: flex;
+  max-width: 600px;
+  width: 100%;
+  font-size: 18px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.signup-text-email {
+  display: flex;
+  font-family: Ubuntu;
+  font-size: 22px;
+  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+.signup-text-email-input {
+  display: flex;
+  max-width: 600px;
+  width: 100%;
+  font-size: 18px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.signup-text-password {
+  display: flex;
+  font-family: Ubuntu;
+  font-size: 22px;
+  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+.signup-text-password-input {
+  display: flex;
+  max-width: 600px;
+  width: 100%;
+  font-size: 18px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.signup-text-nickname {
+  display: flex;
+  font-family: Ubuntu;
+  font-size: 22px;
+  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+
+.signup-text-nickname-input {
+  display: flex;
+  max-width: 600px;
+  width: 100%;
+  font-size: 18px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.signup-text-phone {
+  display: flex;
+  font-family: Ubuntu;
+  font-size: 22px;
+  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+
+.signup-text-phone-input {
+  display: flex;
+  max-width: 600px;
+  width: 100%;
+  font-size: 18px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+.signup-text-address {
+  display: flex;
+  font-family: Ubuntu;
+  font-size: 22px;
+  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+
+.signup-text-address-input {
+  display: flex;
+  max-width: 600px;
+  width: 100%;
+  font-size: 18px;
+  border-radius: 5px;
+  margin-bottom: 40px;
+}
+
+.signup-button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 99%;
+}
+.signup-button-login {
+  width: 100%;
+  background: #c7efe6;
+  margin-bottom: 10px;
+}
+
+.signup-button-or {
+  width: 100%;
+  display: flex;
+  font-family: Ubuntu;
+  flex-direction: row;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.signup-button-container2 {
+  width: 100%;
+  margin-top: 10px;
+  display: flex;
+  gap: 4%;
+  margin-bottom: 20px;
+}
+
+.signup-button-google {
+  width: 48%;
+  background-color: #71c9fc;
+}
+.signup-button-kakao {
+  width: 48%;
+  background-color: #f8e95e;
 }
 
 .signup-image {

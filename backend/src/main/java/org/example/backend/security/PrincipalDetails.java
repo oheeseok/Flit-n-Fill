@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.example.backend.api.user.model.entity.User;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
@@ -16,30 +17,18 @@ import java.util.Map;
 public class PrincipalDetails implements UserDetails, OAuth2User {
     private final User user;
     private final Map<String, Object> attributes;
-//    private final String attributekey;
-    @Getter
-    private final String accessToken;
-    @Getter
-    private final String refreshToken;
 
     // 기본 인증 생성자 (폼 로그인 사용)
     public PrincipalDetails(User user) {
         this.user = user;
         this.attributes = null;
-//        this.attributekey = null;
-        this.accessToken = null;
-        this.refreshToken = null;
     }
 
     // OAuth2 인증 사용자
-    public PrincipalDetails(User user, Map<String, Object> attributes,
-//                            String attributekey,
-                            String accessToken, String refreshToken) {
+    public PrincipalDetails(User user, Map<String, Object> attributes
+                            ) {
         this.user = user;
         this.attributes = attributes;
-//        this.attributekey = attributekey;
-        this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
     }
 
     @Override
@@ -51,7 +40,8 @@ public class PrincipalDetails implements UserDetails, OAuth2User {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
-//        authorities.add(new SimpleGrantedAuthority());
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole().name())); // ROLE_USER or ROLE_ADMIN
+        log.info("권한 부여: ROLE_" + user.getRole().name());
         return authorities;
     }
 
@@ -68,5 +58,9 @@ public class PrincipalDetails implements UserDetails, OAuth2User {
     @Override
     public String getName() {
         return user.getUserEmail();
+    }
+
+    public Long getUserId() {
+        return user.getUserId();
     }
 }
