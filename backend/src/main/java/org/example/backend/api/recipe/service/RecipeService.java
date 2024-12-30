@@ -4,12 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.backend.api.myfridge.model.entity.Food;
 import org.example.backend.api.myfridge.repository.MyfridgeRepository;
-import org.example.backend.api.recipe.model.dto.RecipeDetailDto;
-import org.example.backend.api.recipe.model.dto.RecipeRegisterDto;
-import org.example.backend.api.recipe.model.dto.RecipeSimpleDto;
-import org.example.backend.api.recipe.model.dto.RecipeUpdateDto;
+import org.example.backend.api.recipe.model.dto.*;
 import org.example.backend.api.recipe.model.entity.Recipe;
 import org.example.backend.api.recipe.repository.RecipeRepository;
+import org.example.backend.api.s3.S3Service;
 import org.example.backend.api.user.model.entity.BookmarkedRecipe;
 import org.example.backend.api.user.model.entity.RecipeUserId;
 import org.example.backend.api.user.model.entity.User;
@@ -25,8 +23,10 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.time.LocalDate;
@@ -43,6 +43,9 @@ public class RecipeService {
   private final BookmarkedRecipeRepository bookmarkedRecipeRepository;
   private final MyfridgeRepository myfridgeRepository;
   private final MongoTemplate mongoTemplate;
+  private final S3Service s3Service;
+
+  private static final String RECIPE_STEP_DEFAULT_IMG_URL ="https://flitnfill.s3.ap-northeast-2.amazonaws.com/default-img/recipe-step-default-img.png";
 
   public void setRecipesUserIdToNull(Long userId) {
     Query query = new Query(Criteria.where("userId").is(userId));
@@ -111,9 +114,34 @@ public class RecipeService {
     return recipeDetailDto;
   }
 
-  public RecipeDetailDto addRecipe(Long userId, RecipeRegisterDto dto) {
+  public RecipeDetailDto addRecipe(Long userId, RecipeRegisterDto dto, MultipartFile mainPhoto, List<MultipartFile> stepPhotos) throws IOException {
     User user = userRepository.findById(userId)
             .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
+
+    // 메인 사진 업로드
+    String mainPhotoUrl = s3Service.uploadFile(mainPhoto, "recipes/main");
+
+    // 단계별 사진 업로드
+    List<RecipeStepDto> steps = dto.getRecipeSteps();
+
+    if (stepPhotos == null || stepPhotos.isEmpty()) {
+      steps.forEach(step -> step.setPhoto(RECIPE_STEP_DEFAULT_IMG_URL));
+    } else {
+      for (int i = 0; i < steps.size(); i++) {
+        if (i < stepPhotos.size() && stepPhotos.get(i) != null && !stepPhotos.get(i).isEmpty()) {
+          // 사진이 존재하면 업로드하고 URL 설정
+          String stepPhotoUrl = s3Service.uploadFile(stepPhotos.get(i), "recipes/steps");
+          steps.get(i).setPhoto(stepPhotoUrl);
+        } else {
+          // 사진이 없으면 기본값 설정
+          steps.get(i).setPhoto(RECIPE_STEP_DEFAULT_IMG_URL);
+        }
+      }
+    }
+
+    // 업로드된 URL을 DTO에 반영
+    dto.setRecipeMainPhoto(mainPhotoUrl);
+    dto.setRecipeSteps(steps);
 
     Recipe recipe = Recipe.of(userId, dto);
     Recipe savedRecipe = recipeRepository.save(recipe);
@@ -124,7 +152,8 @@ public class RecipeService {
     return recipeDetailDto;
   }
 
-  public RecipeDetailDto updateRecipe(Long userId, String recipeId, RecipeUpdateDto recipeUpdateDto) {
+  public RecipeDetailDto updateRecipe(Long userId, String recipeId, RecipeUpdateDto recipeUpdateDto,
+                                      MultipartFile mainPhoto, List<MultipartFile> stepPhotos) throws IOException {
     Recipe recipe = recipeRepository.findById(recipeId)
         .orElseThrow(() -> new RecipeNotFoundException("레시피를 찾을 수 없습니다."));
 
@@ -132,10 +161,66 @@ public class RecipeService {
       throw new UnauthorizedException("레시피 수정 권한이 없습니다.");
     }
 
+    // 메인 사진 - 필수
+    if (mainPhoto != null && !mainPhoto.isEmpty()) {
+//      log.info("메인사진 새로 업로드");
+      String oldMainPhotoUrl = recipe.getRecipeMainPhoto();
+//      log.info("oldMainPhotoUrl: {}", oldMainPhotoUrl);
+      if (oldMainPhotoUrl != null && !oldMainPhotoUrl.isEmpty() && !oldMainPhotoUrl.equals(RECIPE_STEP_DEFAULT_IMG_URL)) {
+        // 기존 사진 삭제 (S3 경로에 존재하는 경우만 삭제)
+        s3Service.deleteFile(oldMainPhotoUrl);
+      }
+      // 새 메인 사진 업로드
+      String newMainPhotoUrl = s3Service.uploadFile(mainPhoto, "recipes/main");
+      recipe.setRecipeMainPhoto(newMainPhotoUrl);
+//      log.info("newMainPhotoUrl: {}", newMainPhotoUrl);
+    }
+
+    // 기존 RecipeStepDto
+    List<RecipeStepDto> oldRecipeSteps = recipe.getRecipeSteps();
+
+    // 새 RecipeStepDto
+    List<RecipeStepDto> newRecipeSteps = recipeUpdateDto.getRecipeSteps();
+
+    // recipeStepDto 업데이트 부분
+    for (int i = 0; i < newRecipeSteps.size(); i++) {
+      RecipeStepDto newStep = newRecipeSteps.get(i);
+      MultipartFile newPhoto = stepPhotos.get(i);
+
+      if (i < oldRecipeSteps.size()) {
+        RecipeStepDto oldStep = oldRecipeSteps.get(i);
+        String oldPhotoUrl = oldStep.getPhoto();
+
+        if (oldPhotoUrl != null && !oldPhotoUrl.isEmpty() && !oldPhotoUrl.equals(RECIPE_STEP_DEFAULT_IMG_URL)) {
+//          log.info("기존 사진 삭제: {}", oldPhotoUrl);
+          s3Service.deleteFile(oldPhotoUrl);
+        }
+      }
+
+      if (newPhoto != null && !newPhoto.isEmpty()) {
+        String newPhotoUrl = s3Service.uploadFile(newPhoto, "recipes/steps");
+        newStep.setPhoto(newPhotoUrl);
+//        log.info("새 사진 업로드 완료: {}", newPhotoUrl);
+      } else {
+        newStep.setPhoto(RECIPE_STEP_DEFAULT_IMG_URL);
+      }
+    }
+
+    if (oldRecipeSteps.size() > newRecipeSteps.size()) {
+      for (int i = newRecipeSteps.size(); i < oldRecipeSteps.size(); i++) {
+        RecipeStepDto oldStep = oldRecipeSteps.get(i);
+        String oldPhotoUrl = oldStep.getPhoto();
+
+        if (oldPhotoUrl != null && !oldPhotoUrl.isEmpty() && !oldPhotoUrl.equals(RECIPE_STEP_DEFAULT_IMG_URL)) {
+//          log.info("초과된 기존 사진 삭제: {}", oldPhotoUrl);
+          s3Service.deleteFile(oldPhotoUrl);
+        }
+      }
+    }
+
     recipe.setRecipeTitle(recipeUpdateDto.getRecipeTitle());
-    recipe.setRecipeMainPhoto(recipeUpdateDto.getRecipeMainPhoto());
     recipe.setRecipeFoodDetails(recipeUpdateDto.getRecipeFoodDetails());
-    recipe.setRecipeSteps(recipeUpdateDto.getRecipeSteps());
+    recipe.setRecipeSteps(newRecipeSteps);
 
     recipeRepository.save(recipe);
 
@@ -168,6 +253,28 @@ public class RecipeService {
 
     if (! recipe.getUserId().equals(userId)) {
       throw new UnauthorizedException("레시피 삭제 권한이 없습니다.");
+    }
+
+    // recipe에 연관된 모든 이미지 삭제해야함
+    List<String> recipeImgUrls = new ArrayList<>();
+
+    // main photo
+    String recipeMainPhoto = recipe.getRecipeMainPhoto();
+    if (recipeMainPhoto != null && ! recipeMainPhoto.isEmpty() && ! recipeMainPhoto.equals(RECIPE_STEP_DEFAULT_IMG_URL)) {
+      recipeImgUrls.add(recipeMainPhoto);
+    }
+
+    // recipe step photo
+    List<RecipeStepDto> recipeSteps = recipe.getRecipeSteps();
+    for (RecipeStepDto recipeStep : recipeSteps) {
+      String photo = recipeStep.getPhoto();
+      if (photo != null && ! photo.isEmpty() && ! photo.equals(RECIPE_STEP_DEFAULT_IMG_URL)) {
+        recipeImgUrls.add(photo);
+      }
+    }
+
+    for (String recipeImgUrl : recipeImgUrls) {
+      s3Service.deleteFile(recipeImgUrl);
     }
 
     recipeRepository.deleteById(recipeId);
