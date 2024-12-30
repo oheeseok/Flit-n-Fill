@@ -3,6 +3,7 @@ package org.example.backend.api.myfridge.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.backend.api.myfridge.model.dto.*;
 import org.example.backend.api.myfridge.service.MyfridgeService;
 import org.example.backend.api.user.model.dto.CartSimpleDto;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/my-fridge")
 @RequiredArgsConstructor
+@Slf4j
 public class MyfridgeController {
     private final MyfridgeService myfridgeService;
 
@@ -28,6 +30,7 @@ public class MyfridgeController {
             throw new UserIdNullException("userId not found");
         }
         List<FoodSimpleDto> allFood = myfridgeService.getAllFood(userId);
+        log.info("allFood, {}", allFood.toString());
         return ResponseEntity.status(HttpStatus.OK).body(allFood);
     }
 

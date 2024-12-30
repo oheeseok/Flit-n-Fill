@@ -52,10 +52,18 @@ public class TokenManagementService {
     private void addCookie(HttpServletResponse response, String cookieName, String token) {
         Cookie cookie = new Cookie(cookieName, token);
         cookie.setHttpOnly(true);
-        cookie.setSecure(false);
+        cookie.setSecure(true);
         cookie.setPath("/");
         cookie.setMaxAge(60 * 60 * 24 * 7); // 7일
         response.addCookie(cookie);
+
+        // SameSite=None 속성을 응답 헤더로 추가
+        String headerValue = String.format("%s=%s; Path=%s; HttpOnly; Secure; SameSite=None",
+                cookie.getName(),
+                cookie.getValue(),
+                cookie.getPath()
+        );
+        response.addHeader("Set-Cookie", headerValue);
     }
 
     // 쿠기 삭제
