@@ -10,6 +10,7 @@ import org.example.backend.api.notification.model.entity.Notification;
 import org.example.backend.api.post.model.entity.Post;
 import org.example.backend.api.user.model.entity.User;
 import org.example.backend.enums.TaskStatus;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -38,11 +39,20 @@ public class TradeRequest {
   private User proposer;
 
   @Enumerated(EnumType.STRING)
-  private TaskStatus tradeTaskStatus;
+  @ColumnDefault("'PENDING'")
+  private TaskStatus tradeTaskStatus = TaskStatus.PENDING;
 
   @Column(nullable = false)
   @NotNull
   private LocalDateTime requestCreatedDate;
+
+  public TradeRequest(Long tradeRequestId, Post post, User proposer, TaskStatus tradeTaskStatus, LocalDateTime requestCreatedDate) {
+    this.tradeRequestId = tradeRequestId;
+    this.post = post;
+    this.proposer = proposer;
+    this.tradeTaskStatus = tradeTaskStatus;
+    this.requestCreatedDate = requestCreatedDate;
+  }
 
   @OneToMany(mappedBy = "tradeRequest", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
   private List<Notification> notificationList;

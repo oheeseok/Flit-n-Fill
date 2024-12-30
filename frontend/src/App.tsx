@@ -23,6 +23,7 @@ import RecipeEdit from "./pages/recipe/RecipeEdit";
 import { GlobalProvider } from "./context/GlobalProvider";
 import Layout from "./components/Layout";
 import "./App.css";
+import SignInHome from "./pages/SignInHome.tsx";
 
 function App() {
   return (
@@ -203,6 +204,14 @@ function App() {
               </Layout>
             }
           />
+            <Route
+                path="/signinhome"
+                element={
+                    <Layout>
+                        <SignInHome />
+                    </Layout>
+                }
+            />
           <Route
             path="/signup"
             element={

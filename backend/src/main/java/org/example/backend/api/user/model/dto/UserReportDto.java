@@ -1,4 +1,4 @@
-package org.example.backend.api.admin.model.dto;
+package org.example.backend.api.user.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AdminLoginDto {
-    private String adminId;
-    private String adminPassword;
+public class UserReportDto {
+    private Long userId;
+    private String reportReason;
 }

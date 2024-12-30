@@ -1,11 +1,22 @@
 package org.example.backend.exceptions;
 
+import org.example.backend.api.admin.controller.AdminController;
+import org.example.backend.api.foodlist.controller.FoodListController;
+import org.example.backend.api.myfridge.controller.MyfridgeController;
+import org.example.backend.api.notification.controller.NotificationController;
+import org.example.backend.api.notification.controller.PushNotificationController;
+import org.example.backend.api.post.controller.PostController;
+import org.example.backend.api.recipe.controller.RecipeController;
+import org.example.backend.api.trade.controller.TradeController;
+import org.example.backend.api.user.controller.UserController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@RestControllerAdvice
+@RestControllerAdvice(annotations = { RestController.class}, basePackageClasses = { AdminController.class, FoodListController.class, MyfridgeController.class,
+NotificationController.class, PostController.class, PushNotificationController.class, RecipeController.class, TradeController.class, UserController.class })
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
@@ -50,5 +61,54 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(TradeRequestHandleException.class)
+    public ResponseEntity<String> handleTradeRequestHandleException(TradeRequestHandleException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(TradeNotFoundException.class)
+    public ResponseEntity<String> handleTradeNotFoundException(TradeNotFoundException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(TradeRoomNotFoundException.class)
+    public ResponseEntity<String> handleTradeRoomNotFoundException(TradeRoomNotFoundException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(TradeNotCompletedException.class)
+    public ResponseEntity<String> handleTradeNotCompletedException(TradeNotCompletedException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(KindnessAlreadyReviewedException.class)
+    public ResponseEntity<String> handleKindnessAlreadyReviewedException(KindnessAlreadyReviewedException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(PostCannotBeDeletedException.class)
+    public ResponseEntity<String> handlePostCannotBeDeletedException(PostCannotBeDeletedException ex) {
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(S3FileNotDeletedException.class)
+    public ResponseEntity<String> handleS3FileNotDeletedException(S3FileNotDeletedException ex) {
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(ex.getMessage());
     }
 }

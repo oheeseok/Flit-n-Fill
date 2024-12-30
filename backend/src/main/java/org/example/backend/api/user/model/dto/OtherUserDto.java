@@ -11,13 +11,15 @@ import org.example.backend.api.user.model.entity.User;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OtherUserDto {
+    private Long userId;
     private String userNickname;
     private String userAddress;
     private String userProfile;
-    private double userKindness;
+    private int userKindness;
 
     public static OtherUserDto of(User user) {
         return new OtherUserDto(
+                user.getUserId(),
                 user.getUserNickname(),
                 user.getUserAddress(),
                 user.getUserProfile(),

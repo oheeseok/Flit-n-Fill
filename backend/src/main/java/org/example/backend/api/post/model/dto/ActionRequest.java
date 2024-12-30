@@ -1,4 +1,4 @@
-package org.example.backend.api.trade.model.dto;
+package org.example.backend.api.post.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TradeMessageAddDto {
-    private Long userId;
-    private String tradeRoomMessage;
+public class ActionRequest {
+    private String action;
 }

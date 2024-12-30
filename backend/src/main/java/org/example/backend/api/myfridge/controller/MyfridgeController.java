@@ -3,6 +3,7 @@ package org.example.backend.api.myfridge.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.backend.api.myfridge.model.dto.*;
 import org.example.backend.api.myfridge.service.MyfridgeService;
 import org.example.backend.api.user.model.dto.CartSimpleDto;
@@ -11,12 +12,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/my-fridge")
 @RequiredArgsConstructor
+@Slf4j
 public class MyfridgeController {
     private final MyfridgeService myfridgeService;
 
@@ -27,6 +30,7 @@ public class MyfridgeController {
             throw new UserIdNullException("userId not found");
         }
         List<FoodSimpleDto> allFood = myfridgeService.getAllFood(userId);
+        log.info("allFood, {}", allFood.toString());
         return ResponseEntity.status(HttpStatus.OK).body(allFood);
     }
 
@@ -76,13 +80,13 @@ public class MyfridgeController {
     }
 
     @PatchMapping("/{foodId}/exp-date")
-    public ResponseEntity<Void> updateExpDate(HttpServletRequest request, @PathVariable("foodId") Long foodId, @RequestBody FoodUpdateDto foodUpdateDto) {    // 냉장고 재료 소비기한 수정
+    public ResponseEntity<Void> updateExpDate(HttpServletRequest request, @PathVariable("foodId") Long foodId, @RequestBody LocalDate expDate) {    // 냉장고 재료 소비기한 수정
         Long userId = (Long) request.getAttribute("userId");
         if (userId == null) {
             throw new UserIdNullException("userId not found");
         }
 
-        myfridgeService.updateExpDate(userId, foodId, foodUpdateDto);
+        myfridgeService.updateExpDate(userId, foodId, expDate);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

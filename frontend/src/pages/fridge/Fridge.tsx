@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import ToRegisterButton from "../../components/fridge/ToRegisterButton";
 import ToRecipeButton from "../../components/fridge/ToRecipeButton";
 import ToCommunityButton from "../../components/fridge/ToCommunityButton";
@@ -23,7 +23,7 @@ import Swal from "sweetalert2";
 // }
 
 const Fridge: React.FC = () => {
-  const { fridgeItems, removeFridgeItem, updateFridgeItem } = useFridge();
+  const { fridgeItems, removeFridgeItem, updateFridgeItem, fetchFridgeItems } = useFridge();
   const { bucketItems, addToBucket, removeFromBucket } = useFridge(); // FridgeContext에서 가져옴
   // const [bucketItems, setBucketItems] = useState<FridgeItem[]>([]); 이거 fridgecontext에서 사용하자자
   const [editingItemId, setEditingItemId] = useState<number | null>(null);
@@ -36,6 +36,12 @@ const Fridge: React.FC = () => {
     "냉장" | "냉동" | "실온"
   >("냉장");
   const [editedRemarks, setEditedRemarks] = useState<string>("");
+
+  // 냉장고 재료 가져오기
+  useEffect(() => {
+    fetchFridgeItems()
+  }, []);
+
 
   // 수정 버튼 클릭
   const handleEditClick = (id: number) => {
@@ -68,6 +74,16 @@ const Fridge: React.FC = () => {
       setEditingItemId(null);
     }
   };
+
+  // 버킷에 추가
+  // const addToBucket = (item: FridgeItem) => {
+  //   setBucketItems((prev) => [...prev, { ...item }]);
+  // };
+
+  // // 버킷에서 삭제
+  // const removeFromBucket = (id: number) => {
+  //   setBucketItems((prev) => prev.filter((item) => item.id !== id));
+  // };
 
   // 아이템 렌더링
   const renderItems = (

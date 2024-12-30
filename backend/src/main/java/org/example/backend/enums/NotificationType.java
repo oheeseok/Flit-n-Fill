@@ -11,7 +11,8 @@ public enum NotificationType {
   FOOD_REQUEST_RESULT("재료 추가 요청 결과"),
   REPORT_AGAINST_ME("신고 당함"),
   REPORT_RESULT("신고 결과"),
-  NEW_COMMENT("새 댓글");
+  NEW_COMMENT("새 댓글"),
+  LEVEL_CHANGE("레벨 변동");
 
   private final String description;
 

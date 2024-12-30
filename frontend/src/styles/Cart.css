@@ -37,6 +37,75 @@
   margin: 0 20px 0 20px;
 }
 
+.cart-line {
+  display: flex;
+  /* justify-content: space-between; */
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.bullet {
+  color: #666; /* bullet 색상 */
+  font-size: 12px; /* bullet 크기 */
+  margin-right: 8px; /* bullet과 텍스트 간격 */
+}
+
+.line-text {
+  font-size: 23
+  px;
+  margin-right: 8px; /* 텍스트와 버튼 간격 */
+}
+
+.delete-button {
+  background: none;
+  border: none;
+  color: red;
+  cursor: pointer;
+  font-size: 16px;
+  margin-left: 10px;
+}
+
+.cart-input-container {
+  display: flex;
+  margin-top: 10px;
+}
+
+.cart-input {
+  flex-grow: 1;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.add-button {
+  margin-left: 10px;
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.add-button:hover {
+  background-color: #0056b3;
+}
+
+.save-cart-button {
+  margin-top: 10px;
+  padding: 10px 15px;
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.save-cart-button:hover {
+  background-color: #218838;
+}
+
 .cart-text {
   width: 1360px;
   height: 82vh;
