@@ -16,10 +16,7 @@ import org.example.backend.api.user.repository.CartItemRepository;
 import org.example.backend.api.user.repository.RequestRepository;
 import org.example.backend.api.user.repository.UserCartRepository;
 import org.example.backend.api.user.repository.UserRepository;
-import org.example.backend.enums.FoodCategory;
-import org.example.backend.enums.FoodStorage;
-import org.example.backend.enums.RequestType;
-import org.example.backend.enums.TaskStatus;
+import org.example.backend.enums.*;
 import org.example.backend.exceptions.UserNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,10 +39,10 @@ public class MyfridgeService {
     private final CartItemRepository cartItemRepository;
     private final RequestRepository requestRepository;
 
-    public List<FoodSimpleDto> getAllFood(Long userId) {
+    public List<FoodDetailDto> getAllFood(Long userId) {
         User user = userRepository.findById(userId).get();
-        List<FoodSimpleDto> FoodSimpleDtoList = myfridgeRepository.findByUserOrderByFoodExpDateAsc(user).stream()
-                .map(food -> FoodSimpleDto.of(food))
+        List<FoodDetailDto> FoodSimpleDtoList = myfridgeRepository.findByUserOrderByFoodExpDateAsc(user).stream()
+                .map(food -> FoodDetailDto.of(food))
                 .collect(Collectors.toList());
         return FoodSimpleDtoList;
     }
@@ -131,6 +128,7 @@ public class MyfridgeService {
 
     public FoodDetailDto updateFood(Long userId, Long foodId, FoodUpdateDto foodUpdateDto) {
         Food food = myfridgeRepository.findByFoodId(foodId);
+
         if (food == null) {
             throw new NoSuchElementException("해당 재료가 존재하지 않습니다.");
         }

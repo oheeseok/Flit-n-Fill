@@ -24,12 +24,12 @@ public class MyfridgeController {
     private final MyfridgeService myfridgeService;
 
     @GetMapping
-    public ResponseEntity<List<FoodSimpleDto>> getAllFood(HttpServletRequest request) {// 냉장고 재료 전체 조회
+    public ResponseEntity<List<FoodDetailDto>> getAllFood(HttpServletRequest request) {// 냉장고 재료 전체 조회
         Long userId = (Long) request.getAttribute("userId");
         if (userId == null) {
             throw new UserIdNullException("userId not found");
         }
-        List<FoodSimpleDto> allFood = myfridgeService.getAllFood(userId);
+        List<FoodDetailDto> allFood = myfridgeService.getAllFood(userId);
         log.info("allFood, {}", allFood.toString());
         return ResponseEntity.status(HttpStatus.OK).body(allFood);
     }

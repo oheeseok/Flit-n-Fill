@@ -5,7 +5,6 @@ import ToCommunityButton from "../../components/fridge/ToCommunityButton";
 import { useFridge } from "../../context/FridgeContext";
 import "../../styles/fridge/Fridge.css";
 import Swal from "sweetalert2";
-
 // FridgeItem 타입 정의
 interface FridgeItem {
   id: number;
@@ -15,7 +14,7 @@ interface FridgeItem {
   unit: string;
   expirationDate: string;
   manufactureDate: string;
-  storageMethod: "냉장" | "냉동" | "실온";
+  storageMethod: string;
   remarks: string;
   mainCategory: string;
   subCategory: string;
@@ -32,15 +31,20 @@ const Fridge: React.FC = () => {
   const [editedExpirationDate, setEditedExpirationDate] = useState<string>("");
   const [editedManufactureDate, setEditedManufactureDate] =
     useState<string>("");
-  const [editedStorageMethod, setEditedStorageMethod] = useState<
-    "냉장" | "냉동" | "실온"
-  >("냉장");
+  const [editedStorageMethod, setEditedStorageMethod] = useState<"REFRIGERATED" | "FROZEN" | "ROOM_TEMPERATURE">(
+      "REFRIGERATED"
+  );
   const [editedRemarks, setEditedRemarks] = useState<string>("");
 
   // 냉장고 재료 가져오기
   useEffect(() => {
-    fetchFridgeItems()
+    fetchFridgeItems();
+    console.log("Fetching items...", fridgeItems);
   }, []);
+
+  useEffect(() => {
+    console.log("Fridge items updated:", fridgeItems);
+  }, [fridgeItems]);  // fridgeItems 변경시 렌더링
 
 
   // 수정 버튼 클릭
@@ -60,17 +64,19 @@ const Fridge: React.FC = () => {
   // 저장 버튼 클릭
   const handleSaveEdit = () => {
     if (editingItemId !== null) {
-      const updatedItem: FridgeItem = {
-        ...fridgeItems.find((item) => item.id === editingItemId)!,
-        quantity: editedQuantity === "" ? 0 : editedQuantity,
-        unit: editedUnit,
-        expirationDate: editedExpirationDate,
-        manufactureDate: editedManufactureDate,
-        storageMethod: editedStorageMethod,
-        remarks: editedRemarks,
+      let updatedItem: Partial<FridgeItem>;
+      updatedItem = {
+        // ...fridgeItems.find((item) => item.id === editingItemId)!,
+        foodCount: editedQuantity === "" ? 0 : editedQuantity,
+        foodUnit: editedUnit,
+        foodExpDate: editedExpirationDate,
+        foodProDate: editedManufactureDate,
+        foodStorage: editedStorageMethod,
+        foodDescription: editedRemarks,
       };
 
       updateFridgeItem(editingItemId, updatedItem); // number 타입 id로 업데이트
+
       setEditingItemId(null);
     }
   };
@@ -88,7 +94,7 @@ const Fridge: React.FC = () => {
   // 아이템 렌더링
   const renderItems = (
     items: FridgeItem[],
-    storageMethod: "냉장" | "냉동" | "실온"
+    storageMethod: "REFRIGERATED" | "FROZEN" | "ROOM_TEMPERATURE"
   ) => {
     return items
       .filter((item) => item.storageMethod === storageMethod)
@@ -195,14 +201,14 @@ const Fridge: React.FC = () => {
             <div className="cold-side">
               냉장
               <div className="cold-back">
-                {renderItems(fridgeItems, "냉장")}
+                {renderItems(fridgeItems, "REFRIGERATED")}
               </div>
             </div>
           </div>
           <div className="freeze-container">
             <div className="freeze-side">
               <div className="freeze-back">
-                {renderItems(fridgeItems, "냉동")}
+                {renderItems(fridgeItems, "FROZEN")}
               </div>
               냉동
             </div>
@@ -211,7 +217,7 @@ const Fridge: React.FC = () => {
         <div className="out-container">
           <div className="out-side">
             실온
-            <div className="out-back">{renderItems(fridgeItems, "실온")}</div>
+            <div className="out-back">{renderItems(fridgeItems, "ROOM_TEMPERATURE")}</div>
           </div>
         </div>
         <div className="bucket-container">
@@ -243,9 +249,9 @@ const Fridge: React.FC = () => {
               value={editedUnit}
               onChange={(e) => setEditedUnit(e.target.value)}
             >
-              <option value="개">개</option>
+              <option value="PIECE">개</option>
               <option value="L">L</option>
-              <option value="g">g</option>
+              <option value="G">g</option>
             </select>
           </div>
           <div>

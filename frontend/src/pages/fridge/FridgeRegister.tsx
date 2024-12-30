@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import "../../styles/fridge/FridgeRegister.css";
 import { CATEGORY_DATA } from "../../data/categoryData";
@@ -15,8 +15,8 @@ const FridgeRegister = () => {
   const [unit, setUnit] = useState<string>("개");
   const [expirationDate, setExpirationDate] = useState<string>("");
   const [manufactureDate, setManufactureDate] = useState<string>("");
-  const [storageMethod, setStorageMethod] = useState<"냉장" | "냉동" | "실온">(
-    "냉장"
+  const [storageMethod, setStorageMethod] = useState<"REFRIGERATED" | "FROZEN" | "ROOM_TEMPERATURE">(
+    "REFRIGERATED"
   );
   const [remarks, setRemarks] = useState<string>("");
   const [adminRequest, setAdminRequest] = useState<string>("");
@@ -55,7 +55,7 @@ const FridgeRegister = () => {
     }
 
     const newItem = {
-      id: Date.now(), // 고유 ID 생성
+      // id: Date.now(), // 고유 ID 생성
       mainCategory: selectedMainCategory,
       subCategory: selectedSubCategory,
       detailCategory: selectedDetailCategory,
@@ -87,10 +87,10 @@ const FridgeRegister = () => {
     setSelectedDetailCategory("");
     setName("");
     setQuantity("");
-    setUnit("개");
+    setUnit("PIECE");
     setExpirationDate("");
     setManufactureDate("");
-    setStorageMethod("냉장");
+    setStorageMethod("REFRIGERATED");
     setRemarks("");
     setAdminRequest("");
     setIcon("");
@@ -187,9 +187,11 @@ const FridgeRegister = () => {
                 placeholder="수량 입력"
               />
               <select value={unit} onChange={(e) => setUnit(e.target.value)}>
-                <option value="개">개</option>
+                <option value="PIECE">개</option>
                 <option value="L">L</option>
-                <option value="g">g</option>
+                <option value="G">g</option>
+                <option value="KG">Kg</option>
+                <option value="ML">mL</option>
               </select>
             </div>
           </div>
@@ -219,14 +221,14 @@ const FridgeRegister = () => {
                 <input
                   type="radio"
                   name="storage"
-                  value="냉장"
-                  checked={storageMethod === "냉장"}
+                  value="REFRIGERATED"
+                  checked={storageMethod === "REFRIGERATED"}
                   onChange={(e) => {
                     const value = e.target.value;
                     if (
-                      value === "냉장" ||
-                      value === "냉동" ||
-                      value === "실온"
+                      value === "REFRIGERATED" ||
+                      value === "FROZEN" ||
+                      value === "ROOM_TEMPERATURE"
                     ) {
                       setStorageMethod(value);
                     }
@@ -238,14 +240,14 @@ const FridgeRegister = () => {
                 <input
                   type="radio"
                   name="storage"
-                  value="냉동"
-                  checked={storageMethod === "냉동"}
+                  value="FROZEN"
+                  checked={storageMethod === "FROZEN"}
                   onChange={(e) => {
                     const value = e.target.value;
                     if (
-                      value === "냉장" ||
-                      value === "냉동" ||
-                      value === "실온"
+                        value === "REFRIGERATED" ||
+                        value === "FROZEN" ||
+                        value === "ROOM_TEMPERATURE"
                     ) {
                       setStorageMethod(value);
                     }
@@ -257,14 +259,14 @@ const FridgeRegister = () => {
                 <input
                   type="radio"
                   name="storage"
-                  value="실온"
-                  checked={storageMethod === "실온"}
+                  value="ROOM_TEMPERATURE"
+                  checked={storageMethod === "ROOM_TEMPERATURE"}
                   onChange={(e) => {
                     const value = e.target.value;
                     if (
-                      value === "냉장" ||
-                      value === "냉동" ||
-                      value === "실온"
+                        value === "REFRIGERATED" ||
+                        value === "FROZEN" ||
+                        value === "ROOM_TEMPERATURE"
                     ) {
                       setStorageMethod(value);
                     }
