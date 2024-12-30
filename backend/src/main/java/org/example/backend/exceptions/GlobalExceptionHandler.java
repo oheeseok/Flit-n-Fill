@@ -104,4 +104,11 @@ public class GlobalExceptionHandler {
             .status(HttpStatus.CONFLICT)
             .body(ex.getMessage());
     }
+
+    @ExceptionHandler(S3FileNotDeletedException.class)
+    public ResponseEntity<String> handleS3FileNotDeletedException(S3FileNotDeletedException ex) {
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(ex.getMessage());
+    }
 }
