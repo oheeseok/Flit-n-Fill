@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import profileImg from "../../assets/images/samplerecipemethod.jpg";
+import profileImg from "../../assets/images/samplerecipe2.png";
 
 const StepContainer = styled.div`
   display: flex;

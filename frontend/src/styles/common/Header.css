@@ -2,7 +2,10 @@
   display: flex;
   width: 100%;
   align-items: center;
+  justify-content: space-between; /* 로고와 메뉴를 양 끝으로 배치 */
+  padding: 0 20px; /* 좌우 여백 추가 */
 }
+
 .logo {
   width: 65px;
   height: 90px;
@@ -11,10 +14,9 @@
 
 .headermenu {
   display: flex;
-  width: 100%;
+  width: auto; /* 크기를 자동으로 설정 */
   align-items: center;
   gap: 40px;
-  flex-shrink: 0;
   color: #000;
   text-align: center;
   font-family: Ubuntu;
@@ -22,15 +24,66 @@
   font-style: normal;
   font-weight: 400;
   line-height: normal;
-  margin-left: 730px;
 }
 
-/* 반응형 디자인: 화면 크기 조정 */
+/* Link 태그의 기본 스타일을 덮어쓰기 */
+.headermenu a {
+  color: #000; /* 검은색으로 변경 */
+  text-decoration: none; /* 밑줄 제거 */
+}
+
+/* Link 태그에 hover 효과 추가 */
+.headermenu a:hover {
+  color: #666; /* 호버 시 약간 다른 색상 */
+}
+
+.header-notification-popup {
+  position: absolute;
+  top: 100px;
+  right: 310px;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  width: 200px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 1100;
+}
+
+.header-user-menu {
+  position: absolute;
+  top: 100px;
+  right: 270px;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  width: 150px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+.header-user-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-user-menu ul li {
+  margin: 10px 0;
+}
+
+.header-user-menu ul li a {
+  text-decoration: none;
+  color: black;
+  display: block;
+}
+
+/* 반응형 디자인 */
 
 /* 화면 크기 1024px 이하일 때 */
 @media (max-width: 1024px) {
   .header {
-    gap: 30px; /* 화면 크기에 맞게 gap을 줄임 */
+    padding: 0 15px; /* 더 작은 좌우 여백 */
   }
 
   .logo {
@@ -40,6 +93,24 @@
 
   .headermenu {
     font-size: 18px; /* 메뉴 텍스트 크기 줄임 */
-    gap: 20px; /* 메뉴 항목 간의 간격을 줄임 */
+    gap: 20px; /* 메뉴 항목 간의 간격 줄임 */
+  }
+}
+
+/* 화면 크기 768px 이하일 때 */
+@media (max-width: 768px) {
+  .header {
+    justify-content: space-around; /* 로고와 메뉴를 화면 가운데 정렬 */
+    padding: 0 10px; /* 좌우 여백을 더 줄임 */
+  }
+
+  .logo {
+    width: 40px;
+    height: 60px; /* 로고 크기를 더 작게 */
+  }
+
+  .headermenu {
+    font-size: 16px; /* 텍스트 크기 줄임 */
+    gap: 15px; /* 간격 줄임 */
   }
 }

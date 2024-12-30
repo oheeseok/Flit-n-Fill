@@ -64,8 +64,8 @@
   justify-content: flex-start; /* 왼쪽 정렬 */
   align-items: flex-start;
   gap: 14px; /* 아이템 간격 추가 */
-  width: 600px;
-  height: 480px;
+  width: 660px;
+  height: 520px;
   flex-shrink: 0;
   border-radius: 56px 56px 0px 0px;
   background: rgba(71, 173, 195, 0.6);
@@ -123,8 +123,8 @@
 .freeze-back {
   font-family: Ubuntu;
   font-size: 18px;
-  width: 600px;
-  height: 480px;
+  width: 660px;
+  height: 520px;
   flex-shrink: 0;
   border-radius: 0px 0px 56px 56px;
   background: rgba(63, 126, 112, 0.6);
@@ -183,8 +183,8 @@
   font-size: 18px;
 }
 .out-back {
-  width: 380px;
-  height: 740px;
+  width: 420px;
+  height: 780px;
   border-radius: 30px;
   background: #eebfbb;
   display: flex;
@@ -304,9 +304,6 @@
 .fridge-item:hover .fridge-item-actions {
   display: flex;
 }
-
-
-
 
 /* 말풍선 에딧딧 */
 .edit-popup {

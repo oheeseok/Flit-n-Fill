@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
+import MyPage from "./pages/MyPage";
 import Fridge from "./pages/fridge/Fridge";
 import FridgeRegister from "./pages/fridge/FridgeRegister";
 import Recipe from "./pages/recipe/Recipe";
@@ -10,6 +11,11 @@ import SignUp from "./pages/SignUp";
 import ScrollToTop from "./components/common/ScrollToTop";
 import CommunityRegister from "./pages/community/CommunityRegister";
 import CommunityList from "./pages/community/CommunityList";
+import CommunityEdit from "./pages/community/CommunityEdit";
+import CommunityDetail from "./pages/community/CommunityDetail";
+import ChatRoomList from "./pages/community/ChatRoomList";
+import ChatRoom from "./pages/community/ChatRoom";
+import ChatRoomAfter from "./pages/community/ChatRoomAfter";
 import RecipeRegister from "./pages/recipe/RecipeRegister";
 import RecipeList from "./pages/recipe/RecipeList";
 import RecipeDetail from "./pages/recipe/RecipeDetail";
@@ -17,6 +23,7 @@ import RecipeEdit from "./pages/recipe/RecipeEdit";
 import { GlobalProvider } from "./context/GlobalProvider";
 import Layout from "./components/Layout";
 import "./App.css";
+import SignInHome from "./pages/SignInHome"; // 새로운 페이지 import
 
 function App() {
   return (
@@ -29,6 +36,35 @@ function App() {
             element={
               <Layout>
                 <Home />
+              </Layout>
+            }
+          />
+
+          {/* /home 경로 추가 */}
+          {/* <Route
+            path="/home"
+            element={
+              <Layout>
+                <Home />
+              </Layout>
+            }
+          /> */}
+
+          {/* 로그인한 사용자 전용 홈 경로 */}
+          {/* <Route
+            path="/signinhome"
+            element={
+              <Layout>
+                <SignInHome /> 
+              </Layout>
+            }
+          /> */}
+
+          <Route
+            path="/mypage"
+            element={
+              <Layout>
+                <MyPage />
               </Layout>
             }
           />
@@ -112,6 +148,46 @@ function App() {
               </Layout>
             }
           ></Route>
+          <Route
+            path="/community/edit"
+            element={
+              <Layout>
+                <CommunityEdit />
+              </Layout>
+            }
+          ></Route>
+          <Route
+            path="/community/detail"
+            element={
+              <Layout>
+                <CommunityDetail />
+              </Layout>
+            }
+          ></Route>
+          <Route
+            path="/chatroomlist"
+            element={
+              <Layout>
+                <ChatRoomList />
+              </Layout>
+            }
+          />
+          <Route
+            path="/chatroom"
+            element={
+              <Layout>
+                <ChatRoom />
+              </Layout>
+            }
+          />
+          <Route
+            path="/chatroom/after"
+            element={
+              <Layout>
+                <ChatRoomAfter />
+              </Layout>
+            }
+          />
           <Route
             path="/cart"
             element={

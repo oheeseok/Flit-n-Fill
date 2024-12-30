@@ -1,7 +1,7 @@
-.community-register-body {
+.community-detail-body {
   font-family: Ubuntu;
   display: flex;
-  flex-direction: column; /* 세로 방향 정렬 */
+  flex-direction: column;
   align-items: flex-start; /* 자식 요소를 왼쪽 정렬 */
   padding: 20px;
   max-width: 600px;
@@ -10,16 +10,12 @@
   border-radius: 10px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
-.community-register-category {
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-  text-align: start;
+.community-detail-category {
   font-family: Ubuntu;
   font-size: 18px;
+  font-weight: 600;
 }
-
-.community-register-title {
+.community-detail-title {
   font-family: Ubuntu;
   font-size: 24px;
   font-weight: bold;
@@ -32,20 +28,7 @@
   box-sizing: border-box;
 }
 
-.community-register-text {
-  font-family: Ubuntu;
-  font-size: 16px;
-  font-weight: bold;
-  margin-bottom: 10px;
-  width: 100%;
-  text-align: left;
-  border: 1px solid #d9d9d9;
-  border-radius: 5px;
-  padding: 10px;
-  box-sizing: border-box;
-}
-
-.community-register-profile-container {
+.community-detail-profile-container {
   font-family: Ubuntu;
   display: flex;
   align-items: center;
@@ -53,7 +36,7 @@
   width: 100%;
 }
 
-.community-register-profile-container-profile {
+.community-detail-profile-container-profile {
   width: 50px;
   height: 50px;
   border-radius: 50%;
@@ -61,28 +44,36 @@
   margin-right: 10px;
 }
 
-.community-register-profile-container-name {
+.community-detail-profile-container-name {
   font-family: Ubuntu;
   font-size: 16px;
   font-weight: bold;
   margin-right: 10px;
 }
 
-.community-register-profile-container-time {
+.community-detail-profile-container-time {
   font-size: 12px;
   color: #888888;
 }
 
-.community-register-img {
+.community-detail-img {
   width: 100%;
   margin-bottom: 20px;
 }
+.community-detail-img img {
+  width: 100%;
+  height: 600px;
+  border-radius: 30px;
+  object-fit: cover;
+  cursor: pointer;
+  border: 1px solid #d9d9d9; /* 디폴트 테두리 */
+}
 
-.community-register-box-container {
+.community-detail-box-container {
   width: 100%;
 }
 
-.community-register-box-input {
+.community-detail-box-input {
   font-family: Ubuntu;
   width: 100%;
   height: 150px;
@@ -93,16 +84,26 @@
   box-sizing: border-box;
   margin-bottom: 20px;
   resize: none;
+  background-color: #f9f9f9; /* 읽기 전용 배경 */
+  color: #333;
 }
 
-.community-register-button-container {
+.community-detail-button-container {
   display: flex;
-  justify-content: space-between;
+  justify-content: end;
+  gap: 10px;
+  width: 100%;
+}
+.community-detail-button-container2 {
+  display: flex;
+  justify-content: end;
+  gap: 10px;
   width: 100%;
 }
 
-.community-register-register-button,
-.community-register-cancel-button {
+.community-detail-edit-button,
+.community-detail-delete-button,
+.community-detail-button {
   padding: 10px 20px;
   font-size: 14px;
   font-weight: bold;
@@ -112,24 +113,35 @@
   transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-.community-register-register-button {
+.community-detail-edit-button {
   font-family: Ubuntu;
   background-color: #d4efc7;
   color: #000;
 }
 
-.community-register-register-button:hover {
+.community-detail-edit-button:hover {
   background-color: #85b573;
   transform: translateY(-2px);
 }
 
-.community-register-cancel-button {
+.community-detail-delete-button {
   font-family: Ubuntu;
-  background-color: #d9d9d9;
-  color: #333333;
+  background-color: #f5b7b1;
+  color: #000;
 }
 
-.community-register-cancel-button:hover {
-  background-color: #bbbbbb;
+.community-detail-delete-button:hover {
+  background-color: #e74c3c;
+  transform: translateY(-2px);
+}
+
+.community-detail-button {
+  font-family: Ubuntu;
+  background-color: #d4efc7;
+  color: #000;
+}
+
+.community-detail-button:hover {
+  background-color: #85b573;
   transform: translateY(-2px);
 }
