@@ -68,14 +68,17 @@ public class TradeService {
       Trade trade = tradeRepository.findById((Long) tradeRoom.getTradeId())
           .orElseThrow(() -> new TradeNotFoundException("해당하는 거래를 찾을 수 없습니다."));
       Post post = trade.getPost();
+      User writer = null;
       if (post == null) {
-        continue;
+        simple.setPostTitle("삭제된 게시글");
+      } else {
+        simple.setPostTitle(trade.getPost().getPostTitle());
+        writer = post.getUser();
       }
-      User writer = post.getUser();
-      User proposer = trade.getProposer();
-      simple.setPostTitle(trade.getPost().getPostTitle());
 
-      if (writer.getUserId() == userId) {
+      User proposer = trade.getProposer();
+
+      if (writer == null || writer.getUserId() == userId) {
         simple.setOtherUserNickname(proposer.getUserNickname());
         simple.setOtherUserProfile(proposer.getUserProfile());
       } else {
@@ -122,7 +125,11 @@ public class TradeService {
 
     // 게시글 정보 설정
     Post post = trade.getPost();
-    tradeRoomDetailDto.setPostInfo(PostSimpleDto.of(post, post.getUser()));
+    if (post == null) {
+      tradeRoomDetailDto.setPostInfo(null);
+    } else {
+      tradeRoomDetailDto.setPostInfo(PostSimpleDto.of(post, post.getUser()));
+    }
 
     return tradeRoomDetailDto;
   }
