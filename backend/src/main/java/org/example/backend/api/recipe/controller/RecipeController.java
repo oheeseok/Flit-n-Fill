@@ -1,18 +1,20 @@
 package org.example.backend.api.recipe.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.backend.api.recipe.model.dto.RecipeDetailDto;
-import org.example.backend.api.recipe.model.dto.RecipeRegisterDto;
-import org.example.backend.api.recipe.model.dto.RecipeSimpleDto;
-import org.example.backend.api.recipe.model.dto.RecipeUpdateDto;
+import org.example.backend.api.recipe.model.dto.*;
 import org.example.backend.api.recipe.service.RecipeService;
+import org.example.backend.api.s3.S3Service;
 import org.example.backend.exceptions.UserIdNullException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -57,25 +59,40 @@ public class RecipeController {
         return ResponseEntity.status(HttpStatus.OK).body(recipe);
     }
 
-    @PostMapping
-    public ResponseEntity<RecipeDetailDto> addRecipe(HttpServletRequest request, @RequestBody RecipeRegisterDto recipeRegisterDto) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<RecipeDetailDto> addRecipe(HttpServletRequest request,
+                                                     @RequestPart("recipeRegisterDto") String recipeRegisterDtoJson,
+                                                     @RequestPart("recipeMainPhoto") MultipartFile mainPhoto,
+                                                     @RequestPart(value = "recipeStepPhotos", required = false) List<MultipartFile> stepPhotos) throws IOException {
+        // RecipeRegisterDto를 JSON에서 객체로 변환
+        ObjectMapper objectMapper = new ObjectMapper();
+        RecipeRegisterDto recipeRegisterDto = objectMapper.readValue(recipeRegisterDtoJson, RecipeRegisterDto.class);
+
         Long userId = (Long) request.getAttribute("userId");
         if (userId == null) {
             throw new UserIdNullException("userId not found");
         }
-        RecipeDetailDto recipe = recipeService.addRecipe(userId, recipeRegisterDto);
+
+        // 레시피 생성
+        RecipeDetailDto recipe = recipeService.addRecipe(userId, recipeRegisterDto, mainPhoto, stepPhotos);
         return ResponseEntity.status(HttpStatus.CREATED).body(recipe);
     }
 
-    @PutMapping("/{recipeId}")
+    @PutMapping(value = "/{recipeId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<RecipeDetailDto> updateRecipe(HttpServletRequest request,
                                                         @PathVariable("recipeId") String recipeId,
-                                                        @RequestBody RecipeUpdateDto recipeUpdateDto) {
+                                                        @RequestPart("recipeUpdateDto") String recipeUpdateDtoJson,
+                                                        @RequestPart(value = "recipeMainPhoto", required = false) MultipartFile mainPhoto,
+                                                        @RequestPart(value = "recipeStepPhotos", required = false) List<MultipartFile> stepPhotos) throws IOException {
         Long userId = (Long) request.getAttribute("userId");
         if (userId == null) {
             throw new UserIdNullException("userId not found");
         }
-        RecipeDetailDto updatedRecipe = recipeService.updateRecipe(userId, recipeId, recipeUpdateDto);
+        ObjectMapper objectMapper = new ObjectMapper();
+        RecipeUpdateDto recipeUpdateDto = objectMapper.readValue(recipeUpdateDtoJson, RecipeUpdateDto.class);
+
+        // 레시피 업데이트 서비스 호출
+        RecipeDetailDto updatedRecipe = recipeService.updateRecipe(userId, recipeId, recipeUpdateDto, mainPhoto, stepPhotos);
         return ResponseEntity.status(HttpStatus.OK).body(updatedRecipe);
     }
 
