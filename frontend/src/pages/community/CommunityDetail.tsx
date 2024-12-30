@@ -1,4 +1,3 @@
-import React from "react";
 import { useNavigate } from "react-router-dom"; // useNavigate 추가
 import Swal from "sweetalert2"; // SweetAlert2 추가
 import { useCommunity } from "../../context/CommunityContext";
@@ -19,7 +18,7 @@ const CommunityDetail = () => {
     meetingPlace,
     meetingTime,
     postPhoto1,
-    postPhoto2,
+    // postPhoto2,
     writerFoodId,
     proposerFoodListId,
   } = communityData;

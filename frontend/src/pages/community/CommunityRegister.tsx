@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useCommunity } from "../../context/CommunityContext";
@@ -11,7 +11,10 @@ const CommunityRegister = () => {
 
   // 상태 관리
   const [uploadedImage1, setUploadedImage1] = useState<string | null>(null);
-  const [uploadedImage2, setUploadedImage2] = useState<string | null>(null);
+  const [
+    uploadedImage2,
+    // setUploadedImage2
+  ] = useState<string | null>(null);
   const [title, setTitle] = useState<string>("");
   const [content, setContent] = useState<string>("");
   const [meetingPlace, setMeetingPlace] = useState<string>("");

@@ -1,11 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 // FridgeItem 데이터 구조 정의
-interface FridgeItem {
+export interface FridgeItem {
   id: number;
-  mainCategory: string;
-  subCategory: string;
-  detailCategory: string;
   name: string;
   quantity: number;
   unit: string;
@@ -13,7 +10,11 @@ interface FridgeItem {
   manufactureDate: string;
   storageMethod: "냉장" | "냉동" | "실온";
   remarks: string;
+  adminRequest: string;
   icon: string;
+  mainCategory: string | null; // null 허용
+  subCategory: string | null; // null 허용
+  detailCategory: string | null; // null 허용
 }
 
 // Context 타입 정의
@@ -44,12 +45,14 @@ const FridgeContext = createContext<FridgeContextType>({
 export const FridgeProvider = ({ children }: { children: React.ReactNode }) => {
   const [fridgeItems, setFridgeItems] = useState<FridgeItem[]>(() => {
     const storedItems = localStorage.getItem("fridgeItems");
-    return storedItems ? JSON.parse(storedItems) : [];
+    return storedItems ? (JSON.parse(storedItems) as FridgeItem[]) : [];
   });
 
   const [bucketItems, setBucketItems] = useState<FridgeItem[]>(() => {
     const storedBucketItems = localStorage.getItem("bucketItems");
-    return storedBucketItems ? JSON.parse(storedBucketItems) : [];
+    return storedBucketItems
+      ? (JSON.parse(storedBucketItems) as FridgeItem[])
+      : [];
   });
 
   const addToBucket = (item: FridgeItem) => {

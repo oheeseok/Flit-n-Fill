@@ -26,7 +26,7 @@ const SignUp = () => {
           userAddress: address, // Address 포함
         }
       );
-
+      console.log("회원가입 성공:", response.data); // response 사용
       // 성공 시 처리
       Swal.fire({
         title: "회원가입 성공",

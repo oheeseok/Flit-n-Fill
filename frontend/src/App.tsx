@@ -23,7 +23,6 @@ import RecipeEdit from "./pages/recipe/RecipeEdit";
 import { GlobalProvider } from "./context/GlobalProvider";
 import Layout from "./components/Layout";
 import "./App.css";
-import SignInHome from "./pages/SignInHome"; // 새로운 페이지 import
 
 function App() {
   return (

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useCommunity } from "../../context/CommunityContext";
@@ -23,9 +23,10 @@ const CommunityEdit = () => {
   const [postPhoto1, setPostPhoto1] = useState<string | null>(
     communityData?.postPhoto1 || null
   );
-  const [postPhoto2, setPostPhoto2] = useState<string | null>(
-    communityData?.postPhoto2 || null
-  );
+  const [
+    postPhoto2,
+    // setPostPhoto2
+  ] = useState<string | null>(communityData?.postPhoto2 || null);
   const [tradeType, setTradeType] = useState(
     communityData?.tradeType || "EXCHANGE"
   );
@@ -37,7 +38,7 @@ const CommunityEdit = () => {
   );
 
   const handlePhoto1Change = (image: string) => setPostPhoto1(image);
-  const handlePhoto2Change = (image: string) => setPostPhoto2(image);
+  // const handlePhoto2Change = (image: string) => setPostPhoto2(image);
 
   const handleUpdate = () => {
     if (

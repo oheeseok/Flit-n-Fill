@@ -14,7 +14,7 @@ interface CommunityData {
 
 interface CommunityContextProps {
   communityData: CommunityData | null;
-  setCommunityData: (data: CommunityData) => void;
+  setCommunityData: (data: CommunityData | null) => void;
 }
 
 const CommunityContext = createContext<CommunityContextProps | undefined>(

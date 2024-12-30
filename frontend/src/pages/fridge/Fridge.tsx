@@ -2,25 +2,25 @@ import React, { useState } from "react";
 import ToRegisterButton from "../../components/fridge/ToRegisterButton";
 import ToRecipeButton from "../../components/fridge/ToRecipeButton";
 import ToCommunityButton from "../../components/fridge/ToCommunityButton";
-import { useFridge } from "../../context/FridgeContext";
+import { useFridge, FridgeItem } from "../../context/FridgeContext";
 import "../../styles/fridge/Fridge.css";
 import Swal from "sweetalert2";
 
 // FridgeItem 타입 정의
-interface FridgeItem {
-  id: number;
-  name: string;
-  icon: string;
-  quantity: number;
-  unit: string;
-  expirationDate: string;
-  manufactureDate: string;
-  storageMethod: "냉장" | "냉동" | "실온";
-  remarks: string;
-  mainCategory: string;
-  subCategory: string;
-  detailCategory: string;
-}
+// interface FridgeItem {
+//   id: number;
+//   name: string;
+//   icon: string;
+//   quantity: number;
+//   unit: string;
+//   expirationDate: string;
+//   manufactureDate: string;
+//   storageMethod: "냉장" | "냉동" | "실온";
+//   remarks: string;
+//   mainCategory: string | null;
+//   subCategory: string | null;
+//   detailCategory: string | null;
+// }
 
 const Fridge: React.FC = () => {
   const { fridgeItems, removeFridgeItem, updateFridgeItem } = useFridge();
@@ -133,10 +133,10 @@ const Fridge: React.FC = () => {
 
   // 버킷 렌더링
   const renderBucketItems = () => {
-    return bucketItems.map(
-      (
-        item: FridgeItem // `item` 타입 명시
-      ) => (
+    return bucketItems.map((item) => {
+      if (!item) return null;
+
+      return (
         <div
           className="fridge-item"
           key={item.id}
@@ -147,7 +147,7 @@ const Fridge: React.FC = () => {
             className="fridge-item-icon"
             src={item.icon}
             alt={item.name}
-            onClick={() => addToBucket(item)} // 버킷에 추가
+            onClick={() => addToBucket(item)}
           />
           <div className="fridge-item-expiration">{item.expirationDate}</div>
           <div className="fridge-item-actions">
@@ -155,18 +155,18 @@ const Fridge: React.FC = () => {
               src="/assets/edit.png"
               alt="수정"
               className="bucket-item-edit-icon"
-              onClick={() => handleEditClick(item.id)} // 수정 팝업 호출
+              onClick={() => handleEditClick(item.id)}
             />
             <img
               src="/assets/delete.png"
               alt="삭제"
               className="bucket-item-delete-icon"
-              onClick={() => removeFromBucket(item.id)} // 버킷 내 삭제
+              onClick={() => removeFromBucket(item.id)}
             />
           </div>
         </div>
-      )
-    );
+      );
+    });
   };
 
   return (

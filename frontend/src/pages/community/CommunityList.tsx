@@ -1,4 +1,3 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import { communityData } from "../../data/communityData"; // 임시 데이터 가져오기
 import "../../styles/community/CommunityList.css";

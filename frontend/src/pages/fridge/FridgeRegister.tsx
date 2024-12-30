@@ -2,7 +2,9 @@ import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import "../../styles/fridge/FridgeRegister.css";
 import { CATEGORY_DATA } from "../../data/categoryData";
-import { useFridge } from "../../context/FridgeContext";
+import { useFridge, FridgeItem } from "../../context/FridgeContext";
+
+import FridgeSearchBar from "../../components/fridge/FridgeSearchBar";
 
 const FridgeRegister = () => {
   const { addFridgeItem } = useFridge();
@@ -18,6 +20,11 @@ const FridgeRegister = () => {
   const [storageMethod, setStorageMethod] = useState<"냉장" | "냉동" | "실온">(
     "냉장"
   );
+  // 상태 관리: 재료/완제품
+  const [ingredientType, setIngredientType] = useState<"재료" | "완제품">(
+    "재료"
+  );
+
   const [remarks, setRemarks] = useState<string>("");
   const [adminRequest, setAdminRequest] = useState<string>("");
 
@@ -26,7 +33,9 @@ const FridgeRegister = () => {
 
   useEffect(() => {
     // 이름 및 아이콘 업데이트
-    if (selectedDetailCategory) {
+    if (ingredientType === "완제품") {
+      setIcon("/assets/instant-food.png"); // 완제품 아이콘
+    } else if (selectedDetailCategory) {
       setName(selectedDetailCategory);
       setIcon(
         CATEGORY_DATA[selectedMainCategory]?.중분류?.[selectedSubCategory]
@@ -42,23 +51,37 @@ const FridgeRegister = () => {
       setName("");
       setIcon("");
     }
-  }, [selectedMainCategory, selectedSubCategory, selectedDetailCategory]);
+  }, [
+    ingredientType,
+    selectedMainCategory,
+    selectedSubCategory,
+    selectedDetailCategory,
+  ]);
+
+  // onSearch 함수 저의
+  const handleSearch = (
+    mainCategory: string,
+    subCategory?: string,
+    detailCategory?: string
+  ) => {
+    setSelectedMainCategory(mainCategory || "");
+    setSelectedSubCategory(subCategory || "");
+    setSelectedDetailCategory(detailCategory || "");
+  };
 
   const handleRegister = (): void => {
-    if (!selectedMainCategory || !selectedSubCategory) {
+    if (name.trim() === "") {
       Swal.fire({
         icon: "error",
         title: "입력 오류",
-        text: "대분류와 중분류를 선택해주세요.",
+        text: "이름을 입력해주세요.",
       });
       return;
     }
 
-    const newItem = {
-      id: Date.now(), // 고유 ID 생성
-      mainCategory: selectedMainCategory,
-      subCategory: selectedSubCategory,
-      detailCategory: selectedDetailCategory,
+    const id = Date.now();
+    const newItem: FridgeItem = {
+      id,
       name,
       quantity: typeof quantity === "string" ? 0 : quantity,
       unit,
@@ -68,7 +91,25 @@ const FridgeRegister = () => {
       remarks,
       adminRequest,
       icon,
+      mainCategory:
+        ingredientType === "완제품" ? null : selectedMainCategory || "",
+      subCategory:
+        ingredientType === "완제품" ? null : selectedSubCategory || "",
+      detailCategory:
+        ingredientType === "완제품" ? null : selectedDetailCategory || "",
     };
+
+    if (
+      ingredientType === "재료" &&
+      (!newItem.mainCategory || !newItem.subCategory)
+    ) {
+      Swal.fire({
+        icon: "error",
+        title: "입력 오류",
+        text: "분류를 선택해주세요.",
+      });
+      return;
+    }
 
     addFridgeItem(newItem);
 
@@ -96,14 +137,63 @@ const FridgeRegister = () => {
     setIcon("");
   };
 
+  // 재료/완제품 핸들러
+  const handleIngredientTypeChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ): void => {
+    const value = e.target.value as "재료" | "완제품";
+    setIngredientType(value);
+
+    if (value === "완제품") {
+      setIcon("/assets/instant-food.png");
+      setName("");
+      setSelectedMainCategory("");
+      setSelectedSubCategory("");
+      setSelectedDetailCategory("");
+    } else {
+      setIcon("");
+    }
+  };
+
   return (
     <div className="fridge-register-body">
-      {/* 완제품,  */}
       <div className="fridge-register-container">
+        <div className="fridge-register-category-group">
+          {/* 완제품 표시 */}
+          <label>
+            <input
+              type="radio"
+              name="ingredientType"
+              value="재료"
+              checked={ingredientType === "재료"}
+              onChange={handleIngredientTypeChange}
+            />
+            재료
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="ingredientType"
+              value="완제품"
+              checked={ingredientType === "완제품"}
+              onChange={handleIngredientTypeChange}
+            />
+            완제품
+          </label>
+        </div>
+
+        {/* 서치바 */}
+        <div className="fridge-register-searchbar">
+          <FridgeSearchBar
+            onSearch={handleSearch}
+            disabled={ingredientType === "완제품"}
+          ></FridgeSearchBar>
+        </div>
+
         {/* 아이콘 표시 */}
         {icon && (
           <div className="fridge-register-icon">
-            <img src={icon} alt={name} />
+            <img src={icon} alt={name || "아이콘"} />
           </div>
         )}
 
@@ -113,6 +203,7 @@ const FridgeRegister = () => {
             <select
               value={selectedMainCategory}
               onChange={(e) => setSelectedMainCategory(e.target.value)}
+              disabled={ingredientType === "완제품"}
             >
               <option value="">선택</option>
               {Object.keys(CATEGORY_DATA).map((mainCategory) => (
@@ -190,7 +281,9 @@ const FridgeRegister = () => {
               <select value={unit} onChange={(e) => setUnit(e.target.value)}>
                 <option value="개">개</option>
                 <option value="L">L</option>
+                <option value="mL">ml</option>
                 <option value="g">g</option>
+                <option value="kg">kg</option>
               </select>
             </div>
           </div>
