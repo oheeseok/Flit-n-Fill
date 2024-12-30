@@ -1,9 +1,10 @@
 .header {
+  max-width: 1541.74px;
   display: flex;
   width: 100%;
   align-items: center;
   justify-content: space-between; /* 로고와 메뉴를 양 끝으로 배치 */
-  padding: 0 20px; /* 좌우 여백 추가 */
+  /* padding: 0 10px; 좌우 여백 추가 */
 }
 
 .logo {

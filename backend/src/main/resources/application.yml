@@ -1,0 +1,77 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/flitnfill
+    redis:
+      port: 6379
+      host: localhost
+      timeout: 5000ms
+      database: 0
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/flitnfill?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+    username: root
+    password: 1234
+  # jpa-hibernate configuration
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        show_sql: true
+        format_sql: true
+        highlight_sql: true
+        use_sql_comments: true
+        hbm2ddl:
+          auto: update # update
+        naming:
+          physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+  # OAuth2
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 476001098156-4oc3nmaegoej659au9t1n3k8lmqksfep.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+              - profile
+              - email # 기본값이 openid, profile, email이지만 openid를 등록하게 되면 서비스마다(카카오, 네이버) OAuth2Service를 만들어야하기 때문에 profile, email만 scope로 지정
+            redirect-uri: "http://localhost:8080/login/oauth2/code/google"
+          kakao:
+            client-name: Kakao
+            client-id: 1ac918c3433689f5b90d565476ad5aab
+            client-secret: xaVydXfHnhyPNy3WNvxi5SmRVqO5VYP1
+            scope:
+              - profile_nickname
+              - profile_image
+              - account_email
+            redirect-uri: "http://localhost:8080/login/oauth2/code/kakao"
+            client-authentication-method: client_secret_post
+            authorization-grant-type: authorization_code
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+  # mail
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: flitnfill@gmail.com
+    password: qfkdumtwtqwahigq
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+jwt:
+  secret-key: "2cdefd6f1a93dfb3f113e4745efacd7014eecb90daeac374752f7811531e62bc"
+  access-token-expiration-time: 300000 # 5분 300000
+  refresh-token-expiration-time: 604800000 # 7일""
+server:
+  host: localhost
+  port: 8080

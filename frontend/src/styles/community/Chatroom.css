@@ -1,7 +1,6 @@
 .chatroom-container {
   width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
+  margin: 50px auto;
   font-family: Ubuntu, sans-serif;
   background-color: #f8f8f8;
   border: 1px solid #e0e0e0;
