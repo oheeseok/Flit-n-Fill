@@ -18,8 +18,10 @@ import java.time.LocalDate;
 public class FoodSimpleDto {
     private Long foodId;
     private String foodListName;
-    private FoodStorage foodStorage;
+//    private FoodStorage foodStorage;
+    private String foodStorage;
     private LocalDate foodExpDate;
+
     private int foodListIcon;
 
     public static FoodSimpleDto of(Food food) {
@@ -28,7 +30,7 @@ public class FoodSimpleDto {
         FoodSimpleDto dto = new FoodSimpleDto(
                 food.getFoodId(),
                 food.getFoodListName(),
-                food.getFoodStorage(),
+                food.getFoodStorage().getDescription(),
                 food.getFoodExpDate(),
                 foodListIcon
         );
