@@ -1,18 +1,19 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Fridge from "./pages/fridge/Fridge";
-import FridgeResister from "./pages/fridge/FridgeResister";
+import FridgeRegister from "./pages/fridge/FridgeRegister";
 import Recipe from "./pages/recipe/Recipe";
 import Community from "./pages/community/Community";
 import Cart from "./pages/Cart";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import ScrollToTop from "./components/common/ScrollToTop";
-import CommunityResister from "./pages/community/CommunityResister";
+import CommunityRegister from "./pages/community/CommunityRegister";
 import CommunityList from "./pages/community/CommunityList";
-import RecipeResister from "./pages/recipe/RecipeResister";
+import RecipeRegister from "./pages/recipe/RecipeRegister";
 import RecipeList from "./pages/recipe/RecipeList";
 import RecipeDetail from "./pages/recipe/RecipeDetail";
+import RecipeEdit from "./pages/recipe/RecipeEdit";
 import { GlobalProvider } from "./context/GlobalProvider";
 import Layout from "./components/Layout";
 import "./App.css";
@@ -63,10 +64,10 @@ function App() {
             }
           />
           <Route
-            path="/fridge/resister"
+            path="/fridge/register"
             element={
               <Layout>
-                <FridgeResister />
+                <FridgeRegister />
               </Layout>
             }
           />
@@ -79,10 +80,10 @@ function App() {
             }
           />
           <Route
-            path="/recipe/resister"
+            path="/recipe/register"
             element={
               <Layout>
-                <RecipeResister />
+                <RecipeRegister />
               </Layout>
             }
           ></Route>
@@ -103,6 +104,14 @@ function App() {
             }
           ></Route>
           <Route
+            path="recipe/edit/:id"
+            element={
+              <Layout>
+                <RecipeEdit></RecipeEdit>
+              </Layout>
+            }
+          ></Route>
+          <Route
             path="/community"
             element={
               <Layout>
@@ -111,10 +120,10 @@ function App() {
             }
           />
           <Route
-            path="/community/resister"
+            path="/community/register"
             element={
               <Layout>
-                <CommunityResister />
+                <CommunityRegister />
               </Layout>
             }
           ></Route>

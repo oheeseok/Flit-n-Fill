@@ -323,6 +323,33 @@ public class RecipeService {
     return result;
   }
 
+  public List<RecipeSimpleDto> getMyRecipes(Long userId) {
+    List<String> bookmarkedRecipeIds = bookmarkedRecipeRepository.findRecipeIdsByUserId(userId);
+    List<Recipe> recipes = recipeRepository.findByUserId(userId, Sort.by(Sort.Direction.DESC, "recipeCreatedDate"));
+    return recipes.stream()
+        .map(recipe -> {
+          User user = recipe.getUserId() != null ? userRepository.findById(recipe.getUserId()).orElse(null) : null;
+          // Recipe -> RecipeSimpleDto로 변환
+          RecipeSimpleDto recipeSimpleDto = RecipeSimpleDto.of(recipe, user);
+          recipeSimpleDto.setRecipeIsBookmarked(bookmarkedRecipeIds.contains(recipeSimpleDto.getRecipeId()));
+          return recipeSimpleDto;
+        })
+        .collect(Collectors.toList());
+  }
+
+  public List<RecipeSimpleDto> getBookmarkedRecipes(Long userId) {
+    List<String> bookmarkedRecipeIds = bookmarkedRecipeRepository.findRecipeIdsByUserId(userId);
+    List<Recipe> bookmarkedRecipes = recipeRepository.findAllById(bookmarkedRecipeIds);
+    return bookmarkedRecipes.stream()
+        .map(recipe -> {
+          User user = recipe.getUserId() != null ? userRepository.findById(recipe.getUserId()).orElse(null) : null;
+          RecipeSimpleDto recipeSimpleDto = RecipeSimpleDto.of(recipe, user);
+          recipeSimpleDto.setRecipeIsBookmarked(true);
+          return recipeSimpleDto;
+        })
+        .collect(Collectors.toList());
+  }
+
   public static class Pair<K, V> {
     private final K first;
     private final V second;

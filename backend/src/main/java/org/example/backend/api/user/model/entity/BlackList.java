@@ -23,18 +23,23 @@ public class BlackList {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long blackListId;
 
-  @OneToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", nullable = false)
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "reporter_id", nullable = false)
   @OnDelete(action = OnDeleteAction.CASCADE)
   @NotNull
-  private User user;
+  private User reporter;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "reported_user_id", nullable = false)
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  @NotNull
+  private User reported;
 
   @Column(nullable = false)
-  @ColumnDefault("0")
   @NotNull
-  private int userReportedCount;
+  private LocalDate reportedDate;
 
   @Column(nullable = false)
   @NotNull
-  private LocalDate userLastReportedDate;
+  private String reportReason;
 }

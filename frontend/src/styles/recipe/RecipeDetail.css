@@ -24,6 +24,7 @@
   font-style: normal;
   font-weight: 700;
   line-height: normal;
+  text-align: center;
 }
 
 .recipe-detail-image {
@@ -169,12 +170,28 @@
   text-align: start;
 }
 
-.recipe-detail-delete-container {
+.recipe-detail-action-container {
   width: 100%;
   display: flex;
   margin-bottom: 40px;
   justify-content: flex-end;
   margin-right: 40px;
+}
+
+.recipe-detail-edit-button {
+  background-color: #c7efe6;
+  color: 3c3c3c;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.recipe-detail-edit-button:hover {
+  background-color: #78f3d8;
 }
 
 .recipe-detail-delete-button {

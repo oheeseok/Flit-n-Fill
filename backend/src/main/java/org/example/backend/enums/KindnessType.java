@@ -1,8 +1,8 @@
 package org.example.backend.enums;
 
 public enum KindnessType {
-  GREAT(100, "좋아요"),
-  BAD(30, "별로에요");
+  GREAT(10, "좋아요"),
+  BAD(-5, "별로에요");
 
   private final int score;
   private final String description;

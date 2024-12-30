@@ -79,6 +79,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     return;
                 }
 
+                if (!userEmail.equals(jwtTokenProvider.getUserEmailFromToken(token))) {
+                    log.error("[JwtAuthenticationFilter] User email mismatch: token={}, request={}",
+                            jwtTokenProvider.getUserEmailFromToken(token), userEmail);
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403 Forbidden
+                    response.getWriter().write("User email mismatch");
+                    return;
+                }
+
                 Long userId = Long.parseLong((jwtTokenProvider.validateToken(token)));
 //                log.info("[JwtAuthenticationFilter] 회원 이메일: {}, 회원 ID: {}", userEmail, userId);
                 // 사용자 인증 처리 (인증 정보 설정)

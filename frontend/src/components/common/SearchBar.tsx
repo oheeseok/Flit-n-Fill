@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../../styles/common/SearchBar.css";
 import SearchIcon from "./SearchIcon";
 import { useState } from "react";
+import Swal from "sweetalert2";
 
 const SearchBar = () => {
   const { setSearchQuery } = useRecipe(); // Context에서 setSearchQuery만 사용
@@ -12,12 +13,16 @@ const SearchBar = () => {
   // 검색 실행 함수
   const handleSearch = () => {
     if (inputValue.trim() === "") {
-      alert("검색어를 입력해주세요.");
+      Swal.fire({
+        icon: "info",
+        title: "검색어를 입력해주세요.",
+        confirmButtonText: "확인",
+      });
       return;
     }
+
     setSearchQuery(inputValue); // Context에 검색어 업데이트
-    navigate(`/recipe/list?query=${inputValue}`);
-    // 여기에서 검색 결과를 처리하거나 다른 컴포넌트와 연동
+    navigate(`/recipe/list?query=${inputValue}`); // 검색 결과 페이지로 이동
   };
   // 엔터 키를 눌렀을 때
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {

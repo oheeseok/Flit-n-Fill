@@ -31,15 +31,9 @@ public class Kindness {
   @OnDelete(action = OnDeleteAction.SET_NULL)
   private User reviewee;
 
-  //TradeRoom 에 @Entity가 없어서 인식 못함
-  //TradeRoom 은 MongodB ...
-//  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-//  @JoinColumn(name = "trade_room_id")
-//  @OnDelete(action = OnDeleteAction.CASCADE)
-//  private TradeRoom tradeRoom;
   @Column(nullable = false)
   @NotNull
-  private String tradeRoomId; //임시
+  private String tradeRoomId;
 
   @Enumerated(EnumType.STRING) // Java 레벨
   @Column(nullable = false)

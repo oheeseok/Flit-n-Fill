@@ -1,6 +1,6 @@
 import SearchBar from "../../components/common/SearchBar";
 import "../../styles/community/Community.css";
-import CommunityResisterButton from "../../components/community/CommunityResisterButton";
+import CommunityRegisterButton from "../../components/community/CommunityRegisterButton";
 
 const Community = () => {
   return (
@@ -10,8 +10,8 @@ const Community = () => {
         <div className="community-background"></div>
         {/* 실제 컨텐츠 */}
         <div className="community-content">
-          <div className="community-toresister-button">
-            <CommunityResisterButton></CommunityResisterButton>
+          <div className="community-toregister-button">
+            <CommunityRegisterButton></CommunityRegisterButton>
           </div>
           <div className="community-title">exchange & sharing</div>
           <div className="community-address">

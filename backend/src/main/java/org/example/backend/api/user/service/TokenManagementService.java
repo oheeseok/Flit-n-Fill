@@ -41,11 +41,9 @@ public class TokenManagementService {
         user.setRefreshToken(refreshToken);
         userRepository.save(user);
 
-        // access token, refresh token 쿠키 설정
+        // access token, userEmail
         addCookie(response, "userEmail", user.getUserEmail());
-        addCookie(response, "userId", String.valueOf(user.getUserId()));
         addCookie(response, "accessToken", accessToken);
-        addCookie(response, "refreshToken", refreshToken);
 
         return new UserLoginResponse(accessToken, refreshToken);
     }
@@ -86,35 +84,34 @@ public class TokenManagementService {
         String refreshToken = user.getRefreshToken();
         log.info("refresh token : {}", refreshToken);
 
+        // access token
+        Long expirationTime = ops.get("Blacklist:" + token);
+
+        if (expirationTime != null) {
+            response.sendRedirect("/login");
+            return null; // 로그아웃 된 토큰은 login으로 리다이렉팅
+        }
+
         if (jwtTokenProvider.isTokenExpired(token)) {
             if (jwtTokenProvider.isTokenExpired(refreshToken)) {
                 // access token, refresh token 모두 만료된 경우
                 log.info("둘다 만료");
                 clearCookie(response, "accessToken");
-                clearCookie(response, "refreshToken");
                 clearCookie(response, "userEmail");
-                clearCookie(response, "userId");
                 response.sendRedirect("/login");
                 return null;
             } else {
                 // refresh token 이 만료되지 않은 경우
                 // access token 갱신
-                String accessToken = jwtTokenProvider.generateAccessToken(userEmail, user.getUserId());
-                addCookie(response, "accessToken", accessToken);
-                return accessToken;
+                token = jwtTokenProvider.generateAccessToken(userEmail, user.getUserId());
+                addCookie(response, "accessToken", token);
             }
+        } else if (jwtTokenProvider.isTokenExpired(refreshToken)) {
+            // refresh token 이 만료된 경우
+            user.setRefreshToken(jwtTokenProvider.generateRefreshToken(userEmail, user.getUserId()));
+            userRepository.save(user);
         }
-
-        // access token
-        Long expirationTime = ops.get("Blacklist:" + token);
-
-        if (expirationTime == null) {
-            return token; // 블랙리스트에 없으면 만료되지 않은 것과 동일
-        }
-
-        // 로그아웃된 토큰이므로 true 반환
-        response.sendRedirect("/login");
-        return null;
+        return token; // access token 반환
     }
 
     // 토큰을 블랙리스트에 추가 (만료 시간과 함께 저장)
@@ -128,8 +125,6 @@ public class TokenManagementService {
             ops.set("Blacklist:" + token, expirationTime, expirationTime - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
         }
         clearCookie(response, "accessToken");
-        clearCookie(response, "refreshToken");
         clearCookie(response, "userEmail");
-        clearCookie(response, "userId");
     }
 }

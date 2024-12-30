@@ -43,7 +43,7 @@ public class SpringConfig {
         // 인증 요청 페이지 설정
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/user/register", "/api/user/login", "/oauth2/**", "/api/subscribe/**").permitAll()
+                        .requestMatchers("/api/user/register", "/api/user/login", "/oauth2/**", "/api/subscribe/**", "/api/admin/login", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().permitAll())
@@ -61,11 +61,10 @@ public class SpringConfig {
 
                 // OAuth2 로그인 추가
                 .oauth2Login(oauth2 ->
-                        oauth2.userInfoEndpoint(c -> c.userService(oAuth2UserService)
-                                        .and()
-                                        .successHandler(oAuth2LoginSuccessHandler)))// 로그인 성공시 이동할 URL
+                        oauth2.userInfoEndpoint(c -> c.userService(oAuth2UserService))
+                                .successHandler(oAuth2LoginSuccessHandler))// 로그인 성공시 이동할 URL
 
-                // jwt token filter
+        // jwt token filter
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
