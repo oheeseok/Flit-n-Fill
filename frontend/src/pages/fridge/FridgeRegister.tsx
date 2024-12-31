@@ -3,7 +3,7 @@ import Swal from "sweetalert2";
 import "../../styles/fridge/FridgeRegister.css";
 import { useFridge } from "../../context/FridgeContext";
 import axios from "axios";
-import FridgeSearchBar from "../../components/fridge/FridgeSearchBar.tsx";
+// import FridgeSearchBar from "../../components/fridge/FridgeSearchBar.tsx";
 
 const FridgeRegister = () => {
   const { addFridgeItem } = useFridge();
@@ -22,48 +22,71 @@ const FridgeRegister = () => {
   const [remarks, setRemarks] = useState<string>("");
   const [adminRequest, setAdminRequest] = useState<string>("");
   const [foodListId, setFoodListId] = useState<string>("");
-  const [categories, setCategories] = useState([]);
+  // const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState<Record<string, GroupedCategory>>(
+    {}
+  );
+
   // 상태 관리: 재료/완제품
   const [ingredientType, setIngredientType] = useState<"INGREDIENT" | "COOKED">(
     "INGREDIENT"
   );
 
+  interface FoodListViewDto {
+    foodListId: number; // Long -> number
+    foodListGroup: string;
+    foodListType: string | null; // Optional일 수 있으므로 null 허용
+    foodListProduct: string | null; // Optional일 수 있으므로 null 허용
+    foodListIcon: number;
+  }
+
+  // 수정 여기부터
+  interface SubCategory {
+    icon: number;
+    foodListId: number;
+    소분류: Record<string, { icon: number; foodListId: number }>;
+  }
+
+  interface GroupedCategory {
+    대분류: string;
+    중분류: Record<string, SubCategory>;
+  }
+  // 수정 여기까지
+
   useEffect(() => {
-    // 백엔드에서 데이터 가져오기
     const fetchCategories = async () => {
       try {
         const response = await axios.get("http://localhost:8080/api/foodlist", {
           withCredentials: true,
-        }); // 백엔드 엔드포인트 수정
+        });
+
         const groupedData = response.data.reduce(
           (
-            acc,
+            acc: Record<string, any>, // acc 타입 명시
             {
               foodListGroup,
               foodListProduct,
               foodListType,
               foodListIcon,
               foodListId,
-            }
+            }: FoodListViewDto // 구조 분해한 객체 타입 명시
           ) => {
             if (!acc[foodListGroup]) {
               acc[foodListGroup] = {
-                대분류: foodListGroup, // 대분류 추가
-                중분류: {}, // 중분류를 빈 객체로 초기화
+                대분류: foodListGroup,
+                중분류: {},
               };
             }
 
-            // 중분류가 있을 경우
             if (foodListType) {
               if (!acc[foodListGroup].중분류[foodListType]) {
                 acc[foodListGroup].중분류[foodListType] = {
-                  icon: foodListIcon, // 중분류의 아이콘
+                  icon: foodListIcon,
                   foodListId,
-                  소분류: {}, // 소분류를 빈 객체로 초기화
+                  소분류: {},
                 };
               }
 
-              // foodListProduct가 있을 경우, 소분류에 추가
               if (foodListProduct !== null) {
                 acc[foodListGroup].중분류[foodListType].소분류[
                   foodListProduct
@@ -73,11 +96,10 @@ const FridgeRegister = () => {
                 };
               }
             } else {
-              // 중분류가 없는 경우, foodListProduct를 중분류에 바로 추가
               if (foodListProduct !== null) {
                 acc[foodListGroup].중분류[foodListProduct] = {
-                  icon: foodListIcon, // 중분류의 아이콘
-                  소분류: null, // 소분류가 없는 경우 null로 처리
+                  icon: foodListIcon,
+                  소분류: null,
                   foodListId,
                 };
               }
@@ -88,12 +110,12 @@ const FridgeRegister = () => {
         );
 
         console.log(groupedData);
-
-        setCategories(groupedData); // 응답 데이터를 상태로 저장
+        setCategories(groupedData);
       } catch (error) {
         console.error("Failed to fetch categories:", error);
       }
     };
+
     fetchCategories();
   }, []);
 
@@ -117,7 +139,7 @@ const FridgeRegister = () => {
           selectedDetailCategory
         ]?.foodListId || "";
       setIcon(newicon);
-      setFoodListId(newfoodListId);
+      setFoodListId(newfoodListId.toString());
     } else if (selectedSubCategory) {
       setName(selectedSubCategory);
       const newicon =
@@ -129,7 +151,7 @@ const FridgeRegister = () => {
           selectedDetailCategory
         ]?.foodListId || "";
       setIcon(newicon);
-      setFoodListId(newfoodListId);
+      setFoodListId(newfoodListId.toString());
     } else {
       setName("");
       setIcon("");
@@ -153,8 +175,17 @@ const FridgeRegister = () => {
       return;
     }
 
+    if (!foodListId) {
+      Swal.fire({
+        icon: "error",
+        title: "입력 오류",
+        text: "유효한 식별자를 선택해주세요.",
+      });
+      return;
+    }
+
     const newItem = {
-      // id: Date.now(), // 고유 ID 생성
+      id: Number(foodListId), // 백엔드에서 제공된 식별자를 사용
       mainCategory: selectedMainCategory,
       subCategory: selectedSubCategory,
       detailCategory: selectedDetailCategory,
@@ -167,10 +198,10 @@ const FridgeRegister = () => {
       remarks,
       adminRequest,
       icon,
-      foodListId,
+      foodListId: Number(foodListId), // 타입 변환
     };
 
-    addFridgeItem(newItem);
+    addFridgeItem(newItem); // FridgeItem에 맞는 객체 전달
 
     Swal.fire({
       icon: "success",
@@ -216,20 +247,20 @@ const FridgeRegister = () => {
   };
 
   // onSearch 함수 정의
-  const handleSearch = (
-    mainCategory: string,
-    subCategory?: string,
-    detailCategory?: string
-  ) => {
-    console.log(mainCategory, subCategory, detailCategory);
-    setSelectedMainCategory(mainCategory || "");
-    setSelectedSubCategory(subCategory || "");
-    setSelectedDetailCategory(detailCategory || "");
+  // const handleSearch = (
+  //   mainCategory: string,
+  //   subCategory?: string,
+  //   detailCategory?: string
+  // ) => {
+  //   console.log(mainCategory, subCategory, detailCategory);
+  //   setSelectedMainCategory(mainCategory || "");
+  //   setSelectedSubCategory(subCategory || "");
+  //   setSelectedDetailCategory(detailCategory || "");
 
-    console.log("selectedMain:", selectedMainCategory);
-    console.log("selectedSub:", selectedSubCategory);
-    console.log("selectedDetail:", selectedDetailCategory);
-  };
+  //   console.log("selectedMain:", selectedMainCategory);
+  //   console.log("selectedSub:", selectedSubCategory);
+  //   console.log("selectedDetail:", selectedDetailCategory);
+  // };
 
   const handleMainCategoryChangee = (
     e: React.ChangeEvent<HTMLSelectElement>
@@ -279,13 +310,13 @@ const FridgeRegister = () => {
         </div>
 
         {/* 서치바 */}
-        <div className="fridge-register-searchbar">
+        {/* <div className="fridge-register-searchbar">
           <FridgeSearchBar
             onSearch={handleSearch}
             categories={categories}
             disabled={ingredientType === "COOKED"}
           ></FridgeSearchBar>
-        </div>
+        </div> */}
 
         {/* 아이콘 표시 */}
         {icon && (

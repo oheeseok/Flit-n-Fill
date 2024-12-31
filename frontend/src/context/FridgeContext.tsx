@@ -101,7 +101,7 @@ interface FridgeContextType {
   bucketItems: FridgeItem[];
   addFridgeItem: (item: FridgeItem) => void;
   removeFridgeItem: (id: number) => void;
-  updateFridgeItem: (id: number, updatedItem: FridgeItem) => void;
+  updateFridgeItem: (id: number, updatedItem: Partial<FridgeItem>) => void;
   filterByStorageMethod: (
     method: "REFRIGERATED" | "FROZEN" | "ROOM_TEMPERATURE"
   ) => FridgeItem[];

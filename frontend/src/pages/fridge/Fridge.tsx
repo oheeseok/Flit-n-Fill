@@ -67,12 +67,12 @@ const Fridge: React.FC = () => {
       let updatedItem: Partial<FridgeItem>;
       updatedItem = {
         // ...fridgeItems.find((item) => item.id === editingItemId)!,
-        foodCount: editedQuantity === "" ? 0 : editedQuantity,
-        foodUnit: editedUnit,
-        foodExpDate: editedExpirationDate,
-        foodProDate: editedManufactureDate,
-        foodStorage: editedStorageMethod,
-        foodDescription: editedRemarks,
+        quantity: editedQuantity === "" ? 0 : editedQuantity,
+        unit: editedUnit,
+        expirationDate: editedExpirationDate,
+        manufactureDate: editedManufactureDate,
+        storageMethod: editedStorageMethod,
+        remarks: editedRemarks,
       };
 
       updateFridgeItem(editingItemId, updatedItem); // number 타입 id로 업데이트
