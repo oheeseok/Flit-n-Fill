@@ -42,9 +42,9 @@ const FridgeRegister = () => {
 
   // 수정 여기부터
   interface SubCategory {
-    icon: number;
+    foodListIcon: number;
     foodListId: number;
-    소분류: Record<string, { icon: number; foodListId: number }>;
+    소분류: Record<string, { foodListIcon: number; foodListId: number }>;
   }
 
   interface GroupedCategory {
@@ -81,7 +81,7 @@ const FridgeRegister = () => {
             if (foodListType) {
               if (!acc[foodListGroup].중분류[foodListType]) {
                 acc[foodListGroup].중분류[foodListType] = {
-                  icon: foodListIcon,
+                  foodListIcon: foodListIcon,
                   foodListId,
                   소분류: {},
                 };
@@ -91,14 +91,14 @@ const FridgeRegister = () => {
                 acc[foodListGroup].중분류[foodListType].소분류[
                   foodListProduct
                 ] = {
-                  icon: foodListIcon,
+                  foodListIcon: foodListIcon,
                   foodListId,
                 };
               }
             } else {
               if (foodListProduct !== null) {
                 acc[foodListGroup].중분류[foodListProduct] = {
-                  icon: foodListIcon,
+                  foodListIcon: foodListIcon,
                   소분류: null,
                   foodListId,
                 };
@@ -131,9 +131,9 @@ const FridgeRegister = () => {
     if (selectedDetailCategory) {
       setName(selectedDetailCategory);
       const newicon =
-        categories[selectedMainCategory]?.중분류[selectedSubCategory]?.소분류[
+          "../../assets/icons/" + categories[selectedMainCategory]?.중분류[selectedSubCategory]?.소분류[
           selectedDetailCategory
-        ]?.icon + ".png" || "";
+        ]?.foodListIcon + ".png" || "";
       const newfoodListId =
         categories[selectedMainCategory]?.중분류[selectedSubCategory]?.소분류[
           selectedDetailCategory
@@ -143,13 +143,9 @@ const FridgeRegister = () => {
     } else if (selectedSubCategory) {
       setName(selectedSubCategory);
       const newicon =
-        categories[selectedMainCategory]?.중분류[selectedSubCategory]?.소분류[
-          selectedDetailCategory
-        ]?.icon + ".png" || "";
+          "../../assets/icons/" + categories[selectedMainCategory]?.중분류[selectedSubCategory]?.foodListIcon + ".png" || "";
       const newfoodListId =
-        categories[selectedMainCategory]?.중분류[selectedSubCategory]?.소분류[
-          selectedDetailCategory
-        ]?.foodListId || "";
+        categories[selectedMainCategory]?.중분류[selectedSubCategory]?.foodListId || "";
       setIcon(newicon);
       setFoodListId(newfoodListId.toString());
     } else {
@@ -263,13 +259,53 @@ const FridgeRegister = () => {
   // };
 
   const handleMainCategoryChangee = (
-    e: React.ChangeEvent<HTMLSelectElement>
+      e: React.ChangeEvent<HTMLSelectElement>
   ) => {
     const newCategory = e.target.value;
 
+    // Main Category 변경 시 상태 초기화
     setSelectedMainCategory(newCategory);
     setSelectedSubCategory("");
     setSelectedDetailCategory("");
+    setName("");
+    setQuantity("");
+    setUnit("PIECE");
+    setExpirationDate("");
+    setManufactureDate("");
+    setStorageMethod("REFRIGERATED");
+    setRemarks("");
+    setAdminRequest("");
+    setIcon("");
+    setFoodListId("");
+  };
+
+  const handleSubCategoryChange = (
+      e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const newSubCategory = e.target.value;
+
+    // Sub Category 변경 시 상태 초기화
+    setSelectedSubCategory(newSubCategory);
+    setSelectedDetailCategory("");
+    setName("");
+    setQuantity("");
+    setUnit("PIECE");
+    setExpirationDate("");
+    setManufactureDate("");
+    setStorageMethod("REFRIGERATED");
+    setRemarks("");
+    setAdminRequest("");
+    setIcon("");
+    setFoodListId("");
+  };
+
+  const handleDetailCategoryChange = (
+      e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const newDetailCategory = e.target.value;
+
+    // Detail Category 변경 시 상태 초기화
+    setSelectedDetailCategory(newDetailCategory);
     setName("");
     setQuantity("");
     setUnit("PIECE");
@@ -346,7 +382,7 @@ const FridgeRegister = () => {
               <label>중분류</label>
               <select
                 value={selectedSubCategory}
-                onChange={(e) => setSelectedSubCategory(e.target.value)}
+                onChange={handleSubCategoryChange}
               >
                 <option value="">선택</option>
                 {Object.keys(
@@ -371,7 +407,7 @@ const FridgeRegister = () => {
                 <label>소분류</label>
                 <select
                   value={selectedDetailCategory}
-                  onChange={(e) => setSelectedDetailCategory(e.target.value)}
+                  onChange={handleDetailCategoryChange}
                 >
                   <option value="">선택</option>
                   {Object.keys(
