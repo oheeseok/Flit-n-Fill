@@ -1,5 +1,6 @@
 package org.example.backend.api.user.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -73,16 +75,17 @@ public class UserController {
     }
 
     @PutMapping("/info")
-    public ResponseEntity<?> updateUserInfo(Authentication authentication, @RequestBody UserUpdateDto updateDto) throws Exception {
+    public ResponseEntity<?> updateUserInfo(Authentication authentication,
+                                            @RequestPart("userUpdateDto") String updateDtoJson,
+                                            @RequestPart(value = "userProfile", required = false) MultipartFile userProfile) throws Exception {
         String userEmail = authentication.getName();
         log.info("logined email: {}", userEmail);
 
-        if (userService.existsByUserNickname(updateDto.getUserNickname())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 사용중인 닉네임입니다.");
-        }
+        ObjectMapper objectMapper = new ObjectMapper();
+        UserUpdateDto updateDto = objectMapper.readValue(updateDtoJson, UserUpdateDto.class);
 
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(userService.updateUserInfo(userEmail, updateDto));
+            return ResponseEntity.status(HttpStatus.OK).body(userService.updateUserInfo(userEmail, updateDto, userProfile));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원 정보 수정 중 오류가 발생했습니다.");
         }
