@@ -1,5 +1,8 @@
 package org.example.backend.api.post.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,9 +11,12 @@ import org.example.backend.api.post.service.PostService;
 import org.example.backend.exceptions.TradeRequestHandleException;
 import org.example.backend.exceptions.UserIdNullException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,14 +39,19 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK).body(posts);
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PostDetailDto> addPost(HttpServletRequest request,
-                                                 @RequestBody PostRegisterDto postRegisterDto) {
+                                                 @RequestPart("postRegisterDto") String postRegisterDtoJson,
+                                                 @RequestPart("postMainPhoto") MultipartFile postMainPhoto) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        PostRegisterDto postRegisterDto = objectMapper.readValue(postRegisterDtoJson, PostRegisterDto.class);
+
         Long userId = (Long) request.getAttribute("userId");
         if (userId == null) {
             throw new UserIdNullException("userId not found");
         }
-        PostDetailDto post = postService.addPost(userId, postRegisterDto);
+        PostDetailDto post = postService.addPost(userId, postRegisterDto, postMainPhoto);
         return ResponseEntity.status(HttpStatus.CREATED).body(post);
     }
 
@@ -50,15 +61,21 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK).body(post);
     }
 
-    @PutMapping("/{postId}")
+    @PutMapping(value = "/{postId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PostDetailDto> updatePost(HttpServletRequest request,
                                                     @PathVariable("postId") Long postId,
-                                                    @RequestBody PostUpdateDto postUpdateDto) {
+                                                    @RequestPart("postUpdateDto") String postUpdateDtoJson,
+                                                    @RequestPart(value = "postMainPhoto", required = false) MultipartFile postMainPhoto) throws IOException {
         Long userId = (Long) request.getAttribute("userId");
         if (userId == null) {
             throw new UserIdNullException("userId not found");
         }
-        PostDetailDto updatedPost = postService.updatePost(userId, postId, postUpdateDto);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        PostUpdateDto postUpdateDto = objectMapper.readValue(postUpdateDtoJson, PostUpdateDto.class);
+
+        PostDetailDto updatedPost = postService.updatePost(userId, postId, postUpdateDto, postMainPhoto);
         return ResponseEntity.status(HttpStatus.OK).body(updatedPost);
     }
 

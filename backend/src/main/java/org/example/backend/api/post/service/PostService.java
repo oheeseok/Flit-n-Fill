@@ -14,6 +14,7 @@ import org.example.backend.api.notification.service.PushNotificationService;
 import org.example.backend.api.post.model.dto.*;
 import org.example.backend.api.post.model.entity.Post;
 import org.example.backend.api.post.repository.PostRepository;
+import org.example.backend.api.s3.S3Service;
 import org.example.backend.api.trade.model.entity.TradeRequest;
 import org.example.backend.api.trade.repository.TradeRequestRepository;
 import org.example.backend.api.user.model.entity.User;
@@ -25,8 +26,9 @@ import org.example.backend.enums.TradeType;
 import org.example.backend.exceptions.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDate;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -47,6 +49,7 @@ public class PostService {
   private final NotificationService notificationService;
   private final EmailService emailService;
   private final NotificationRepository notificationRepository;
+  private final S3Service s3Service;
 
   public List<PostSimpleDto> getAllPosts() {
     List<Post> posts = postRepository.findAllByOrderByPostCreatedDateDesc();
@@ -68,9 +71,12 @@ public class PostService {
         .collect(Collectors.toList());
   }
 
-  public PostDetailDto addPost(Long userId, PostRegisterDto postRegisterDto) {
+  public PostDetailDto addPost(Long userId, PostRegisterDto postRegisterDto, MultipartFile postMainPhoto) throws IOException {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
+
+    String photoUrl = s3Service.uploadFile(postMainPhoto, "posts/main");
+    postRegisterDto.setPostPhoto1(photoUrl);
 
     Post post = Post.of(user, postRegisterDto);
     // setWriterFood, setProposerFoodList 따로 하는 이유: myfridgeRepository, foodListRepository를 써야하기 때문
@@ -111,7 +117,7 @@ public class PostService {
   }
 
 
-  public PostDetailDto updatePost(Long userId, Long postId, PostUpdateDto postUpdateDto) {
+  public PostDetailDto updatePost(Long userId, Long postId, PostUpdateDto postUpdateDto, MultipartFile postMainPhoto) throws IOException {
     Post post = postRepository.findById(postId)
         .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
 
@@ -129,6 +135,13 @@ public class PostService {
       throw new NoSuchElementException("FoodList does not exist with ID: " + postUpdateDto.getProposerFoodListId());
     }
 
+    if (postMainPhoto != null && !postMainPhoto.isEmpty()) {
+      String oldPhotoUrl = post.getPostPhoto1();
+      s3Service.deleteFile(oldPhotoUrl);
+      String newPhotoUrl = s3Service.uploadFile(postMainPhoto, "posts/main");
+      post.setPostPhoto1(newPhotoUrl);
+    }
+
     String writerFoodName = writerFood.get().getFoodListName();
     String proposerFoodName = foodList.get().getFoodListType() == null ?
         foodList.get().getFoodListProduct() :
@@ -141,7 +154,6 @@ public class PostService {
 
     post.setPostTitle(postUpdateDto.getPostTitle());
     post.setPostContent(postUpdateDto.getPostContent());
-    post.setPostPhoto1(postUpdateDto.getPostPhoto1());
     post.setPostPhoto2(postUpdateDto.getPostPhoto2());
     post.setMeetingPlace(postUpdateDto.getMeetingPlace());
     post.setMeetingTime(postUpdateDto.getMeetingTime());
@@ -197,6 +209,15 @@ public class PostService {
               null
           );
         }
+        String postMainPhoto = post.getPostPhoto1();
+        String postPhoto2 = post.getPostPhoto2();
+        if (postMainPhoto != null && !postMainPhoto.isEmpty()) {
+          s3Service.deleteFile(postMainPhoto);
+        }
+        if (postPhoto2 != null && !postPhoto2.isEmpty()) {
+          s3Service.deleteFile(postPhoto2);
+        }
+
         postRepository.deleteById(postId);
       }
     }

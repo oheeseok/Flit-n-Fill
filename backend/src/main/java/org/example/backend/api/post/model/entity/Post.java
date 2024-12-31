@@ -103,7 +103,7 @@ public class Post {
     post.setPostTitle(dto.getPostTitle());
     post.setPostContent(dto.getPostContent());
     post.setPostPhoto1(dto.getPostPhoto1());
-    post.setPostPhoto2(dto.getPostPhoto2());
+    post.setPostPhoto2(dto.getPostPhoto2() != null ? dto.getPostPhoto2() : null);
     post.setTradeType(dto.getTradeType());
     post.setMeetingPlace(dto.getMeetingPlace());
     post.setMeetingTime(dto.getMeetingTime());
