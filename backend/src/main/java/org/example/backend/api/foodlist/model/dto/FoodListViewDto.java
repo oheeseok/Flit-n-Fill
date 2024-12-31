@@ -11,13 +11,15 @@ import org.example.backend.api.foodlist.model.entity.FoodList;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FoodListViewDto {
+    private Long foodListId;
     private String foodListGroup;
-    private String foodListProduct;
     private String foodListType;
+    private String foodListProduct;
     private int foodListIcon;
 
     public static FoodListViewDto of(FoodList foodList) {
         FoodListViewDto dto = new FoodListViewDto(
+                foodList.getFoodListId(),
                 foodList.getFoodListGroup(),
                 foodList.getFoodListProduct(),
                 foodList.getFoodListType(),
