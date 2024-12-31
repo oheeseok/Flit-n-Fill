@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import {fromDescriptionToEnum, fromEnumToDescription} from "../components/enum.tsx";
 import axios from "axios";
 
 // 백엔드에서 받은 FoodDetailDto 타입의 데이터
@@ -14,6 +13,7 @@ interface FoodDetailDto {
   foodStorage: string;
   foodDescription: string;
   foodListIcon: number;
+  foodListId: number;
   foodCategory: string;
 }
 
@@ -28,6 +28,7 @@ interface FridgeItem {
   storageMethod: string;
   remarks: string;
   icon: string;
+  foodListId: number;
 }
 // 변환 함수
 const convertToFridgeItem = (foodDetail: FoodDetailDto): FridgeItem => {
@@ -40,12 +41,26 @@ const convertToFridgeItem = (foodDetail: FoodDetailDto): FridgeItem => {
     manufactureDate: foodDetail.foodProDate, // 문자열로 변환된 날짜
     storageMethod: foodDetail.foodStorage,
     remarks: foodDetail.foodDescription,
-    icon: `icon-${foodDetail.foodListIcon}`,  // 아이콘은 백엔드에서 받은 숫자값을 기반으로 문자열로 변환
+    foodListId: foodDetail.foodListId,
+    icon: `assets/icons/${foodDetail.foodListIcon}.png`,  // 아이콘은 백엔드에서 받은 숫자값을 기반으로 문자열로 변환
   };
 };
 
 // FridgeItem -> FoodDetailDto 변환 함수
-const convertToFoodDetailDto = (fridgeItem: FridgeItem): FoodDetailDto => {
+const convertToFoodDetailDto = (fridgeItem: FridgeItem): {
+  foodCount: number;
+  foodDescription: string;
+  foodListName: string;
+  foodId: number;
+  foodListId: number;
+  foodRegistDate: string;
+  foodExpDate: string;
+  foodListIcon: string;
+  foodUnit: string;
+  foodStorage: string;
+  foodProDate: string;
+  foodCategory: string
+} => {
   return {
     foodId: fridgeItem.id,
     foodListName: fridgeItem.name,
@@ -56,8 +71,9 @@ const convertToFoodDetailDto = (fridgeItem: FridgeItem): FoodDetailDto => {
     foodExpDate: fridgeItem.expirationDate, // 문자열 그대로 사용
     foodStorage: fridgeItem.storageMethod, // storageMethod를 다시 Enum 값으로 변환하는 함수 필요
     foodDescription: fridgeItem.remarks,
-    foodListIcon: parseInt(fridgeItem.icon.split('-')[1], 10), // 'icon-1' 형태에서 숫자만 추출
-    foodCategory: "INGREDIENT", // foodCategory는 backend에서 받아서 ��어야함
+    foodListIcon: fridgeItem.icon, // 'icon-1' 형태에서 숫자만 추출
+    foodListId: fridgeItem.foodListId,  // foodListId를 그대로 사용
+    foodCategory: fridgeItem.foodListId ? "INGREDIENT" : "COOKED", // foodCategory는 backend에서 받아서 ��어야함
   };
 };
 
@@ -68,7 +84,7 @@ interface FridgeContextType {
   addFridgeItem: (item: Partial<FridgeItem>) => void;
   removeFridgeItem: (id: number) => void;
   updateFridgeItem: (id: number, updatedItem : FridgeItem) => void;
-  filterByStorageMethod: (method: "냉장" | "냉동" | "실온") => FridgeItem[];
+  filterByStorageMethod: (method: "REFRIGERATED" | "FROZEN" | "ROOM_TEMPERATURE") => FridgeItem[];
   addToBucket: (item: FridgeItem) => void;
   removeFromBucket: (id: number) => void;
   fetchFridgeItems: () => Promise<void>; // 비동기 함수로 수정
@@ -92,11 +108,6 @@ const FridgeContext = createContext<FridgeContextType>({
 export const FridgeProvider = ({ children }: { children: React.ReactNode }) => {
   const [fridgeItems, setFridgeItems] = useState<FridgeItem[]>([]);
   const [bucketItems, setBucketItems] = useState<FridgeItem[]>([]);
-
-  // useEffect(() => {
-  //   // 상태 업데이트 후 실행될 코드
-  //   console.log("Fridge items updated:", fridgeItems);
-  // }, [fridgeItems]); // fridgeItems가 변경될 때마다 실행
 
   // axios로 서버에서 데이터를 가져오기
   const fetchFridgeItems = async () => {
@@ -132,6 +143,7 @@ export const FridgeProvider = ({ children }: { children: React.ReactNode }) => {
   // 냉장고에 아이템 추가
   const addFridgeItem = async (item: FridgeItem) => {
     try {
+      console.log("Adding item to fridge:", item);
       const dto = convertToFoodDetailDto(item);
       console.log("Adding item to fridge:", dto);
       const response = await axios.post("http://localhost:8080/api/my-fridge", dto,{withCredentials: true}); // 서버에 아이템 추가
@@ -146,6 +158,7 @@ export const FridgeProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       await axios.delete(`http://localhost:8080/api/my-fridge/${id}`, {withCredentials: true}); // 서버에서 아이템 삭제
       setFridgeItems((prevItems) => prevItems.filter((item) => item.id !== id));
+      removeFromBucket(id);
     } catch (error) {
       console.error("Error removing fridge item", error);
     }
@@ -163,7 +176,7 @@ export const FridgeProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   // 저장 방법으로 필터링
-  const filterByStorageMethod = (method: "냉장" | "냉동" | "실온") => {
+  const filterByStorageMethod = (method: "REFRIGERATED" | "FROZEN" | "ROOM_TEMPERATURE") => {
     return fridgeItems.filter((item) => item.storageMethod === method);
   };
 

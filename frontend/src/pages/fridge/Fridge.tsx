@@ -27,7 +27,7 @@ const Fridge: React.FC = () => {
   // const [bucketItems, setBucketItems] = useState<FridgeItem[]>([]); 이거 fridgecontext에서 사용하자자
   const [editingItemId, setEditingItemId] = useState<number | null>(null);
   const [editedQuantity, setEditedQuantity] = useState<number | "">("");
-  const [editedUnit, setEditedUnit] = useState<string>("개");
+  const [editedUnit, setEditedUnit] = useState<string>("PIECE");
   const [editedExpirationDate, setEditedExpirationDate] = useState<string>("");
   const [editedManufactureDate, setEditedManufactureDate] =
     useState<string>("");
@@ -254,7 +254,7 @@ const Fridge: React.FC = () => {
               <option value="G">g</option>
             </select>
           </div>
-          <div>
+          <div>s
             <label>소비기한:</label>
             <input
               type="date"
@@ -276,27 +276,27 @@ const Fridge: React.FC = () => {
               <label>
                 <input
                   type="radio"
-                  value="냉장"
-                  checked={editedStorageMethod === "냉장"}
-                  onChange={() => setEditedStorageMethod("냉장")}
+                  value="REFRIGERATED"
+                  checked={editedStorageMethod === "REFRIGERATED"}
+                  onChange={() => setEditedStorageMethod("REFRIGERATED")}
                 />
                 냉장
               </label>
               <label>
                 <input
                   type="radio"
-                  value="냉동"
-                  checked={editedStorageMethod === "냉동"}
-                  onChange={() => setEditedStorageMethod("냉동")}
+                  value="FROZONE"
+                  checked={editedStorageMethod === "FROZEN"}
+                  onChange={() => setEditedStorageMethod("FROZEN")}
                 />
                 냉동
               </label>
               <label>
                 <input
                   type="radio"
-                  value="실온"
-                  checked={editedStorageMethod === "실온"}
-                  onChange={() => setEditedStorageMethod("실온")}
+                  value="ROOM_TEMPERATURE"
+                  checked={editedStorageMethod === "ROOM_TEMPERATURE"}
+                  onChange={() => setEditedStorageMethod("ROOM_TEMPERATURE")}
                 />
                 실온
               </label>
