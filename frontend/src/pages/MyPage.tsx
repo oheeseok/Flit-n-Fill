@@ -1,29 +1,69 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useUser } from "../context/UserContext";
 import Swal from "sweetalert2"; // SweetAlert2 사용
 import "../styles/main/MyPage.css";
 import ProfileImageUploader from "../components/main/ProfileUploader"; // ProfileUploader 컴포넌트 사용
 
 const MyPage: React.FC = () => {
   // 상태 관리
+  const { user, fetchUserData, updateUserInfo } = useUser();
   const [nickname, setNickname] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
   const [address, setAddress] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [profileImage, setProfileImage] = useState<string | null>(null);
 
-  // 이벤트 핸들러
-  const handleEditProfile = (e: React.FormEvent) => {
-    e.preventDefault();
+  // 기본 프로필 이미지 URL
+  const DEFAULT_PROFILE_IMAGE =
+    "https://flitnfill.s3.ap-northeast-2.amazonaws.com/default-img/recipe-step-default-img.png";
 
-    // SweetAlert2로 알림 표시
-    Swal.fire({
-      icon: "success",
-      title: "프로필 업데이트 완료",
-      text: "프로필 정보가 성공적으로 업데이트되었습니다.",
-      confirmButtonText: "확인",
-    }).then(() => {
-      console.log("Profile Updated:", { nickname, phone, address, password, profileImage });
-    });
+  // 컴포넌트가 마운트될 때 사용자 데이터 초기화
+  useEffect(() => {
+    const initializeUserData = async () => {
+      if (!user) {
+        await fetchUserData(); // DB에서 사용자 데이터 가져오기
+      }
+    };
+
+    initializeUserData();
+  }, [user, fetchUserData]);
+
+  useEffect(() => {
+    if (user) {
+      console.log("User data loaded:", user);
+      setNickname(user.userNickname || "");
+      setPhone(user.userPhone || "");
+      setAddress(user.userAddress || "");
+      setProfileImage(user.userProfile || DEFAULT_PROFILE_IMAGE);
+    }
+  }, [user]);
+
+  // 이벤트 핸들러
+  const handleEditProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await updateUserInfo({
+        userNickname: nickname,
+        userPhone: phone,
+        userAddress: address,
+        userProfile: profileImage,
+        userPassword: password,
+      });
+      Swal.fire({
+        icon: "success",
+        title: "프로필 업데이트 완료",
+        text: "프로필 정보가 성공적으로 업데이트되었습니다.",
+        confirmButtonText: "확인",
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "프로필 업데이트 실패",
+        text: "오류가 발생했습니다. 다시 시도해주세요.",
+        confirmButtonText: "확인",
+      });
+      console.error("Failed to update profile:", error);
+    }
   };
 
   const handleDeleteID = () => {
@@ -64,7 +104,7 @@ const MyPage: React.FC = () => {
           {/* ProfileImageUploader 컴포넌트 사용 */}
           <ProfileImageUploader
             onChangeImage={(image) => setProfileImage(image)}
-            uploadedImage={profileImage}
+            uploadedImage={profileImage || DEFAULT_PROFILE_IMAGE}
           />
         </div>
         <form className="mypage-form" onSubmit={handleEditProfile}>

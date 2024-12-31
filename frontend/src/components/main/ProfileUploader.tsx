@@ -1,6 +1,9 @@
 import React from "react";
 import styled from "styled-components";
-import profileImg from "../../assets/images/profilesample.png";
+// import profileImg from "../../assets/images/profilesample.png";
+
+const profileImg =
+  "https://flitnfill.s3.ap-northeast-2.amazonaws.com/default-img/recipe-step-default-img.png";
 
 const Container = styled.div`
   display: flex;
@@ -52,7 +55,7 @@ function ProfileImageUploader({
     <Container>
       <MyProfileImg
         src={uploadedImage || profileImg}
-        alt="프로필필 이미지"
+        alt="프로필 이미지"
         onClick={() => document.getElementById("file-input")?.click()}
       />
       <HiddenInput

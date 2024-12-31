@@ -175,16 +175,16 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 480px;
-  height: 860px;
+  width: 94%;
+  height: 94%;
   border-radius: 35px;
   background: #f1d3d0;
   font-family: Ubuntu;
   font-size: 18px;
 }
 .out-back {
-  width: 420px;
-  height: 780px;
+  width: 90%;
+  height: 90%;
   border-radius: 30px;
   background: #eebfbb;
   display: flex;
@@ -394,4 +394,122 @@
 
 .edit-popup button:last-child {
   margin-right: 0; /* 마지막 버튼 간격 제거 */
+}
+
+/* 미디어 쿼리 */
+@media (max-width: 1024px) {
+  .fridge-container {
+    width: 82%;
+    height: auto;
+    margin-left: 10px;
+  }
+
+  .cold-container {
+    width: 100%;
+    height: auto;
+    border-radius: 30px 30px 0px 0px;
+  }
+  .cold-side {
+    
+  }
+  .cold-back {
+    width: 90%;
+    gap: 10px;
+  }
+
+  .freeze-container {
+    width: 100%;
+    height: auto;
+    border-radius: 0px;
+  }
+
+  .bucket-container {
+    width: 100%;
+    height: auto;
+    margin: 40px 10px;
+    border-radius: 50px;
+  }
+
+  .bucket-area {
+    width: 90%;
+    height: auto;
+    gap: 10px;
+  }
+
+  .edit-popup {
+    width: 90%;
+    padding: 15px;
+  }
+
+  .edit-popup button {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .fridgebody {
+    flex-direction: column;
+  }
+
+  .fridge-container {
+    width: 100%;
+    margin: 20px auto;
+  }
+
+  .cold-container {
+    width: 100%;
+    height: auto;
+  }
+
+  .cold-back {
+    width: 100%;
+    gap: 8px;
+  }
+
+  .bucket-container {
+    width: 100%;
+    margin: 20px auto;
+    border-radius: 20px;
+  }
+
+  .bucket-area {
+    width: 100%;
+    gap: 8px;
+  }
+
+  .edit-popup {
+    width: 95%;
+  }
+
+  .edit-popup button {
+    font-size: 10px;
+    padding: 6px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .fridge-container {
+    width: 100%;
+    margin: 10px auto;
+  }
+
+  .cold-container {
+    border-radius: 20px;
+  }
+
+  .bucket-container {
+    width: 100%;
+    border-radius: 10px;
+  }
+
+  .edit-popup {
+    width: 100%;
+    padding: 10px;
+  }
+
+  .edit-popup button {
+    font-size: 8px;
+    padding: 4px 8px;
+  }
 }
