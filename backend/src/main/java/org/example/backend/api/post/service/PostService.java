@@ -14,6 +14,7 @@ import org.example.backend.api.notification.service.PushNotificationService;
 import org.example.backend.api.post.model.dto.*;
 import org.example.backend.api.post.model.entity.Post;
 import org.example.backend.api.post.repository.PostRepository;
+import org.example.backend.api.s3.S3Service;
 import org.example.backend.api.trade.model.entity.TradeRequest;
 import org.example.backend.api.trade.repository.TradeRequestRepository;
 import org.example.backend.api.user.model.entity.User;
@@ -25,7 +26,9 @@ import org.example.backend.enums.TradeType;
 import org.example.backend.exceptions.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -47,6 +50,7 @@ public class PostService {
   private final NotificationService notificationService;
   private final EmailService emailService;
   private final NotificationRepository notificationRepository;
+  private final S3Service s3Service;
 
   public List<PostSimpleDto> getAllPosts() {
     List<Post> posts = postRepository.findAllByOrderByPostCreatedDateDesc();
@@ -68,9 +72,12 @@ public class PostService {
         .collect(Collectors.toList());
   }
 
-  public PostDetailDto addPost(Long userId, PostRegisterDto postRegisterDto) {
+  public PostDetailDto addPost(Long userId, PostRegisterDto postRegisterDto, MultipartFile postMainPhoto) throws IOException {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
+
+    String photoUrl = s3Service.uploadFile(postMainPhoto, "posts/main");
+    postRegisterDto.setPostPhoto1(photoUrl);
 
     Post post = Post.of(user, postRegisterDto);
     // setWriterFood, setProposerFoodList 따로 하는 이유: myfridgeRepository, foodListRepository를 써야하기 때문

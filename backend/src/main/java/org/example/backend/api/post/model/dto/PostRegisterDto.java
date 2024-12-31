@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.example.backend.enums.FoodUnit;
 import org.example.backend.enums.TradeType;
 
 import java.time.LocalDateTime;

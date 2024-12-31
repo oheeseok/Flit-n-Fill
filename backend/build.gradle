@@ -57,6 +57,8 @@ dependencies {
     // JAXB 의존성 추가
     implementation 'javax.xml.bind:jaxb-api:2.3.1'
     runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:2.3.1'
+
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.0'
 }
 
 tasks.named('test') {
