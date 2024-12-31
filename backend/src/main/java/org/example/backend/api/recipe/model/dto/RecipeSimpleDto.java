@@ -17,6 +17,7 @@ public class RecipeSimpleDto {
     private String recipeId;
     private String recipeTitle;
     private String recipeMainPhoto;
+    private String recipeFoodDetails;
     private boolean recipeIsVisibility;
     private boolean recipeIsBookmarked; // 현재 로그인한 사용자 기준의 북마크 여부
     private LocalDateTime recipeCreatedDate;
@@ -28,6 +29,7 @@ public class RecipeSimpleDto {
         dto.setRecipeId(recipe.getRecipeId());
         dto.setRecipeTitle(recipe.getRecipeTitle());
         dto.setRecipeMainPhoto(recipe.getRecipeMainPhoto());
+        dto.setRecipeFoodDetails(recipe.getRecipeFoodDetails());
         dto.setRecipeIsVisibility(recipe.isRecipeIsVisibility());
         dto.setRecipeCreatedDate(recipe.getRecipeCreatedDate());
         if (user != null) {
