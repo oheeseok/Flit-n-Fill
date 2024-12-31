@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.backend.api.recipe.service.RecipeService;
+import org.example.backend.api.s3.S3Service;
 import org.example.backend.api.user.model.dto.*;
 import org.example.backend.api.user.model.entity.Request;
 import org.example.backend.api.user.model.entity.User;
@@ -22,7 +23,9 @@ import org.example.backend.security.PrincipalDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 
 @Service
@@ -37,6 +40,9 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final TokenManagementService tokenManagementService;
     private final RequestRepository requestRepository;
+    private final S3Service s3Service;
+
+    private static final String PROFILE_DEFAULT_IMG_URL = "https://flitnfill.s3.ap-northeast-2.amazonaws.com/default-img/profile-default-img.jpg";
 
     // userEmail 중복 검사
     public boolean existsByUserEmail(String userEmail) {
@@ -59,7 +65,7 @@ public class UserService {
                 encodedPassword, // 암호화된 비밀번호 사용
                 userRegisterDto.getUserPhone(),
                 userRegisterDto.getUserAddress(),
-                "default profile url",
+                PROFILE_DEFAULT_IMG_URL,
                 1,
                 50,
                 AuthProvider.LOCAL
@@ -134,7 +140,7 @@ public class UserService {
         return UserInfoDto.of(user);
     }
 
-    public UserInfoDto updateUserInfo(String userEmail, UserUpdateDto updateDto) {
+    public UserInfoDto updateUserInfo(String userEmail, UserUpdateDto updateDto, MultipartFile userProfile) throws IOException {
         if (userEmail == null) {
             throw new IllegalArgumentException("계정 정보가 존재하지 않습니다.");
         }
@@ -149,7 +155,14 @@ public class UserService {
             user.setUserPassword(password);
         }
         user.setUserAddress(updateDto.getUserAddress() != null ? updateDto.getUserAddress() : user.getUserAddress());
-        user.setUserProfile(updateDto.getUserProfile() != null ? updateDto.getUserProfile() : user.getUserProfile());
+        if (userProfile != null) {
+            s3Service.deleteFile(user.getUserProfile());
+            String newProfile = s3Service.uploadFile(userProfile, "users/profile");
+            user.setUserProfile(newProfile);
+        } else {  // 프로필 삭제 시 기본 프로필로 변경
+            s3Service.deleteFile(user.getUserProfile());
+            user.setUserProfile(PROFILE_DEFAULT_IMG_URL);
+        }
 
         User updatedUser = userRepository.save(user);
 
@@ -204,5 +217,12 @@ public class UserService {
         request.setReportedUser(reportedUser);
 
         return RequestDetailDto.of(requestRepository.save(request));
+    }
+
+    public String getCurrentNickname(String userEmail) {
+        User user = userRepository.findByUserEmail(userEmail)
+                .orElseThrow(() -> new UserNotFoundException("존재하지 않는 회원입니다."));
+
+        return user.getUserNickname();
     }
 }
