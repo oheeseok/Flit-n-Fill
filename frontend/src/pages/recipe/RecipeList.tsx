@@ -5,7 +5,7 @@ import "../../styles/recipe/RecipeList.css";
 import { useState, useEffect } from "react";
 
 const RecipeList = () => {
-  const { recipes, toggleBookmark, searchQuery, fetchRecipes } = useRecipe();
+  const { recipes, toggleBookmark, searchQuery, getAllRecipes } = useRecipe();
   const [searchParams] = useSearchParams();
   const [showBookmarksOnly, setShowBookmarksOnly] = useState(false);
   const [sortOrder, setSortOrder] = useState("popular");
@@ -15,15 +15,15 @@ const RecipeList = () => {
 
     const query = searchParams.get("query");
     if (query) {
-      fetchRecipes({
+      getAllRecipes({
         sort: sortOrder,
-        search: query,
+        search: query || "", // 검색어가 없으면 빈 문자열,
       });
     }
-  }, [sortOrder, searchParams, searchQuery, fetchRecipes]);
+  }, [sortOrder, searchParams, searchQuery, getAllRecipes]);
 
   const filteredRecipes = recipes.filter(
-    (recipe) => !showBookmarksOnly || recipe.isBookmarked
+    (recipe) => !showBookmarksOnly || recipe.recipeIsBookmarked
   );
 
   return (
@@ -53,7 +53,7 @@ const RecipeList = () => {
       </div>
       <div className="recipelistbody">
         {filteredRecipes.map((recipe, index) => (
-          <div className="recipe-list-container" key={recipe.id}>
+          <div className="recipe-list-container" key={recipe.recipeId}>
             <div className="recipe-list-box-name-title">
               {recipe.recipeTitle}
             </div>
@@ -74,7 +74,7 @@ const RecipeList = () => {
                 </div>
                 <div
                   className={`recipe-list-box-card-profile-container-star ${
-                    recipe.isBookmarked ? "star-filled" : "star-empty"
+                    recipe.recipeIsBookmarked ? "star-filled" : "star-empty"
                   }`}
                   onClick={() => toggleBookmark(index)}
                   style={{ cursor: "pointer" }}
