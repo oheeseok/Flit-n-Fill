@@ -1,28 +1,29 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import ToRegisterButton from "../../components/fridge/ToRegisterButton";
 import ToRecipeButton from "../../components/fridge/ToRecipeButton";
 import ToCommunityButton from "../../components/fridge/ToCommunityButton";
-import { useFridge } from "../../context/FridgeContext";
+import { useFridge, FridgeItem } from "../../context/FridgeContext";
 import "../../styles/fridge/Fridge.css";
 import Swal from "sweetalert2";
 // FridgeItem 타입 정의
-interface FridgeItem {
-  id: number;
-  name: string;
-  icon: string;
-  quantity: number;
-  unit: string;
-  expirationDate: string;
-  manufactureDate: string;
-  storageMethod: string;
-  remarks: string;
-  mainCategory: string;
-  subCategory: string;
-  detailCategory: string;
-}
+// interface FridgeItem {
+//   id: number;
+//   name: string;
+//   icon: string;
+//   quantity: number;
+//   unit: string;
+//   expirationDate: string;
+//   manufactureDate: string;
+//   storageMethod: "REFRIGERATED" | "FROZEN" | "ROOM_TEMPERATURE";
+//   remarks: string;
+//   mainCategory: string;
+//   subCategory: string;
+//   detailCategory: string;
+// }
 
 const Fridge: React.FC = () => {
-  const { fridgeItems, removeFridgeItem, updateFridgeItem, fetchFridgeItems } = useFridge();
+  const { fridgeItems, removeFridgeItem, updateFridgeItem, fetchFridgeItems } =
+    useFridge();
   const { bucketItems, addToBucket, removeFromBucket } = useFridge(); // FridgeContext에서 가져옴
   // const [bucketItems, setBucketItems] = useState<FridgeItem[]>([]); 이거 fridgecontext에서 사용하자자
   const [editingItemId, setEditingItemId] = useState<number | null>(null);
@@ -31,9 +32,9 @@ const Fridge: React.FC = () => {
   const [editedExpirationDate, setEditedExpirationDate] = useState<string>("");
   const [editedManufactureDate, setEditedManufactureDate] =
     useState<string>("");
-  const [editedStorageMethod, setEditedStorageMethod] = useState<"REFRIGERATED" | "FROZEN" | "ROOM_TEMPERATURE">(
-      "REFRIGERATED"
-  );
+  const [editedStorageMethod, setEditedStorageMethod] = useState<
+    "REFRIGERATED" | "FROZEN" | "ROOM_TEMPERATURE"
+  >("REFRIGERATED");
   const [editedRemarks, setEditedRemarks] = useState<string>("");
 
   // 냉장고 재료 가져오기
@@ -44,8 +45,7 @@ const Fridge: React.FC = () => {
 
   useEffect(() => {
     console.log("Fridge items updated:", fridgeItems);
-  }, [fridgeItems]);  // fridgeItems 변경시 렌더링
-
+  }, [fridgeItems]); // fridgeItems 변경시 렌더링
 
   // 수정 버튼 클릭
   const handleEditClick = (id: number) => {
@@ -80,16 +80,6 @@ const Fridge: React.FC = () => {
       setEditingItemId(null);
     }
   };
-
-  // 버킷에 추가
-  // const addToBucket = (item: FridgeItem) => {
-  //   setBucketItems((prev) => [...prev, { ...item }]);
-  // };
-
-  // // 버킷에서 삭제
-  // const removeFromBucket = (id: number) => {
-  //   setBucketItems((prev) => prev.filter((item) => item.id !== id));
-  // };
 
   // 아이템 렌더링
   const renderItems = (
@@ -217,7 +207,9 @@ const Fridge: React.FC = () => {
         <div className="out-container">
           <div className="out-side">
             실온
-            <div className="out-back">{renderItems(fridgeItems, "ROOM_TEMPERATURE")}</div>
+            <div className="out-back">
+              {renderItems(fridgeItems, "ROOM_TEMPERATURE")}
+            </div>
           </div>
         </div>
         <div className="bucket-container">
@@ -254,8 +246,8 @@ const Fridge: React.FC = () => {
               <option value="G">g</option>
             </select>
           </div>
-          <div>s
-            <label>소비기한:</label>
+          <div>
+            s<label>소비기한:</label>
             <input
               type="date"
               value={editedExpirationDate}

@@ -1,10 +1,26 @@
 import { useState } from "react";
-import "../../styles/common/SearchBar.css";
+import "../../styles/fridge/FridgeSearchBar.css";
 import SearchIcon from "../common/SearchIcon";
 import Swal from "sweetalert2";
-import { CATEGORY_DATA } from "../../data/categoryData";
 
 interface FridgeSearchBarProps {
+  categories: {
+    [mainCategory: string]: {
+      대분류: string; // 대분류
+      중분류: {
+        [subCategory: string]: {
+          icon: string; // 중분류 아이콘
+          foodListId: string; // foodListId
+          소분류: {
+            [detailCategory: string]: {
+              icon: string; // 소분류 아이콘
+              foodListId: string; // foodListId
+            };
+          } | null; // 소분류가 없을 수 있음
+        };
+      };
+    };
+  };
   onSearch: (
     mainCategory: string,
     subCategory?: string,
@@ -12,7 +28,10 @@ interface FridgeSearchBarProps {
   ) => void;
 }
 
-const FridgeSearchBar: React.FC<FridgeSearchBarProps> = ({ onSearch }) => {
+const FridgeSearchBar: React.FC<FridgeSearchBarProps> = ({
+  categories,
+  onSearch,
+}) => {
   const [inputValue, setInputValue] = useState("");
 
   const handleSearch = () => {
@@ -25,23 +44,27 @@ const FridgeSearchBar: React.FC<FridgeSearchBarProps> = ({ onSearch }) => {
       return;
     }
 
-    const searchResults = Object.entries(CATEGORY_DATA).find(
+    const searchResults = Object.entries(categories).find(
       ([mainCategory, data]) => {
-        if (data.중분류.includes(inputValue)) {
-          onSearch(mainCategory, inputValue);
+        // 중분류에서 검색
+        const subCategory = Object.keys(data.중분류).find(
+          (key) => key === inputValue
+        );
+        if (subCategory) {
+          onSearch(mainCategory, subCategory);
           return true;
         }
-        if (
-          Object.values(data.소분류).some((details) =>
-            details.includes(inputValue)
-          )
-        ) {
-          const subCategory = Object.keys(data.소분류).find((key) =>
-            data.소분류[key].includes(inputValue)
-          );
-          if (subCategory) {
-            onSearch(mainCategory, subCategory, inputValue);
-          }
+
+        // 소분류에서 검색
+        const detailCategory = Object.entries(data.중분류).find(
+          ([_, subCategoryData]) =>
+            subCategoryData.소분류 &&
+            Object.keys(subCategoryData.소분류).includes(inputValue)
+        );
+
+        if (detailCategory) {
+          const [foundSubCategory, _] = detailCategory;
+          onSearch(mainCategory, foundSubCategory, inputValue);
           return true;
         }
         return false;

@@ -9,7 +9,7 @@ import RecipeDetailButton from "../../components/recipe/RecipeDetailButton";
 import RecipeCancelButton from "../../components/recipe/RecipeCancelButton";
 import Swal from "sweetalert2";
 
-interface RecipeStepDto {
+interface RecipeMethod {
   seq: number;
   photo: string;
   description: string;
@@ -37,7 +37,7 @@ const RecipeEdit = () => {
   const [recipeIngredients, setRecipeIngredients] = useState(
     recipe.recipeFoodDetails
   );
-  const [recipeMethods, setRecipeStepDtos] = useState<RecipeStepDto[]>(
+  const [recipeMethods, setRecipeMethods] = useState<RecipeMethod[]>(
     recipe.recipeSteps
   );
   const [recipeIsVisibility, setRecipeIsVisibility] = useState(
@@ -105,15 +105,15 @@ const RecipeEdit = () => {
     });
   };
 
-  const addRecipeStepDto = () => {
-    setRecipeStepDtos((prev) => [
+  const addRecipeMethod = () => {
+    setRecipeMethods((prev) => [
       ...prev,
       { seq: prev.length + 1, photo: "", description: "" },
     ]);
   };
 
-  const delRecipeStepDto = (index: number) => {
-    setRecipeStepDtos((prevMethods) =>
+  const delRecipeMethod = (index: number) => {
+    setRecipeMethods((prevMethods) =>
       prevMethods
         .filter((_, i) => i !== index)
         .map((method, idx) => ({ ...method, seq: idx + 1 }))
@@ -125,7 +125,7 @@ const RecipeEdit = () => {
   };
 
   const handleStepImageChange = (seq: number, photo: string): void => {
-    setRecipeStepDtos((prevMethods) =>
+    setRecipeMethods((prevMethods) =>
       prevMethods.map((method, i) =>
         i === seq ? { ...method, photo } : method
       )
@@ -136,7 +136,7 @@ const RecipeEdit = () => {
     seq: number,
     event: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
-    setRecipeStepDtos((prevMethods) =>
+    setRecipeMethods((prevMethods) =>
       prevMethods.map((method, i) =>
         i === seq ? { ...method, description: event.target.value } : method
       )
@@ -169,7 +169,6 @@ const RecipeEdit = () => {
           <RecipeImageUploader
             uploadedImage={recipeImage}
             onChangeImage={handleImageChange}
-            size="large"
           />
         </div>
       </div>
@@ -203,7 +202,7 @@ const RecipeEdit = () => {
             ></textarea>
             <button
               className="recipe-edit-method-box-remove"
-              onClick={() => delRecipeStepDto(seq)}
+              onClick={() => delRecipeMethod(seq)}
             >
               -
             </button>
@@ -211,7 +210,7 @@ const RecipeEdit = () => {
         ))}
         <button
           className="recipe-edit-method-box-add-button"
-          onClick={addRecipeStepDto}
+          onClick={addRecipeMethod}
         >
           +
         </button>
