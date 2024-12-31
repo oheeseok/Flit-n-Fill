@@ -61,15 +61,21 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK).body(post);
     }
 
-    @PutMapping("/{postId}")
+    @PutMapping(value = "/{postId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PostDetailDto> updatePost(HttpServletRequest request,
                                                     @PathVariable("postId") Long postId,
-                                                    @RequestBody PostUpdateDto postUpdateDto) {
+                                                    @RequestPart("postUpdateDto") String postUpdateDtoJson,
+                                                    @RequestPart(value = "postMainPhoto", required = false) MultipartFile postMainPhoto) throws IOException {
         Long userId = (Long) request.getAttribute("userId");
         if (userId == null) {
             throw new UserIdNullException("userId not found");
         }
-        PostDetailDto updatedPost = postService.updatePost(userId, postId, postUpdateDto);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        PostUpdateDto postUpdateDto = objectMapper.readValue(postUpdateDtoJson, PostUpdateDto.class);
+
+        PostDetailDto updatedPost = postService.updatePost(userId, postId, postUpdateDto, postMainPhoto);
         return ResponseEntity.status(HttpStatus.OK).body(updatedPost);
     }
 

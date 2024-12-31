@@ -118,7 +118,7 @@ public class PostService {
   }
 
 
-  public PostDetailDto updatePost(Long userId, Long postId, PostUpdateDto postUpdateDto) {
+  public PostDetailDto updatePost(Long userId, Long postId, PostUpdateDto postUpdateDto, MultipartFile postMainPhoto) throws IOException {
     Post post = postRepository.findById(postId)
         .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
 
@@ -136,6 +136,13 @@ public class PostService {
       throw new NoSuchElementException("FoodList does not exist with ID: " + postUpdateDto.getProposerFoodListId());
     }
 
+    if (postMainPhoto != null && !postMainPhoto.isEmpty()) {
+      String oldPhotoUrl = post.getPostPhoto1();
+      s3Service.deleteFile(oldPhotoUrl);
+      String newPhotoUrl = s3Service.uploadFile(postMainPhoto, "posts/main");
+      post.setPostPhoto1(newPhotoUrl);
+    }
+
     String writerFoodName = writerFood.get().getFoodListName();
     String proposerFoodName = foodList.get().getFoodListType() == null ?
         foodList.get().getFoodListProduct() :
@@ -148,7 +155,6 @@ public class PostService {
 
     post.setPostTitle(postUpdateDto.getPostTitle());
     post.setPostContent(postUpdateDto.getPostContent());
-    post.setPostPhoto1(postUpdateDto.getPostPhoto1());
     post.setPostPhoto2(postUpdateDto.getPostPhoto2());
     post.setMeetingPlace(postUpdateDto.getMeetingPlace());
     post.setMeetingTime(postUpdateDto.getMeetingTime());
