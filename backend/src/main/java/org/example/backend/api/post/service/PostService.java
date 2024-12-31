@@ -29,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -210,6 +209,15 @@ public class PostService {
               null
           );
         }
+        String postMainPhoto = post.getPostPhoto1();
+        String postPhoto2 = post.getPostPhoto2();
+        if (postMainPhoto != null && !postMainPhoto.isEmpty()) {
+          s3Service.deleteFile(postMainPhoto);
+        }
+        if (postPhoto2 != null && !postPhoto2.isEmpty()) {
+          s3Service.deleteFile(postPhoto2);
+        }
+
         postRepository.deleteById(postId);
       }
     }
