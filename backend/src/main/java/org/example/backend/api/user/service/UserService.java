@@ -192,6 +192,9 @@ public class UserService {
 
         log.info("레시피 유저 아이디 null 설정완료");
         // 사용자 삭제
+        if (user.getUserProfile() != null && !user.getUserProfile().isEmpty()) {
+            s3Service.deleteFile(user.getUserProfile());
+        }
         userRepository.delete(user);
     }
 
