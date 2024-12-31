@@ -154,6 +154,7 @@ public class UserService {
             String password = passwordEncoder.encode(updateDto.getUserPassword());
             user.setUserPassword(password);
         }
+        user.setUserPhone(updateDto.getUserPhone() != null ? updateDto.getUserPhone() : user.getUserPassword());
         user.setUserAddress(updateDto.getUserAddress() != null ? updateDto.getUserAddress() : user.getUserAddress());
         if (userProfile != null) {
             s3Service.deleteFile(user.getUserProfile());
