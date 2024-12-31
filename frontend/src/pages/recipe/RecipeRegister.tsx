@@ -26,6 +26,7 @@ const RecipeRegister = () => {
     { seq: 1, photo: "", description: "" },
   ]);
   const [recipeIsVisibility, setRecipeIsVisibility] = useState(true);
+  const [isBookmarked] = useState(false);
 
   const handleRegister = () => {
     // 입력값 유효성 검사
@@ -70,6 +71,7 @@ const RecipeRegister = () => {
       recipeFoodDetails: recipeIngredients,
       recipeSteps: recipeMethods,
       recipeIsVisibility, // 공개/비공개 상태 추가
+      isBookmarked,
     });
 
     // 새로 추가된 레시피의 인덱스에 따라 경로 이동
@@ -146,7 +148,6 @@ const RecipeRegister = () => {
           <RecipeImageUploader
             uploadedImage={recipeImage}
             onChangeImage={handleImageChange}
-            size="large"
           />
         </div>
       </div>

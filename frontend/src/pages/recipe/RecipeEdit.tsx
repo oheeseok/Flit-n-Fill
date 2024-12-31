@@ -169,7 +169,6 @@ const RecipeEdit = () => {
           <RecipeImageUploader
             uploadedImage={recipeImage}
             onChangeImage={handleImageChange}
-            size="large"
           />
         </div>
       </div>

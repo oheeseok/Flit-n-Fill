@@ -2,7 +2,6 @@ import React, { useState, ChangeEvent } from "react";
 import axios from "axios";
 import "../styles/common/SignIn.css"; // 스타일 파일 경로는 프로젝트에 맞게 설정하세요.
 
-
 interface UserLoginResponse {
   accessToken: string;
 }
@@ -17,14 +16,14 @@ const SignIn: React.FC = () => {
     try {
       // API 요청을 보냄 (localhost:8080)
       const response = await axios.post<UserLoginResponse>(
-          "http://localhost:8080/api/user/login",
-          {
-            userEmail: email,
-            userPassword: password,
-          },
-          {
-            withCredentials: true, // CORS 에러를 ��하기 위해 credentials: 'include'로 설정
-          }
+        "http://localhost:8080/api/user/login",
+        {
+          userEmail: email,
+          userPassword: password,
+        },
+        {
+          withCredentials: true, // CORS 에러를 ��하기 위해 credentials: 'include'로 설정
+        }
       );
 
       // 로그인 성공 시 받은 토큰을 로컬 스토리지에 저장
@@ -34,8 +33,7 @@ const SignIn: React.FC = () => {
       alert("로그인 성공"); // 로그인 성공 메시지
 
       // 로그인 후 대시보드로 리디렉션
-      window.location.href = "/SignInhome"; // 홈 페이지로 리디렉션
-
+      window.location.href = "/"; // 홈 페이지로 리디렉션
     } catch (error: any) {
       // 에러 처리
       if (error.response) {
@@ -57,49 +55,65 @@ const SignIn: React.FC = () => {
   };
 
   return (
-      <>
-        <div className="signinbody">
-          <div className="signin-container">
-            <div className="signin-title">Welcome back!</div>
-            <div className="signin-title-2">
-              Enter your credentials to access your account
-            </div>
-
-            <div className="signin-text">Email address</div>
-            <input
-                type="text"
-                className="signin-input"
-                placeholder="Enter your email"
-                value={email}
-                onChange={handleChangeEmail}
-            />
-
-            <div className="signin-text">Password</div>
-            <input
-                type="password"
-                className="signin-input"
-                placeholder="Enter your password"
-                value={password}
-                onChange={handleChangePassword}
-            />
-
-            <label>
-              <input type="checkbox" />
-              Remember your id
-            </label>
-
-            <button onClick={handleLogin}>Log In</button>
-
-            <div>---------or---------</div>
-            <button onClick={() => window.location.href = "http://localhost:8080/oauth2/authorization/google"}>구글 로그인</button>
-            <button onClick={() => window.location.href = "http://localhost:8080/oauth2/authorization/kakao"}>카카오 로그인</button>
-
-            <div>Don't have an account? <a href="/signUp">Sign Up</a></div>
+    <>
+      <div className="signinbody">
+        <div className="signin-container">
+          <div className="signin-title">Welcome back!</div>
+          <div className="signin-title-2">
+            Enter your credentials to access your account
           </div>
 
-          <div className="signin-image"></div>
+          <div className="signin-text">Email address</div>
+          <input
+            type="text"
+            className="signin-input"
+            placeholder="Enter your email"
+            value={email}
+            onChange={handleChangeEmail}
+          />
+
+          <div className="signin-text">Password</div>
+          <input
+            type="password"
+            className="signin-input"
+            placeholder="Enter your password"
+            value={password}
+            onChange={handleChangePassword}
+          />
+
+          <label>
+            <input type="checkbox" />
+            Remember your id
+          </label>
+
+          <button onClick={handleLogin}>Log In</button>
+
+          <div>---------or---------</div>
+          <button
+            onClick={() =>
+              (window.location.href =
+                "http://localhost:8080/oauth2/authorization/google")
+            }
+          >
+            구글 로그인
+          </button>
+          <button
+            onClick={() =>
+              (window.location.href =
+                "http://localhost:8080/oauth2/authorization/kakao")
+            }
+          >
+            카카오 로그인
+          </button>
+
+          <div>
+            Don't have an account? <a href="/signUp">Sign Up</a>
+          </div>
         </div>
-      </>
+
+        <div className="signin-image"></div>
+      </div>
+    </>
   );
 };
 

@@ -53,7 +53,7 @@ const RecipeList = () => {
       </div>
       <div className="recipelistbody">
         {filteredRecipes.map((recipe, index) => (
-          <div className="recipe-list-container" key={recipe.id}>
+          <div className="recipe-list-container" key={index}>
             <div className="recipe-list-box-name-title">
               {recipe.recipeTitle}
             </div>

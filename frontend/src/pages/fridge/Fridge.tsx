@@ -1,47 +1,51 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import ToRegisterButton from "../../components/fridge/ToRegisterButton";
 import ToRecipeButton from "../../components/fridge/ToRecipeButton";
 import ToCommunityButton from "../../components/fridge/ToCommunityButton";
-import { useFridge } from "../../context/FridgeContext";
+import { useFridge, FridgeItem } from "../../context/FridgeContext";
 import "../../styles/fridge/Fridge.css";
 import Swal from "sweetalert2";
-
 // FridgeItem 타입 정의
-interface FridgeItem {
-  id: number;
-  name: string;
-  icon: string;
-  quantity: number;
-  unit: string;
-  expirationDate: string;
-  manufactureDate: string;
-  storageMethod: "냉장" | "냉동" | "실온";
-  remarks: string;
-  mainCategory: string;
-  subCategory: string;
-  detailCategory: string;
-}
+// interface FridgeItem {
+//   id: number;
+//   name: string;
+//   icon: string;
+//   quantity: number;
+//   unit: string;
+//   expirationDate: string;
+//   manufactureDate: string;
+//   storageMethod: "REFRIGERATED" | "FROZEN" | "ROOM_TEMPERATURE";
+//   remarks: string;
+//   mainCategory: string;
+//   subCategory: string;
+//   detailCategory: string;
+// }
 
 const Fridge: React.FC = () => {
-  const { fridgeItems, removeFridgeItem, updateFridgeItem, fetchFridgeItems } = useFridge();
+  const { fridgeItems, removeFridgeItem, updateFridgeItem, fetchFridgeItems } =
+    useFridge();
   const { bucketItems, addToBucket, removeFromBucket } = useFridge(); // FridgeContext에서 가져옴
   // const [bucketItems, setBucketItems] = useState<FridgeItem[]>([]); 이거 fridgecontext에서 사용하자자
   const [editingItemId, setEditingItemId] = useState<number | null>(null);
   const [editedQuantity, setEditedQuantity] = useState<number | "">("");
-  const [editedUnit, setEditedUnit] = useState<string>("개");
+  const [editedUnit, setEditedUnit] = useState<string>("PIECE");
   const [editedExpirationDate, setEditedExpirationDate] = useState<string>("");
   const [editedManufactureDate, setEditedManufactureDate] =
     useState<string>("");
   const [editedStorageMethod, setEditedStorageMethod] = useState<
-    "냉장" | "냉동" | "실온"
-  >("냉장");
+    "REFRIGERATED" | "FROZEN" | "ROOM_TEMPERATURE"
+  >("REFRIGERATED");
   const [editedRemarks, setEditedRemarks] = useState<string>("");
 
   // 냉장고 재료 가져오기
   useEffect(() => {
-    fetchFridgeItems()
+    fetchFridgeItems();
+    console.log("Fetching items...", fridgeItems);
   }, []);
 
+  useEffect(() => {
+    console.log("Fridge items updated:", fridgeItems);
+  }, [fridgeItems]); // fridgeItems 변경시 렌더링
 
   // 수정 버튼 클릭
   const handleEditClick = (id: number) => {
@@ -60,8 +64,9 @@ const Fridge: React.FC = () => {
   // 저장 버튼 클릭
   const handleSaveEdit = () => {
     if (editingItemId !== null) {
-      const updatedItem: FridgeItem = {
-        ...fridgeItems.find((item) => item.id === editingItemId)!,
+      let updatedItem: Partial<FridgeItem>;
+      updatedItem = {
+        // ...fridgeItems.find((item) => item.id === editingItemId)!,
         quantity: editedQuantity === "" ? 0 : editedQuantity,
         unit: editedUnit,
         expirationDate: editedExpirationDate,
@@ -71,24 +76,15 @@ const Fridge: React.FC = () => {
       };
 
       updateFridgeItem(editingItemId, updatedItem); // number 타입 id로 업데이트
+
       setEditingItemId(null);
     }
   };
 
-  // 버킷에 추가
-  // const addToBucket = (item: FridgeItem) => {
-  //   setBucketItems((prev) => [...prev, { ...item }]);
-  // };
-
-  // // 버킷에서 삭제
-  // const removeFromBucket = (id: number) => {
-  //   setBucketItems((prev) => prev.filter((item) => item.id !== id));
-  // };
-
   // 아이템 렌더링
   const renderItems = (
     items: FridgeItem[],
-    storageMethod: "냉장" | "냉동" | "실온"
+    storageMethod: "REFRIGERATED" | "FROZEN" | "ROOM_TEMPERATURE"
   ) => {
     return items
       .filter((item) => item.storageMethod === storageMethod)
@@ -195,14 +191,14 @@ const Fridge: React.FC = () => {
             <div className="cold-side">
               냉장
               <div className="cold-back">
-                {renderItems(fridgeItems, "냉장")}
+                {renderItems(fridgeItems, "REFRIGERATED")}
               </div>
             </div>
           </div>
           <div className="freeze-container">
             <div className="freeze-side">
               <div className="freeze-back">
-                {renderItems(fridgeItems, "냉동")}
+                {renderItems(fridgeItems, "FROZEN")}
               </div>
               냉동
             </div>
@@ -211,7 +207,9 @@ const Fridge: React.FC = () => {
         <div className="out-container">
           <div className="out-side">
             실온
-            <div className="out-back">{renderItems(fridgeItems, "실온")}</div>
+            <div className="out-back">
+              {renderItems(fridgeItems, "ROOM_TEMPERATURE")}
+            </div>
           </div>
         </div>
         <div className="bucket-container">
@@ -243,13 +241,13 @@ const Fridge: React.FC = () => {
               value={editedUnit}
               onChange={(e) => setEditedUnit(e.target.value)}
             >
-              <option value="개">개</option>
+              <option value="PIECE">개</option>
               <option value="L">L</option>
-              <option value="g">g</option>
+              <option value="G">g</option>
             </select>
           </div>
           <div>
-            <label>소비기한:</label>
+            s<label>소비기한:</label>
             <input
               type="date"
               value={editedExpirationDate}
@@ -270,27 +268,27 @@ const Fridge: React.FC = () => {
               <label>
                 <input
                   type="radio"
-                  value="냉장"
-                  checked={editedStorageMethod === "냉장"}
-                  onChange={() => setEditedStorageMethod("냉장")}
+                  value="REFRIGERATED"
+                  checked={editedStorageMethod === "REFRIGERATED"}
+                  onChange={() => setEditedStorageMethod("REFRIGERATED")}
                 />
                 냉장
               </label>
               <label>
                 <input
                   type="radio"
-                  value="냉동"
-                  checked={editedStorageMethod === "냉동"}
-                  onChange={() => setEditedStorageMethod("냉동")}
+                  value="FROZONE"
+                  checked={editedStorageMethod === "FROZEN"}
+                  onChange={() => setEditedStorageMethod("FROZEN")}
                 />
                 냉동
               </label>
               <label>
                 <input
                   type="radio"
-                  value="실온"
-                  checked={editedStorageMethod === "실온"}
-                  onChange={() => setEditedStorageMethod("실온")}
+                  value="ROOM_TEMPERATURE"
+                  checked={editedStorageMethod === "ROOM_TEMPERATURE"}
+                  onChange={() => setEditedStorageMethod("ROOM_TEMPERATURE")}
                 />
                 실온
               </label>

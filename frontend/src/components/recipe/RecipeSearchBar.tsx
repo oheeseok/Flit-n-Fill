@@ -1,6 +1,6 @@
 import { useRecipe } from "../../context/RecipeContext";
 import { useNavigate } from "react-router-dom";
-import "../../styles/common/SearchBar.css";
+import "../../styles/fridge/FridgeSearchBar.css";
 import SearchIcon from "../common/SearchIcon";
 import { useState } from "react";
 import Swal from "sweetalert2";

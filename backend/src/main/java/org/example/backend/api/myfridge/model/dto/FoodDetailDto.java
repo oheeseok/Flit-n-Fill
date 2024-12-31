@@ -29,7 +29,7 @@ public class FoodDetailDto {
 
     public static FoodDetailDto of(Food food) {
         String foodListName = food.getFoodListName();
-        int foodListIcon = food.getFoodList().getFoodListIcon();
+        int foodListIcon = food.getFoodList() == null ? 0 : food.getFoodList().getFoodListIcon();
 
         FoodDetailDto dto = new FoodDetailDto(
                 food.getFoodId(),

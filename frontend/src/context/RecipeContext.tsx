@@ -5,7 +5,6 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
-import axios from "axios";
 
 // Recipe 데이터 인터페이스
 interface RecipeMethod {
@@ -84,10 +83,11 @@ export const RecipeProvider = ({ children }: { children: React.ReactNode }) => {
       let filteredRecipes = allRecipes;
 
       if (params?.search) {
-        filteredRecipes = filteredRecipes.filter((recipe) =>
-          recipe.recipeFoodDetails
-            .toLowerCase()
-            .includes(params.search.toLowerCase())
+        filteredRecipes = filteredRecipes.filter(
+          (recipe) =>
+            recipe.recipeFoodDetails
+              .toLowerCase()
+              .includes(params.search!.toLowerCase()) // Non-null assertion 사용
         );
       }
 

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import "../../styles/fridge/FridgeRegister.css";
-import { CATEGORY_DATA } from "../../data/categoryData";
 import { useFridge } from "../../context/FridgeContext";
+import axios from "axios";
+// import FridgeSearchBar from "../../components/fridge/FridgeSearchBar.tsx";
 
 const FridgeRegister = () => {
   const { addFridgeItem } = useFridge();
@@ -12,37 +13,153 @@ const FridgeRegister = () => {
     useState<string>("");
   const [name, setName] = useState<string>("");
   const [quantity, setQuantity] = useState<number | "">("");
-  const [unit, setUnit] = useState<string>("개");
+  const [unit, setUnit] = useState<string>("PIECE");
   const [expirationDate, setExpirationDate] = useState<string>("");
   const [manufactureDate, setManufactureDate] = useState<string>("");
-  const [storageMethod, setStorageMethod] = useState<"냉장" | "냉동" | "실온">(
-    "냉장"
-  );
+  const [storageMethod, setStorageMethod] = useState<
+    "REFRIGERATED" | "FROZEN" | "ROOM_TEMPERATURE"
+  >("REFRIGERATED");
   const [remarks, setRemarks] = useState<string>("");
   const [adminRequest, setAdminRequest] = useState<string>("");
+  const [foodListId, setFoodListId] = useState<string>("");
+  // const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState<Record<string, GroupedCategory>>(
+    {}
+  );
+
+  // 상태 관리: 재료/완제품
+  const [ingredientType, setIngredientType] = useState<"INGREDIENT" | "COOKED">(
+    "INGREDIENT"
+  );
+
+  interface FoodListViewDto {
+    foodListId: number; // Long -> number
+    foodListGroup: string;
+    foodListType: string | null; // Optional일 수 있으므로 null 허용
+    foodListProduct: string | null; // Optional일 수 있으므로 null 허용
+    foodListIcon: number;
+  }
+
+  // 수정 여기부터
+  interface SubCategory {
+    foodListIcon: number;
+    foodListId: number;
+    소분류: Record<string, { foodListIcon: number; foodListId: number }>;
+  }
+
+  interface GroupedCategory {
+    대분류: string;
+    중분류: Record<string, SubCategory>;
+  }
+  // 수정 여기까지
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get("http://localhost:8080/api/foodlist", {
+          withCredentials: true,
+        });
+
+        const groupedData = response.data.reduce(
+          (
+            acc: Record<string, any>, // acc 타입 명시
+            {
+              foodListGroup,
+              foodListProduct,
+              foodListType,
+              foodListIcon,
+              foodListId,
+            }: FoodListViewDto // 구조 분해한 객체 타입 명시
+          ) => {
+            if (!acc[foodListGroup]) {
+              acc[foodListGroup] = {
+                대분류: foodListGroup,
+                중분류: {},
+              };
+            }
+
+            if (foodListType) {
+              if (!acc[foodListGroup].중분류[foodListType]) {
+                acc[foodListGroup].중분류[foodListType] = {
+                  foodListIcon: foodListIcon,
+                  foodListId,
+                  소분류: {},
+                };
+              }
+
+              if (foodListProduct !== null) {
+                acc[foodListGroup].중분류[foodListType].소분류[
+                  foodListProduct
+                ] = {
+                  foodListIcon: foodListIcon,
+                  foodListId,
+                };
+              }
+            } else {
+              if (foodListProduct !== null) {
+                acc[foodListGroup].중분류[foodListProduct] = {
+                  foodListIcon: foodListIcon,
+                  소분류: null,
+                  foodListId,
+                };
+              }
+            }
+            return acc;
+          },
+          {}
+        );
+
+        console.log(groupedData);
+        setCategories(groupedData);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   // 아이콘 경로 상태
   const [icon, setIcon] = useState<string>("");
 
   useEffect(() => {
     // 이름 및 아이콘 업데이트
+    if (ingredientType === "COOKED") {
+      setIcon("/assets/instant-food.png"); // 완제품 아이콘
+      return;
+    }
     if (selectedDetailCategory) {
       setName(selectedDetailCategory);
-      setIcon(
-        CATEGORY_DATA[selectedMainCategory]?.중분류?.[selectedSubCategory]
-          ?.소분류?.[selectedDetailCategory] || ""
-      );
+      const newicon =
+          "../../assets/icons/" + categories[selectedMainCategory]?.중분류[selectedSubCategory]?.소분류[
+          selectedDetailCategory
+        ]?.foodListIcon + ".png" || "";
+      const newfoodListId =
+        categories[selectedMainCategory]?.중분류[selectedSubCategory]?.소분류[
+          selectedDetailCategory
+        ]?.foodListId || "";
+      setIcon(newicon);
+      setFoodListId(newfoodListId.toString());
     } else if (selectedSubCategory) {
       setName(selectedSubCategory);
-      setIcon(
-        CATEGORY_DATA[selectedMainCategory]?.중분류?.[selectedSubCategory]
-          ?.icon || ""
-      );
+      const newicon =
+          "../../assets/icons/" + categories[selectedMainCategory]?.중분류[selectedSubCategory]?.foodListIcon + ".png" || "";
+      const newfoodListId =
+        categories[selectedMainCategory]?.중분류[selectedSubCategory]?.foodListId || "";
+      setIcon(newicon);
+      setFoodListId(newfoodListId.toString());
     } else {
       setName("");
       setIcon("");
+      setFoodListId(""); // foodListId 초기화
     }
-  }, [selectedMainCategory, selectedSubCategory, selectedDetailCategory]);
+  }, [
+    selectedMainCategory,
+    selectedSubCategory,
+    selectedDetailCategory,
+    categories,
+    ingredientType,
+  ]);
 
   const handleRegister = (): void => {
     if (!selectedMainCategory || !selectedSubCategory) {
@@ -54,8 +171,17 @@ const FridgeRegister = () => {
       return;
     }
 
+    if (!foodListId) {
+      Swal.fire({
+        icon: "error",
+        title: "입력 오류",
+        text: "유효한 식별자를 선택해주세요.",
+      });
+      return;
+    }
+
     const newItem = {
-      id: Date.now(), // 고유 ID 생성
+      id: Number(foodListId), // 백엔드에서 제공된 식별자를 사용
       mainCategory: selectedMainCategory,
       subCategory: selectedSubCategory,
       detailCategory: selectedDetailCategory,
@@ -68,9 +194,10 @@ const FridgeRegister = () => {
       remarks,
       adminRequest,
       icon,
+      foodListId: Number(foodListId), // 타입 변환
     };
 
-    addFridgeItem(newItem);
+    addFridgeItem(newItem); // FridgeItem에 맞는 객체 전달
 
     Swal.fire({
       icon: "success",
@@ -81,28 +208,156 @@ const FridgeRegister = () => {
     resetForm();
   };
 
+  // 재료/완제품 핸들러
+  const handleIngredientTypeChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ): void => {
+    const value = e.target.value as "INGREDIENT" | "COOKED";
+    setIngredientType(value);
+
+    if (value === "COOKED") {
+      setIcon("/assets/instant-food.png");
+      setName("");
+      setSelectedMainCategory("");
+      setSelectedSubCategory("");
+      setSelectedDetailCategory("");
+    } else {
+      setIcon("");
+    }
+  };
+
   const resetForm = (): void => {
     setSelectedMainCategory("");
     setSelectedSubCategory("");
     setSelectedDetailCategory("");
     setName("");
     setQuantity("");
-    setUnit("개");
+    setUnit("PIECE");
     setExpirationDate("");
     setManufactureDate("");
-    setStorageMethod("냉장");
+    setStorageMethod("REFRIGERATED");
     setRemarks("");
     setAdminRequest("");
     setIcon("");
+    setFoodListId("");
+  };
+
+  // onSearch 함수 정의
+  // const handleSearch = (
+  //   mainCategory: string,
+  //   subCategory?: string,
+  //   detailCategory?: string
+  // ) => {
+  //   console.log(mainCategory, subCategory, detailCategory);
+  //   setSelectedMainCategory(mainCategory || "");
+  //   setSelectedSubCategory(subCategory || "");
+  //   setSelectedDetailCategory(detailCategory || "");
+
+  //   console.log("selectedMain:", selectedMainCategory);
+  //   console.log("selectedSub:", selectedSubCategory);
+  //   console.log("selectedDetail:", selectedDetailCategory);
+  // };
+
+  const handleMainCategoryChangee = (
+      e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const newCategory = e.target.value;
+
+    // Main Category 변경 시 상태 초기화
+    setSelectedMainCategory(newCategory);
+    setSelectedSubCategory("");
+    setSelectedDetailCategory("");
+    setName("");
+    setQuantity("");
+    setUnit("PIECE");
+    setExpirationDate("");
+    setManufactureDate("");
+    setStorageMethod("REFRIGERATED");
+    setRemarks("");
+    setAdminRequest("");
+    setIcon("");
+    setFoodListId("");
+  };
+
+  const handleSubCategoryChange = (
+      e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const newSubCategory = e.target.value;
+
+    // Sub Category 변경 시 상태 초기화
+    setSelectedSubCategory(newSubCategory);
+    setSelectedDetailCategory("");
+    setName("");
+    setQuantity("");
+    setUnit("PIECE");
+    setExpirationDate("");
+    setManufactureDate("");
+    setStorageMethod("REFRIGERATED");
+    setRemarks("");
+    setAdminRequest("");
+    setIcon("");
+    setFoodListId("");
+  };
+
+  const handleDetailCategoryChange = (
+      e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const newDetailCategory = e.target.value;
+
+    // Detail Category 변경 시 상태 초기화
+    setSelectedDetailCategory(newDetailCategory);
+    setName("");
+    setQuantity("");
+    setUnit("PIECE");
+    setExpirationDate("");
+    setManufactureDate("");
+    setStorageMethod("REFRIGERATED");
+    setRemarks("");
+    setAdminRequest("");
+    setIcon("");
+    setFoodListId("");
   };
 
   return (
     <div className="fridge-register-body">
       <div className="fridge-register-container">
+        <div className="fridge-register-category-group">
+          {/* 완제품 표시 */}
+          <label>
+            <input
+              type="radio"
+              name="ingredientType"
+              value="INGREDIENT"
+              checked={ingredientType === "INGREDIENT"}
+              onChange={handleIngredientTypeChange}
+            />
+            재료
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="ingredientType"
+              value="COOKED"
+              checked={ingredientType === "COOKED"}
+              onChange={handleIngredientTypeChange}
+            />
+            완제품
+          </label>
+        </div>
+
+        {/* 서치바 */}
+        {/* <div className="fridge-register-searchbar">
+          <FridgeSearchBar
+            onSearch={handleSearch}
+            categories={categories}
+            disabled={ingredientType === "COOKED"}
+          ></FridgeSearchBar>
+        </div> */}
+
         {/* 아이콘 표시 */}
         {icon && (
           <div className="fridge-register-icon">
-            <img src={icon} alt={name} />
+            <img src={icon} alt={name || "아이콘"} />
           </div>
         )}
 
@@ -111,10 +366,10 @@ const FridgeRegister = () => {
             <label>대분류</label>
             <select
               value={selectedMainCategory}
-              onChange={(e) => setSelectedMainCategory(e.target.value)}
+              onChange={handleMainCategoryChangee}
             >
               <option value="">선택</option>
-              {Object.keys(CATEGORY_DATA).map((mainCategory) => (
+              {Object.keys(categories).map((mainCategory) => (
                 <option key={mainCategory} value={mainCategory}>
                   {mainCategory}
                 </option>
@@ -127,11 +382,11 @@ const FridgeRegister = () => {
               <label>중분류</label>
               <select
                 value={selectedSubCategory}
-                onChange={(e) => setSelectedSubCategory(e.target.value)}
+                onChange={handleSubCategoryChange}
               >
                 <option value="">선택</option>
                 {Object.keys(
-                  CATEGORY_DATA[selectedMainCategory]?.중분류 || {}
+                  categories[selectedMainCategory]?.중분류 || {}
                 ).map((subCategory) => (
                   <option key={subCategory} value={subCategory}>
                     {subCategory}
@@ -142,19 +397,23 @@ const FridgeRegister = () => {
           )}
 
           {selectedSubCategory &&
-            CATEGORY_DATA[selectedMainCategory]?.중분류?.[selectedSubCategory]
-              ?.소분류 && (
+            categories[selectedMainCategory]?.중분류[selectedSubCategory]
+              ?.소분류 &&
+            Object.keys(
+              categories[selectedMainCategory].중분류[selectedSubCategory]
+                .소분류
+            ).length > 0 && (
               <div className="fridge-register-dropdown">
                 <label>소분류</label>
                 <select
                   value={selectedDetailCategory}
-                  onChange={(e) => setSelectedDetailCategory(e.target.value)}
+                  onChange={handleDetailCategoryChange}
                 >
                   <option value="">선택</option>
                   {Object.keys(
-                    CATEGORY_DATA[selectedMainCategory]?.중분류?.[
+                    categories[selectedMainCategory]?.중분류[
                       selectedSubCategory
-                    ]?.소분류 || {}
+                    ].소분류 || {}
                   ).map((detailCategory) => (
                     <option key={detailCategory} value={detailCategory}>
                       {detailCategory}
@@ -187,9 +446,11 @@ const FridgeRegister = () => {
                 placeholder="수량 입력"
               />
               <select value={unit} onChange={(e) => setUnit(e.target.value)}>
-                <option value="개">개</option>
+                <option value="PIECE">개</option>
                 <option value="L">L</option>
-                <option value="g">g</option>
+                <option value="G">g</option>
+                <option value="KG">Kg</option>
+                <option value="ML">mL</option>
               </select>
             </div>
           </div>
@@ -219,14 +480,14 @@ const FridgeRegister = () => {
                 <input
                   type="radio"
                   name="storage"
-                  value="냉장"
-                  checked={storageMethod === "냉장"}
+                  value="REFRIGERATED"
+                  checked={storageMethod === "REFRIGERATED"}
                   onChange={(e) => {
                     const value = e.target.value;
                     if (
-                      value === "냉장" ||
-                      value === "냉동" ||
-                      value === "실온"
+                      value === "REFRIGERATED" ||
+                      value === "FROZEN" ||
+                      value === "ROOM_TEMPERATURE"
                     ) {
                       setStorageMethod(value);
                     }
@@ -238,14 +499,14 @@ const FridgeRegister = () => {
                 <input
                   type="radio"
                   name="storage"
-                  value="냉동"
-                  checked={storageMethod === "냉동"}
+                  value="FROZEN"
+                  checked={storageMethod === "FROZEN"}
                   onChange={(e) => {
                     const value = e.target.value;
                     if (
-                      value === "냉장" ||
-                      value === "냉동" ||
-                      value === "실온"
+                      value === "REFRIGERATED" ||
+                      value === "FROZEN" ||
+                      value === "ROOM_TEMPERATURE"
                     ) {
                       setStorageMethod(value);
                     }
@@ -257,14 +518,14 @@ const FridgeRegister = () => {
                 <input
                   type="radio"
                   name="storage"
-                  value="실온"
-                  checked={storageMethod === "실온"}
+                  value="ROOM_TEMPERATURE"
+                  checked={storageMethod === "ROOM_TEMPERATURE"}
                   onChange={(e) => {
                     const value = e.target.value;
                     if (
-                      value === "냉장" ||
-                      value === "냉동" ||
-                      value === "실온"
+                      value === "REFRIGERATED" ||
+                      value === "FROZEN" ||
+                      value === "ROOM_TEMPERATURE"
                     ) {
                       setStorageMethod(value);
                     }
