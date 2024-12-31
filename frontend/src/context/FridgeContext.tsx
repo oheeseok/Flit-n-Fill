@@ -25,13 +25,24 @@ interface FridgeItem {
   unit: string;
   expirationDate: string;
   manufactureDate: string;
-  storageMethod: string;
+  storageMethod: "REFRIGERATED" | "FROZEN" | "ROOM_TEMPERATURE";
   remarks: string;
   icon: string;
-  foodListId: number;
+  foodListId?: number;
 }
 // 변환 함수
-const convertToFridgeItem = (foodDetail: FoodDetailDto): FridgeItem => {
+const convertToFridgeItem = (foodDetail: FoodDetailDto): {
+  unit: string;
+  quantity: number;
+  storageMethod: string;
+  name: string;
+  icon: string;
+  manufactureDate: string;
+  foodListId: number;
+  id: number;
+  remarks: string;
+  expirationDate: string
+} => {
   return {
     id: foodDetail.foodId,
     name: foodDetail.foodListName,
@@ -52,12 +63,12 @@ const convertToFoodDetailDto = (fridgeItem: FridgeItem): {
   foodDescription: string;
   foodListName: string;
   foodId: number;
-  foodListId: number;
+  foodListId: number | undefined;
   foodRegistDate: string;
   foodExpDate: string;
   foodListIcon: string;
   foodUnit: string;
-  foodStorage: string;
+  foodStorage: "REFRIGERATED" | "FROZEN" | "ROOM_TEMPERATURE";
   foodProDate: string;
   foodCategory: string
 } => {
@@ -81,7 +92,7 @@ const convertToFoodDetailDto = (fridgeItem: FridgeItem): {
 interface FridgeContextType {
   fridgeItems: FridgeItem[];
   bucketItems: FridgeItem[];
-  addFridgeItem: (item: Partial<FridgeItem>) => void;
+  addFridgeItem: (item: FridgeItem) => void;
   removeFridgeItem: (id: number) => void;
   updateFridgeItem: (id: number, updatedItem : FridgeItem) => void;
   filterByStorageMethod: (method: "REFRIGERATED" | "FROZEN" | "ROOM_TEMPERATURE") => FridgeItem[];

@@ -14,7 +14,7 @@ interface FridgeItem {
   unit: string;
   expirationDate: string;
   manufactureDate: string;
-  storageMethod: string;
+  storageMethod: "REFRIGERATED" | "FROZEN" | "ROOM_TEMPERATURE";
   remarks: string;
   mainCategory: string;
   subCategory: string;
@@ -80,16 +80,6 @@ const Fridge: React.FC = () => {
       setEditingItemId(null);
     }
   };
-
-  // 버킷에 추가
-  // const addToBucket = (item: FridgeItem) => {
-  //   setBucketItems((prev) => [...prev, { ...item }]);
-  // };
-
-  // // 버킷에서 삭제
-  // const removeFromBucket = (id: number) => {
-  //   setBucketItems((prev) => prev.filter((item) => item.id !== id));
-  // };
 
   // 아이템 렌더링
   const renderItems = (

@@ -3,6 +3,7 @@ import Swal from "sweetalert2";
 import "../../styles/fridge/FridgeRegister.css";
 import { useFridge } from "../../context/FridgeContext";
 import axios from "axios";
+import FridgeSearchBar from "../../components/fridge/FridgeSearchBar.tsx";
 
 const FridgeRegister = () => {
   const { addFridgeItem } = useFridge();
@@ -22,6 +23,10 @@ const FridgeRegister = () => {
   const [adminRequest, setAdminRequest] = useState<string>("");
   const [foodListId, setFoodListId] = useState<string>("");
   const [categories, setCategories] = useState([]);
+  // 상태 관리: 재료/완제품
+  const [ingredientType, setIngredientType] = useState<"INGREDIENT" | "COOKED">(
+      "INGREDIENT"
+  );
 
   useEffect(() => {
     // 백엔드에서 데이터 가져오기
@@ -82,32 +87,31 @@ const FridgeRegister = () => {
 
   useEffect(() => {
     // 이름 및 아이콘 업데이트
+    if (ingredientType === "COOKED") {
+      setIcon("/assets/instant-food.png"); // 완제품 아이콘
+      return;
+    }
     if (selectedDetailCategory) {
       setName(selectedDetailCategory);
-      setIcon(
-          "/assets/icons/" +
-          categories[selectedMainCategory].중분류[selectedSubCategory].소분류[selectedDetailCategory].icon + ".png" || ""
-      );
-      setFoodListId(
-          categories[selectedMainCategory].중분류[selectedSubCategory].소분류[selectedDetailCategory].foodListId|| ""
-      );
+      const newicon =
+          categories[selectedMainCategory]?.중분류[selectedSubCategory]?.소분류[selectedDetailCategory]?.icon + ".png" || "";
+      const newfoodListId =
+          categories[selectedMainCategory]?.중분류[selectedSubCategory]?.소분류[selectedDetailCategory]?.foodListId || "";
+      setIcon(newicon);
+      setFoodListId(newfoodListId);
     } else if (selectedSubCategory) {
       setName(selectedSubCategory);
-      setIcon(
-          "/assets/icons/" +
-          categories[selectedMainCategory].중분류[selectedSubCategory].icon + ".png" || ""
-      );
-      setFoodListId(
-          categories[selectedMainCategory].중분류[selectedSubCategory].foodListId || ""
-      );
+      const newicon =
+          categories[selectedMainCategory]?.중분류[selectedSubCategory]?.소분류[selectedDetailCategory]?.icon + ".png" || "";
+      const newfoodListId =
+          categories[selectedMainCategory]?.중분류[selectedSubCategory]?.소분류[selectedDetailCategory]?.foodListId || "";
+      setIcon(newicon);
+      setFoodListId(newfoodListId);
     } else {
       setName("");
       setIcon("");
       setFoodListId("");  // foodListId 초기화
-    }
-    console.log("selected icon : ", icon);
-    console.log("selected foodListId : ", foodListId);
-  }, [selectedMainCategory, selectedSubCategory, selectedDetailCategory, categories]);
+    }}, [selectedMainCategory, selectedSubCategory, selectedDetailCategory, categories, ingredientType]);
 
   const handleRegister = (): void => {
     if (!selectedMainCategory || !selectedSubCategory) {
@@ -147,6 +151,24 @@ const FridgeRegister = () => {
     resetForm();
   };
 
+  // 재료/완제품 핸들러
+  const handleIngredientTypeChange = (
+      e: React.ChangeEvent<HTMLInputElement>
+  ): void => {
+    const value = e.target.value as "INGREDIENT" | "COOKED";
+    setIngredientType(value);
+
+    if (value === "COOKED") {
+      setIcon("/assets/instant-food.png");
+      setName("");
+      setSelectedMainCategory("");
+      setSelectedSubCategory("");
+      setSelectedDetailCategory("");
+    } else {
+      setIcon("");
+    }
+  };
+
   const resetForm = (): void => {
     setSelectedMainCategory("");
     setSelectedSubCategory("");
@@ -161,6 +183,22 @@ const FridgeRegister = () => {
     setAdminRequest("");
     setIcon("");
     setFoodListId("");
+  };
+
+  // onSearch 함수 정의
+  const handleSearch = (
+      mainCategory: string,
+      subCategory?: string,
+      detailCategory?: string
+  ) => {
+    console.log(mainCategory, subCategory, detailCategory);
+    setSelectedMainCategory(mainCategory || "");
+    setSelectedSubCategory(subCategory || "");
+    setSelectedDetailCategory(detailCategory || "");
+
+    console.log("selectedMain:", selectedMainCategory);
+    console.log("selectedSub:", selectedSubCategory);
+    console.log("selectedDetail:", selectedDetailCategory);
   };
 
   const handleMainCategoryChangee = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -184,10 +222,43 @@ const FridgeRegister = () => {
   return (
     <div className="fridge-register-body">
       <div className="fridge-register-container">
+        <div className="fridge-register-category-group">
+          {/* 완제품 표시 */}
+          <label>
+            <input
+                type="radio"
+                name="ingredientType"
+                value="INGREDIENT"
+                checked={ingredientType === "INGREDIENT"}
+                onChange={handleIngredientTypeChange}
+            />
+            재료
+          </label>
+          <label>
+            <input
+                type="radio"
+                name="ingredientType"
+                value="COOKED"
+                checked={ingredientType === "COOKED"}
+                onChange={handleIngredientTypeChange}
+            />
+            완제품
+          </label>
+        </div>
+
+        {/* 서치바 */}
+        <div className="fridge-register-searchbar">
+          <FridgeSearchBar
+              onSearch={handleSearch}
+              categories={categories}
+              disabled={ingredientType === "COOKED"}
+          ></FridgeSearchBar>
+        </div>
+
         {/* 아이콘 표시 */}
         {icon && (
             <div className="fridge-register-icon">
-              <img src={icon} alt={name}/>
+              <img src={icon} alt={name || "아이콘"} />
             </div>
         )}
 
