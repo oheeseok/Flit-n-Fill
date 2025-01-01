@@ -9,18 +9,17 @@
 
 .signin-container {
   display: inline-flex;
-  width: 560px;
+  width: 40%;
   height: 720px;
-  padding-bottom: 62.894px;
-  gap: 9.827px;
+  padding-bottom: 62px;
+  gap: 10px;
   flex-shrink: 0;
-  border: 1px solid;
   display: flex;
   flex-direction: column; /* 수직 방향으로 배치 */
-  justify-content: flex-start; /* 위에서부터 차례대로 배치 */
+  justify-content: center; /* 위에서부터 차례대로 배치 */
   position: relative;
   align-items: flex-start;
-  margin: 200px 110px;
+  margin: 180px 90px 180px 140px;
 }
 .signin-title {
   color: #000;
@@ -33,26 +32,95 @@
 .signin-title-2 {
   color: #000;
   font-family: Ubuntu;
-  font-size: 18px;
+  font-size: 24px;
   font-style: normal;
   font-weight: 400;
   line-height: normal;
+  margin-bottom: 60px;
 }
-.signin-text {
+.signin-text1 {
   display: flex;
-  width: 397.021px;
-  height: 56.998px;
+  font-family: Ubuntu;
+  font-size: 22px;
+  width: 100%;
   flex-direction: column;
   align-items: flex-start;
   flex-shrink: 0;
 }
 
+.signin-input1 {
+  display: flex;
+  max-width: 600px;
+  width: 100%;
+  font-size: 18px;
+  border-radius: 5px;
+  margin-bottom: 40px;
+}
+
+.signin-text2 {
+  display: flex;
+  font-family: Ubuntu;
+  font-size: 22px;
+  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+
+.signin-input2 {
+  display: flex;
+  max-width: 600px;
+  width: 100%;
+  font-size: 18px;
+  border-radius: 5px;
+  margin-bottom: 40px;
+}
+
+.signin-checkbox {
+  margin-bottom: 40px;
+}
+
+.signin-button-container1 {
+  width: 100%;
+}
+
+.signin-button-login {
+  width: 100%;
+  background: #c7efe6;
+  margin-bottom: 40px;
+}
+.signin-button-or {
+  width: 100%;
+  display: flex;
+  font-family: Ubuntu;
+  flex-direction: row;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.signin-button-container2 {
+  width: 100%;
+  margin-top: 40px;
+  display: flex;
+  gap: 4%;
+  margin-bottom: 40px;
+}
+
+.signin-button-google {
+  width: 48%;
+  background-color: #71c9fc;
+}
+.signin-button-kakao {
+  width: 48%;
+  background-color: #f8e95e;
+}
 .signin-image {
   background-image: url("../../assets/images/sign.jpg");
   background-size: cover;
   background-position: center;
   width: 780px;
   height: 1200px;
-  top: 0;
-  right: 0;
+  margin: 0 auto;
 }
