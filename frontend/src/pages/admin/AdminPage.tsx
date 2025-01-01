@@ -13,6 +13,7 @@ interface RequestDetailDto {
     requestDate: string;
     responseStatus: string;
     responseMessage: string;
+    isOpen: boolean; // 상세 정보 표시 여부 추가
 }
 
 interface AdminResponseDto {
@@ -25,7 +26,6 @@ const AdminPage = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true); // 로딩 상태 관리
     const [requests, setRequests] = useState<RequestDetailDto[]>([]); // 요청 목록 (빈 배열로 초기화)
-    const [selectedRequest, setSelectedRequest] = useState<RequestDetailDto | null>(null); // 선택된 요청 상세 정보
 
     // 요청 목록 가져오기
     const fetchRequestList = async () => {
@@ -34,9 +34,13 @@ const AdminPage = () => {
                 withCredentials: true, // 쿠키와 같은 인증 정보를 자동으로 보내도록 설정
             });
 
-            // 응답이 배열인지 확인
+            // 응답이 배열인지 확인하고, 각 요청에 isOpen 상태를 추가
             if (Array.isArray(response.data)) {
-                setRequests(response.data); // 요청 목록을 상태에 저장
+                const requestsWithState = response.data.map((request: RequestDetailDto) => ({
+                    ...request,
+                    isOpen: false, // 요청 목록의 각 요청은 기본적으로 상세 정보가 닫혀 있는 상태로 설정
+                }));
+                setRequests(requestsWithState); // 요청 목록을 상태에 저장
             } else {
                 console.error("응답 데이터가 배열이 아닙니다:", response.data);
             }
@@ -54,7 +58,6 @@ const AdminPage = () => {
             setLoading(false);
         } else {
             setLoading(false); // 관리자인 경우 로딩 상태를 false로 변경
-            fetchRequestList(); // 요청 목록을 가져옵니다.
         }
     }, [isAdmin, navigate]);
 
@@ -64,7 +67,14 @@ const AdminPage = () => {
             const response = await axios.get(`http://localhost:8080/api/admin/requests/${requestId}`, {
                 withCredentials: true, // 쿠키와 같은 인증 정보를 자동으로 보내도록 설정
             });
-            setSelectedRequest(response.data); // 요청 상세 정보를 상태에 저장
+            // 상세 정보 불러오기 후 상태 업데이트
+            setRequests((prevRequests) =>
+                prevRequests.map((request) =>
+                    request.requestId === requestId
+                        ? { ...request, isOpen: !request.isOpen } // 클릭 시 상세 정보 토글
+                        : request
+                )
+            );
         } catch (error) {
             console.error("요청 상세 정보 조회 실패", error);
         }
@@ -79,7 +89,6 @@ const AdminPage = () => {
                 withCredentials: true, // 쿠키와 같은 인증 정보를 자동으로 보내도록 설정
             }); // 요청 상태 업데이트
             fetchRequestList(); // 상태 업데이트 후 요청 목록 다시 가져오기
-            setSelectedRequest(null); // 요청 수락/거절 후 상세 정보 초기화
         } catch (error) {
             console.error("요청 상태 업데이트 실패", error);
         }
@@ -103,49 +112,49 @@ const AdminPage = () => {
                             <button onClick={() => fetchRequestDetail(request.requestId)}>
                                 {request.requestId}: {request.requestUserId}
                             </button>
+
+                            {/* 요청 상세 정보 토글 */}
+                            {request.isOpen && (
+                                <div className="request-detail">
+                                    <p><strong>Request ID:</strong> {request.requestId}</p>
+                                    <p><strong>User ID:</strong> {request.requestUserId}</p>
+                                    <p><strong>Request Type:</strong> {request.requestType}</p>
+                                    <p><strong>Request Content:</strong> {request.requestContent}</p>
+                                    <p><strong>Reported User ID:</strong> {request.reportedUserId}</p>
+                                    <p><strong>Request Date:</strong> {request.requestDate}</p>
+                                    <p><strong>Response Status:</strong> {request.responseStatus}</p>
+                                    <p><strong>Response Message:</strong> {request.responseMessage}</p>
+
+                                    {/* 수락/거절 버튼 */}
+                                    <div>
+                                        <h4>Respond to Request</h4>
+                                        <button
+                                            onClick={() =>
+                                                handleUpdateRequestStatus(request.requestId, "ACCEPTED", "Request accepted.")
+                                            }
+                                        >
+                                            Accept
+                                        </button>
+                                        <button
+                                            onClick={() =>
+                                                handleUpdateRequestStatus(request.requestId, "REJECTED", "Request rejected.")
+                                            }
+                                        >
+                                            Reject
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </li>
                     ))}
                 </ul>
             </div>
-
-            {/* 요청 상세 정보 */}
-            {selectedRequest && (
-                <div className="request-detail">
-                    <h3>Request Detail</h3>
-                    <p><strong>Request ID:</strong> {selectedRequest.requestId}</p>
-                    <p><strong>User ID:</strong> {selectedRequest.requestUserId}</p>
-                    <p><strong>Request Type:</strong> {selectedRequest.requestType}</p>
-                    <p><strong>Request Content:</strong> {selectedRequest.requestContent}</p>
-                    <p><strong>Reported User ID:</strong> {selectedRequest.reportedUserId}</p>
-                    <p><strong>Request Date:</strong> {selectedRequest.requestDate}</p>
-                    <p><strong>Response Status:</strong> {selectedRequest.responseStatus}</p>
-                    <p><strong>Response Message:</strong> {selectedRequest.responseMessage}</p>
-
-                    {/* 수락/거절 버튼 */}
-                    <div>
-                        <h4>Respond to Request</h4>
-                        <button
-                            onClick={() =>
-                                handleUpdateRequestStatus(selectedRequest.requestId, "ACCEPTED", "Request accepted.")
-                            }
-                        >
-                            Accept
-                        </button>
-                        <button
-                            onClick={() =>
-                                handleUpdateRequestStatus(selectedRequest.requestId, "REJECTED", "Request rejected.")
-                            }
-                        >
-                            Reject
-                        </button>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };
 
 export default AdminPage;
+
 
 
 //     return (
