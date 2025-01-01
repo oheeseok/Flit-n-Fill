@@ -1,6 +1,8 @@
 import SearchBar from "../../components/common/SearchBar";
 import "../../styles/community/Community.css";
 import CommunityRegisterButton from "../../components/community/CommunityRegisterButton";
+import "../../styles/community/CommunityList.css";
+import CommunityList from "./CommunityList";
 
 const Community = () => {
   return (
@@ -39,6 +41,9 @@ const Community = () => {
             <button className="community-button">교환</button>
             <button className="community-button">나눔</button>
           </div>
+
+          {/*  */}
+          <CommunityList />
         </div>
       </div>
     </div>

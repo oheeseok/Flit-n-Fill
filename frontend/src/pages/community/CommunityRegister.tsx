@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import axios from "axios";
 import { useCommunity } from "../../context/CommunityContext";
 import CommunityImageUploader from "../../components/community/CommunityImageUploader";
 import "../../styles/community/CommunityRegister.css";
@@ -10,11 +11,7 @@ const CommunityRegister = () => {
   const { setCommunityData } = useCommunity(); // Context의 데이터 설정 함수 사용
 
   // 상태 관리
-  const [uploadedImage1, setUploadedImage1] = useState<string | null>(null);
-  const [
-    uploadedImage2,
-    // setUploadedImage2
-  ] = useState<string | null>(null);
+  const [uploadedImage1, setUploadedImage1] = useState<File | null>(null);
   const [title, setTitle] = useState<string>("");
   const [content, setContent] = useState<string>("");
   const [meetingPlace, setMeetingPlace] = useState<string>("");
@@ -24,10 +21,9 @@ const CommunityRegister = () => {
   const [proposerFoodListId, setProposerFoodListId] = useState<number>(0);
 
   // 이미지 업로드 핸들러
-  const handleImage1Change = (image: string) => setUploadedImage1(image);
-  // const handleImage2Change = (image: string) => setUploadedImage2(image);
+  const handleImage1Change = (image: File) => setUploadedImage1(image);
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     // 필수 입력값 확인
     if (
       !title.trim() ||
@@ -35,8 +31,6 @@ const CommunityRegister = () => {
       !meetingPlace.trim() ||
       !meetingTime.trim() ||
       !uploadedImage1
-      // ||
-      // !uploadedImage2
     ) {
       Swal.fire({
         icon: "warning",
@@ -46,31 +40,59 @@ const CommunityRegister = () => {
       return;
     }
 
+    try {
+      const formData = new FormData();
+
     // JSON 데이터 생성
-    const communityPost = {
-      postTitle: title,
-      postContent: content,
-      meetingPlace,
-      meetingTime,
-      postPhoto1: uploadedImage1,
-      postPhoto2: uploadedImage2,
-      tradeType: category,
-      writerFoodId,
-      proposerFoodListId,
-    };
+      const communityPost = {
+        postTitle: title,
+        postContent: content,
+        meetingPlace,
+        meetingTime,
+        postPhoto1: uploadedImage1 ? uploadedImage1.name : null,
+        tradeType: category,
+        writerFoodId,
+        proposerFoodListId,
+      };
+      formData.append("postRegisterDto", JSON.stringify(communityPost))
+      formData.append("postMainPhoto", uploadedImage1)
 
-    console.log("등록 데이터:", communityPost);
+      console.log("formData: ", formData)
 
-    // Context에 데이터 저장
-    setCommunityData(communityPost);
+      // Context에 데이터 저장
+      setCommunityData(communityPost);
 
-    Swal.fire({
-      icon: "success",
-      title: "등록 성공",
-      text: "게시물이 성공적으로 등록되었습니다!",
-    }).then(() => {
-      navigate("/community/detail");
-    });
+      const response = await axios.post(
+        "/api/posts",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+          withCredentials: true,
+        }
+      );
+
+      if (response.status === 201) {
+        Swal.fire({
+          icon: "success",
+          title: "등록 성공",
+          text: "게시물이 성공적으로 등록되었습니다!",
+        }).then(() => {
+          navigate("/community");
+        });
+      }
+
+
+    } catch (error) {
+      console.error("게시글 등록 실패:", error);
+      Swal.fire({
+        icon: "error",
+        title: "등록 실패",
+        text: "게시물 등록 중 오류가 발생했습니다.",
+      });
+    }
+
+
+    
   };
 
   const handleCancel = () => {
