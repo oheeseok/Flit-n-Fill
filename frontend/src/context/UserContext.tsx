@@ -3,6 +3,7 @@ import axios from "axios"; // DB와 통신할 때 사용할 라이브러리
 
 // 사용자 타입 정의
 interface User {
+  userId: number;
   userName: string;
   userEmail: string;
   userNickname: string;
