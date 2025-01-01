@@ -1,0 +1,78 @@
+.chatroom-after-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 20px auto 60px;
+  text-align: center;
+  font-family: Ubuntu, sans-serif;
+  padding: 20px;
+  background-color: #f8f8f8;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.05);
+}
+
+.chatroom-after-header {
+  margin-bottom: 30px;
+}
+
+.chatroom-after-profile-image {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.chatroom-after-header h2 {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333333;
+}
+
+.chatroom-after-feedback {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  margin-bottom: 30px;
+}
+
+.chatroom-after-feedback-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.chatroom-after-feedback-option:hover {
+  transform: scale(1.1);
+}
+
+.chatroom-after-feedback-image {
+  width: 150px;
+  height: 150px;
+  margin-bottom: 10px;
+}
+
+.chatroom-after-feedback p {
+  font-size: 16px;
+  color: #555555;
+}
+
+.chatroom-after-fridge-status {
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+}
+
+.chatroom-after-fridge-status h3 {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.chatroom-after-fridge-status p {
+  font-size: 16px;
+  color: #555555;
+  margin: 5px 0;
+}
