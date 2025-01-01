@@ -6,10 +6,10 @@ interface User {
   userName: string;
   userEmail: string;
   userNickname: string;
-  userPassword: string; // 요거슨 보안관리 주의
   userPhone: string;
   userAddress: string;
-  userProfile: string | null;
+  userProfile: string;
+  userKindness: number;
 }
 
 interface UserContextType {
@@ -19,6 +19,15 @@ interface UserContextType {
   setAccessToken: (token: string | null) => void;
   fetchUserData: () => Promise<void>;
   updateUserInfo: (updatedUser: Partial<User>) => Promise<void>;
+  updateUserInfoWithFile: (
+    userUpdateDto: {
+      userNickname: string;
+      userPassword: string;
+      userPhone: string;
+      userAddress: string;
+    },
+    userProfileFile: File | null
+  ) => Promise<User>; // 반환 타입을 `Promise<User>`로 수정
   logout: () => void;
 }
 
@@ -64,57 +73,66 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     }
 
     try {
-      console.log("Updating user info:", updatedUser); // 전송 데이터 로그
+      console.log("Updating user info:", updatedUser);
       const response = await axios.put(
         "http://localhost:8080/api/user/info",
         updatedUser,
         {
-          // headers: { Authorization: `Bearer ${accessToken}` },
           withCredentials: true,
         }
       );
 
       if (response.status === 200) {
+        console.log("User info updated successfully:", response.data);
         setUser((prevUser) => ({
           ...prevUser!,
-          ...updatedUser,
+          ...updatedUser, // 업데이트된 정보 반영
         }));
-        // const fetchUserData = async () => {
-        //   if (!accessToken) {
-        //     console.warn("No access token available.");
-        //     return;
-        //   }
-
-        //   try {
-        //     console.log("Sending request with token:", accessToken); // 디버깅용 로그
-
-        //     const response = await axios.get<any>(
-        //       "http://localhost:8080/api/user/info",
-        //       {
-        //         withCredentials: true,
-        //       }
-        //     );
-
-        // if (
-        //   typeof response.data === "string" &&
-        //   response.data.includes("<html>")
-        // ) {
-        //   console.error("Unexpected HTML response. Authentication failed.");
-        //   logout();
-        //   return;
-        // }
-        // setUser((prevUser) => ({
-        //   ...prevUser!,
-        //   ...updatedUser, // 업데이트된 정보 반영
-        // }));
-
-        // setUser(response.data); // 사용자 데이터 설정
-        console.log("User data updated:", response.data);
       } else {
         console.warn("Unexpected server response:", response);
       }
     } catch (error) {
       console.error("Failed to update user info:", error);
+      throw error;
+    }
+  };
+
+  const updateUserInfoWithFile = async (
+    userUpdateDto: {
+      userNickname: string;
+      userPassword: string;
+      userPhone: string;
+      userAddress: string;
+    },
+    userProfileFile: File | null
+  ): Promise<User> => {
+    const formData = new FormData();
+
+    formData.append(
+      "userUpdateDto",
+      new Blob([JSON.stringify(userUpdateDto)], { type: "application/json" })
+    );
+
+    if (userProfileFile) {
+      formData.append("userProfile", userProfileFile);
+    }
+
+    try {
+      const response = await axios.put<User>(
+        "http://localhost:8080/api/user/info",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
+      );
+
+      return response.data; // API에서 반환된 `User` 객체 반환
+    } catch (error) {
+      console.error("Failed to update user info with file:", error);
+      throw error; // 에러 전달
     }
   };
 
@@ -135,6 +153,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
         setAccessToken,
         fetchUserData,
         updateUserInfo,
+        updateUserInfoWithFile, // `Promise<User>` 반환
         logout,
       }}
     >

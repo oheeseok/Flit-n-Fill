@@ -1,8 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-// import profileImg from "../../assets/images/profilesample.png";
 
-const profileImg =
+const DEFAULT_PROFILE_IMAGE =
   "https://flitnfill.s3.ap-northeast-2.amazonaws.com/default-img/recipe-step-default-img.png";
 
 const Container = styled.div`
@@ -38,6 +37,9 @@ function ProfileImageUploader({
   onChangeImage,
   uploadedImage,
 }: ProfileUploaderProps) {
+  // 기본 이미지 설정
+  const imageToDisplay = uploadedImage || DEFAULT_PROFILE_IMAGE;
+
   const onChangeFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -54,7 +56,7 @@ function ProfileImageUploader({
   return (
     <Container>
       <MyProfileImg
-        src={uploadedImage || profileImg}
+        src={imageToDisplay} // 기본 이미지 또는 업로드된 이미지
         alt="프로필 이미지"
         onClick={() => document.getElementById("file-input")?.click()}
       />

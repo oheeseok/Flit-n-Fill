@@ -6,16 +6,16 @@ import ProfileImageUploader from "../components/main/ProfileUploader"; // Profil
 
 const MyPage: React.FC = () => {
   // 상태 관리
-  const { user, fetchUserData, updateUserInfo } = useUser();
-  const [nickname, setNickname] = useState<string>("");
-  const [phone, setPhone] = useState<string>("");
-  const [address, setAddress] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+  const { user, fetchUserData, updateUserInfoWithFile } = useUser();
+  const [nickname, setNickname] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [password, setPassword] = useState("");
   const [profileImage, setProfileImage] = useState<string | null>(null);
-
+  const [selectedFile, setSelectedFile] = useState<File | null>(null); // 파일 상태 추가
   // 기본 프로필 이미지 URL
-  const DEFAULT_PROFILE_IMAGE =
-    "https://flitnfill.s3.ap-northeast-2.amazonaws.com/default-img/recipe-step-default-img.png";
+  // const DEFAULT_PROFILE_IMAGE =
+  //   "https://flitnfill.s3.ap-northeast-2.amazonaws.com/default-img/recipe-step-default-img.png";
 
   // 컴포넌트가 마운트될 때 사용자 데이터 초기화
   useEffect(() => {
@@ -30,40 +30,66 @@ const MyPage: React.FC = () => {
 
   useEffect(() => {
     if (user) {
-      console.log("User data loaded:", user);
       setNickname(user.userNickname || "");
       setPhone(user.userPhone || "");
       setAddress(user.userAddress || "");
-      setProfileImage(user.userProfile || DEFAULT_PROFILE_IMAGE);
+      setProfileImage(user.userProfile || null);
     }
   }, [user]);
-
   // 이벤트 핸들러
   const handleEditProfile = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const userUpdateDto = {
+      userNickname: nickname,
+      userPassword: password,
+      userPhone: phone,
+      userAddress: address,
+    };
+
     try {
-      await updateUserInfo({
-        userNickname: nickname,
-        userPhone: phone,
-        userAddress: address,
-        userProfile: profileImage,
-        userPassword: password,
-      });
+      const updatedUser = await updateUserInfoWithFile(
+        userUpdateDto,
+        selectedFile
+      );
+      console.log("Updated user:", updatedUser);
+
       Swal.fire({
         icon: "success",
         title: "프로필 업데이트 완료",
         text: "프로필 정보가 성공적으로 업데이트되었습니다.",
         confirmButtonText: "확인",
       });
+
+      setProfileImage(updatedUser.userProfile); // 상태 갱신
     } catch (error) {
+      console.error("Failed to update profile:", error);
       Swal.fire({
         icon: "error",
         title: "프로필 업데이트 실패",
         text: "오류가 발생했습니다. 다시 시도해주세요.",
         confirmButtonText: "확인",
       });
-      console.error("Failed to update profile:", error);
     }
+  };
+  const handleImageChange = (imageBase64: string) => {
+    setProfileImage(imageBase64);
+
+    // Base64 데이터를 파일 객체로 변환
+    const base64ToFile = (base64: string, filename: string) => {
+      const arr = base64.split(",");
+      const mime = arr[0].match(/:(.*?);/)?.[1] || "image/jpeg";
+      const bstr = atob(arr[1]);
+      let n = bstr.length;
+      const u8arr = new Uint8Array(n);
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      return new File([u8arr], filename, { type: mime });
+    };
+
+    const file = base64ToFile(imageBase64, "uploaded-profile-image.jpg");
+    setSelectedFile(file);
   };
 
   const handleDeleteID = () => {
@@ -103,8 +129,8 @@ const MyPage: React.FC = () => {
         <div className="mypage-profile-picture">
           {/* ProfileImageUploader 컴포넌트 사용 */}
           <ProfileImageUploader
-            onChangeImage={(image) => setProfileImage(image)}
-            uploadedImage={profileImage || DEFAULT_PROFILE_IMAGE}
+            onChangeImage={handleImageChange} // Base64 데이터를 받아 처리
+            uploadedImage={profileImage}
           />
         </div>
         <form className="mypage-form" onSubmit={handleEditProfile}>
