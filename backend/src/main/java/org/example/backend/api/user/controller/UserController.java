@@ -50,7 +50,8 @@ public class UserController {
         try {
             UserLoginResponse login = userService.login(userLoginDto, response);
 
-            return ResponseEntity.status(HttpStatus.OK).body("로그인에 성공하였습니다.");
+//            return ResponseEntity.status(HttpStatus.OK).body("로그인에 성공하였습니다.");
+            return ResponseEntity.status(HttpStatus.OK).body(login);
         } catch (LoginFailedException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {

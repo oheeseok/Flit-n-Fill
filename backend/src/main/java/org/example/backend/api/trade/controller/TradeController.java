@@ -54,10 +54,10 @@ public class TradeController {
         tradeService.changeTradeStatus(tradeRoomId, status);
 
         // 거래 완료 시 만족도 평가 페이지로 리디렉션
-        if ("COMPLETED".equals(status)) {
-            URI feedbackUri = URI.create("/feedback"); // 만족도 평가 페이지 경로
-            return ResponseEntity.status(HttpStatus.SEE_OTHER).location(feedbackUri).build();
-        }
+//        if ("COMPLETED".equals(status)) {
+//            URI feedbackUri = URI.create("/feedback"); // 만족도 평가 페이지 경로
+//            return ResponseEntity.status(HttpStatus.SEE_OTHER).location(feedbackUri).build();
+//        }
 
         return ResponseEntity.noContent().build(); // 기본적으로 204 반환
     }

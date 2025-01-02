@@ -1,22 +1,34 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 import Icon from "../../assets/icon.png";
 import "../../styles/common/Header.css";
-import Swal from "sweetalert2";
+import NotificationPopup from "../../pages/NotificationPopup";
 
 const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [showNotification, setShowNotification] = useState<boolean>(false);
   const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+
   const navigate = useNavigate();
+
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
+    const userProfile = localStorage.getItem("userProfile");
+
     if (token) {
       setIsLoggedIn(true);
     }
-  }, []);
 
+    // userProfile이 null이면 기본 아이콘, 아니면 userProfile에 저장된 이미지 불러오기
+    if (userProfile !== "undefined" && userProfile !== null) {
+      setProfileImage(userProfile);
+    } else {
+      setProfileImage("/assets/user-icon.png"); // 기본 아이콘
+    }
+  }, []);
   const toggleNotification = () => {
     setShowNotification((prev) => !prev);
   };
@@ -45,74 +57,74 @@ const Header = () => {
     });
   };
 
+  const handleMenuClick = () => {
+    toggleUserMenu();
+  }
+
   return (
-    <div className="header">
-      <Link to="/" className="logo">
-        <img src={Icon} alt="Flit-n-Fill" />
-      </Link>
+      <div className="header">
+        <Link to="/" className="logo">
+          <img src={Icon} alt="Flit-n-Fill" />
+        </Link>
 
-      <ul className="headermenu">
-        <Link to="/fridge">fridge</Link>
-        <Link to="/recipe">recipe</Link>
-        <Link to="/community">community</Link>
-        <Link to="/cart">cart</Link>
+        <ul className="headermenu">
+          <Link to="/fridge">fridge</Link>
+          <Link to="/recipe">recipe</Link>
+          <Link to="/community">community</Link>
+          <Link to="/cart">cart</Link>
 
-        {/* 로그인 상태에 따라 메뉴 다르게 표시 */}
-        {isLoggedIn ? (
-          <>
-            <a
-              href="#"
-              className="header-notification"
-              onClick={toggleNotification}
-            >
-              <img src="/assets/notification-icon.png" alt="notification" />
-            </a>
-            {/* 알림창 */}
-            {showNotification && (
-              <div className="header-notification-popup">
-                <p>New notification!</p>
-                <p>No new messages</p>
-              </div>
-            )}
+          {/* 로그인 상태에 따라 메뉴 다르게 표시 */}
+          {isLoggedIn ? (
+              <>
+                <a
+                    href="#"
+                    className="header-notification"
+                    onClick={toggleNotification}
+                >
+                  <img src="/assets/notification-icon.png" alt="notification" />
+                </a>
+                {/* 알림 팝업 */}
+                {showNotification && (
+                    <NotificationPopup setShowNotification={setShowNotification} />
+                )}
 
-            {/* 사용자 메뉴 버튼 */}
-            <a href="#" className="header-user" onClick={toggleUserMenu}>
-              <img src="/assets/user-icon.png" alt="user" />
-            </a>
-            {/* 사용자 메뉴창 */}
-            {showUserMenu && (
-              <div className="header-user-menu">
-                <ul>
-                  <li>
-                    <Link to="/mypage">회원 정보 수정</Link>
-                  </li>
-                  <li>
-                    <Link to="#">내 게시글 보기</Link>
-                  </li>
-                  <li>
-                    <Link to="#">내 거래글 보기</Link>
-                  </li>
-                  <li>
-                    <Link to="#">내 레시피 보기</Link>
-                  </li>
-                  <li>
-                    <a href="#" onClick={handleLogout}>
-                      Logout
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            )}
-          </>
-        ) : (
-          <>
-            <Link to="/signin">sign in</Link>
-            <Link to="/signup">sign up</Link>
-          </>
-        )}
-      </ul>
-    </div>
+                {/* 사용자 메뉴 버튼 */}
+                <a href="#" className="header-user" onClick={toggleUserMenu}>
+                  <img src={profileImage || "/assets/user-icon.png"} alt="user" />
+                </a>
+                {/* 사용자 메뉴창 */}
+                {showUserMenu && (
+                    <div className="header-user-menu">
+                      <ul>
+                        <li>
+                          <Link to="/mypage" onClick={handleMenuClick}>회원 정보 수정</Link>
+                        </li>
+                        <li>
+                          <Link to="#" onClick={handleMenuClick}>내 게시글 보기</Link>
+                        </li>
+                        <li>
+                          <Link to="#" onClick={handleMenuClick}>내 거래글 보기</Link>
+                        </li>
+                        <li>
+                          <Link to="#" onClick={handleMenuClick}>내 레시피 보기</Link>
+                        </li>
+                        <li>
+                          <a href="#" onClick={handleLogout}>
+                            Logout
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
+                )}
+              </>
+          ) : (
+              <>
+                <Link to="/signin">sign in</Link>
+                <Link to="/signup">sign up</Link>
+              </>
+          )}
+        </ul>
+      </div>
   );
 };
-
 export default Header;

@@ -16,6 +16,9 @@ import org.example.backend.api.user.repository.UserRepository;
 import org.example.backend.exceptions.RecipeNotFoundException;
 import org.example.backend.exceptions.UnauthorizedException;
 import org.example.backend.exceptions.UserNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -56,18 +59,17 @@ public class RecipeService {
     log.info("setRecipesUserIdToNull: Updated recipes with userId {} to null", userId);
   }
 
-  public List<RecipeSimpleDto> getAllRecipes(Long userId) {
+  public Page<RecipeSimpleDto> getAllRecipes(Long userId, int page, int size) {
     List<String> bookmarkedRecipeIds = bookmarkedRecipeRepository.findRecipeIdsByUserId(userId);
-    List<Recipe> recipes = recipeRepository.findAll(Sort.by(Sort.Direction.DESC, "recipeCreatedDate"));
-    return recipes.stream()
-        .map(recipe -> {
+    Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "recipeCreatedDate"));
+    Page<Recipe> recipePage = recipeRepository.findAll(pageable);
+    return recipePage.map(recipe -> {
           User user = recipe.getUserId() != null ? userRepository.findById(recipe.getUserId()).orElse(null) : null;
           // Recipe -> RecipeSimpleDto로 변환
           RecipeSimpleDto recipeSimpleDto = RecipeSimpleDto.of(recipe, user);
           recipeSimpleDto.setRecipeIsBookmarked(bookmarkedRecipeIds.contains(recipeSimpleDto.getRecipeId()));
           return recipeSimpleDto;
-        })
-        .collect(Collectors.toList());
+        });
   }
 
   /**

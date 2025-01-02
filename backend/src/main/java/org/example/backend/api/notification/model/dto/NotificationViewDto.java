@@ -12,6 +12,7 @@ import org.example.backend.enums.NotificationType;
 @AllArgsConstructor
 @NoArgsConstructor
 public class NotificationViewDto {
+    private Long notificationId;
     private NotificationType notificationType;
     private String notificationMessage;
     private Long tradeRequestId;
@@ -20,6 +21,7 @@ public class NotificationViewDto {
 
     public static NotificationViewDto of(Notification n) {
         NotificationViewDto dto = new NotificationViewDto();
+        dto.setNotificationId(n.getNotificationId());
         dto.setNotificationType(n.getNotificationType());
         dto.setNotificationMessage(n.getNotificationMessage());
         dto.setNotificationIsRead(n.isNotificationIsRead());

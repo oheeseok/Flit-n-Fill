@@ -62,11 +62,40 @@ const Fridge: React.FC = () => {
   };
 
   // 저장 버튼 클릭
-  const handleSaveEdit = () => {
+  const handleSaveEdit = (): void => {
     if (editingItemId !== null) {
-      let updatedItem: Partial<FridgeItem>;
-      updatedItem = {
-        // ...fridgeItems.find((item) => item.id === editingItemId)!,
+      // 유효성 검사 함수
+      const validateInput = (): boolean => {
+        const errorMessages = [
+          {
+            condition: editedQuantity === "" || editedQuantity === 0,
+            message: "수량을 입력해주세요.",
+          },
+          {
+            condition: new Date(editedExpirationDate) <= new Date(),
+            message: "소비기한은 오늘 이후 날짜로 설정해야 합니다."
+          }
+        ];
+  
+        for (const { condition, message } of errorMessages) {
+          if (condition) {
+            Swal.fire({
+              icon: "error",
+              title: "입력 오류",
+              text: message,
+            });
+            return false;
+          }
+        }
+  
+        return true;
+      };
+  
+      // 유효성 검사 통과하지 못하면 중단
+      if (!validateInput()) return;
+  
+      let updatedItem: Partial<FridgeItem> = {
+        id: editingItemId,
         quantity: editedQuantity === "" ? 0 : editedQuantity,
         unit: editedUnit,
         expirationDate: editedExpirationDate,
@@ -74,9 +103,27 @@ const Fridge: React.FC = () => {
         storageMethod: editedStorageMethod,
         remarks: editedRemarks,
       };
-
-      updateFridgeItem(editingItemId, updatedItem); // number 타입 id로 업데이트
-
+  
+      // 업데이트된 항목 전송
+      updateFridgeItem(updatedItem)
+        .then(() => {
+          // 성공 시 알림
+          Swal.fire({
+            icon: "success",
+            title: "수정 완료",
+            text: "냉장고 항목이 수정되었습니다.",
+          });
+        })
+        .catch((error) => {
+          // 실패 시 알림
+          Swal.fire({
+            icon: "error",
+            title: "수정 실패",
+            text: "냉장고 항목 수정에 실패했습니다.",
+          });
+          console.error("Error updating fridge item", error);
+        });
+  
       setEditingItemId(null);
     }
   };

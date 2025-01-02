@@ -3,6 +3,7 @@ import axios from "axios"; // DB와 통신할 때 사용할 라이브러리
 
 // 사용자 타입 정의
 interface User {
+  userId: number;
   userName: string;
   userEmail: string;
   userNickname: string;
@@ -52,8 +53,11 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
       const response = await axios.get<User>(
         "http://localhost:8080/api/user/info",
         {
-          // headers: { Authorization: `Bearer ${accessToken}` }, // Authorization 헤더 추가
           withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
+          },
         }
       );
 
@@ -79,6 +83,10 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
         updatedUser,
         {
           withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
+          },
         }
       );
 
@@ -141,6 +149,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     setUser(null);
     setAccessToken(null);
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("userEmail");
     alert("로그아웃 되었습니다.");
   };
 
