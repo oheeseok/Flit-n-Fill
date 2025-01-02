@@ -13,22 +13,39 @@ const Header = () => {
 
   const navigate = useNavigate();
 
-
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    const userProfile = localStorage.getItem("userProfile");
-
-    if (token) {
-      setIsLoggedIn(true);
-    }
-
-    // userProfile이 null이면 기본 아이콘, 아니면 userProfile에 저장된 이미지 불러오기
-    if (userProfile !== "undefined" && userProfile !== null) {
-      setProfileImage(userProfile);
-    } else {
-      setProfileImage("/assets/user-icon.png"); // 기본 아이콘
-    }
+    // storage 이벤트에서 사용할 함수 정의
+    const handleStorageChange = () => {
+      const token = localStorage.getItem("accessToken");
+      const userProfile = localStorage.getItem("userProfile");
+  
+      // 토큰이 있을 경우 로그인 상태로 설정
+      if (token) {
+        setIsLoggedIn(true);
+      } else {
+        setIsLoggedIn(false);
+      }
+  
+      // userProfile이 null이면 기본 아이콘, 아니면 userProfile에 저장된 이미지 불러오기
+      if (userProfile !== "undefined" && userProfile !== null) {
+        setProfileImage(userProfile);
+      } else {
+        setProfileImage("/assets/user-icon.png"); // 기본 아이콘
+      }
+    };
+  
+    // storage 이벤트 리스너 추가
+    window.addEventListener("storage", handleStorageChange);
+  
+    // 초기 상태 확인
+    handleStorageChange();
+  
+    // cleanup: 컴포넌트가 언마운트되면 리스너 제거
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, []);
+
   const toggleNotification = () => {
     setShowNotification((prev) => !prev);
   };
@@ -49,7 +66,7 @@ const Header = () => {
       cancelButtonText: "취소",
     }).then((result) => {
       if (result.isConfirmed) {
-        localStorage.removeItem("accessToken");
+        localStorage.clear();
         setIsLoggedIn(false);
         Swal.fire("로그아웃 완료", "로그아웃 되었습니다.", "success");
         navigate("/");

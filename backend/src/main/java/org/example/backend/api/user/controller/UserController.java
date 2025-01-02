@@ -48,6 +48,7 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserLoginDto userLoginDto, HttpServletResponse response) {
         try {
+            log.info("login email: {}", userLoginDto.getUserEmail());
             UserLoginResponse login = userService.login(userLoginDto, response);
 
 //            return ResponseEntity.status(HttpStatus.OK).body("로그인에 성공하였습니다.");
