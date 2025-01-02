@@ -186,6 +186,7 @@ public class RecipeService {
     for (int i = 0; i < newRecipeSteps.size(); i++) {
       RecipeStepDto newStep = newRecipeSteps.get(i);
       MultipartFile newPhoto = stepPhotos.get(i);
+      String backupPhotoUrl = "";
 
       if (i < oldRecipeSteps.size()) {
         RecipeStepDto oldStep = oldRecipeSteps.get(i);
@@ -193,7 +194,9 @@ public class RecipeService {
 
         if (oldPhotoUrl != null && !oldPhotoUrl.isEmpty() && !oldPhotoUrl.equals(RECIPE_STEP_DEFAULT_IMG_URL)) {
 //          log.info("기존 사진 삭제: {}", oldPhotoUrl);
-          s3Service.deleteFile(oldPhotoUrl);
+//          s3Service.deleteFile(oldPhotoUrl);
+          log.info("updateRecipe - 기존 사진 삭제 안함");
+          backupPhotoUrl = oldPhotoUrl;
         }
       }
 
@@ -202,7 +205,8 @@ public class RecipeService {
         newStep.setPhoto(newPhotoUrl);
 //        log.info("새 사진 업로드 완료: {}", newPhotoUrl);
       } else {
-        newStep.setPhoto(RECIPE_STEP_DEFAULT_IMG_URL);
+//        newStep.setPhoto(RECIPE_STEP_DEFAULT_IMG_URL);
+        newStep.setPhoto(backupPhotoUrl);
       }
     }
 
