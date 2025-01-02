@@ -10,7 +10,7 @@ const Cart = () => {
   const getMyCart = async () => {
     try {
       const response = await axios.get("/api/my-fridge/shoppingcart", {
-        headers: { "Content-Type": "application/json" },
+        withCredentials: true,
       });
       // setInputText(response.data.join("\n")); // textarea에 표시할 텍스트로 변환
       setLines(response.data); // textarea에 표시할 텍스트로 변환
@@ -43,7 +43,7 @@ const Cart = () => {
   // };
 
   // 텍스트 입력 처리 함수
-  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputText(e.target.value);
   };
 
@@ -70,7 +70,7 @@ const Cart = () => {
         "/api/my-fridge/shoppingcart", // 백엔드 API 경로
         lines, // 리스트를 전송
         {
-          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
         }
       );
       console.log("response: ", response);
@@ -109,7 +109,7 @@ const Cart = () => {
               className="cart-input"
               value={inputText}
               placeholder="사야할 재료를 입력해주세요."
-              onChange={handleInputChange}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange(e)}
             />
             <button className="add-button" onClick={handleAddLine}>
               추가
