@@ -26,6 +26,7 @@ const AdminPage = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true); // 로딩 상태 관리
     const [requests, setRequests] = useState<RequestDetailDto[]>([]); // 요청 목록 (빈 배열로 초기화)
+    const [responseMessage, setResponseMessage] = useState<string>(''); // 수락/거절 메시지 상태
 
 
     // 요청 목록 가져오기
@@ -113,6 +114,11 @@ const AdminPage = () => {
         }
     };
 
+    // 메시지 입력 상태 관리
+    const handleMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setResponseMessage(event.target.value);
+    };
+
     if (loading) {
         return <div>Loading...</div>; // 로딩 중인 경우 표시
     }
@@ -144,19 +150,25 @@ const AdminPage = () => {
                                     <p><strong>Response Status:</strong> {request.responseStatus}</p>
                                     <p><strong>Response Message:</strong> {request.responseMessage}</p>
 
-                                    {/* 수락/거절 버튼 */}
+                                    {/* 수락/거절 메시지 입력란 */}
                                     <div>
                                         <h4>Respond to Request</h4>
+                                        <input
+                                            type="text"
+                                            value={responseMessage}
+                                            onChange={handleMessageChange}
+                                            placeholder="응답 메세지를 입력해주세요."
+                                        />
                                         <button
                                             onClick={() =>
-                                                handleUpdateRequestStatus(request.requestId, "ACCEPTED", "Request accepted.")
+                                                handleUpdateRequestStatus(request.requestId, "ACCEPTED", responseMessage)
                                             }
                                         >
                                             Accept
                                         </button>
                                         <button
                                             onClick={() =>
-                                                handleUpdateRequestStatus(request.requestId, "DENIED", "Request rejected.")
+                                                handleUpdateRequestStatus(request.requestId, "DENIED", responseMessage)
                                             }
                                         >
                                             Reject
