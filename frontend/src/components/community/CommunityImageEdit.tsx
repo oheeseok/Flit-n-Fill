@@ -36,31 +36,10 @@ function CommunityImageEdit({
 }: CommunityImageEditProps) {
   const onChangeFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    // if (file) {
-    //   const reader = new FileReader();
-    //   reader.onloadend = () => {
-    //     if (reader.result) {
-    //       onChangeImage(File);
-    //     }
-    //   };
-    //   reader.readAsDataURL(file);
-    // }
     if (file) {
       onChangeImage(file)
     }
   };
-
-  // 안전하게 `URL.createObjectURL` 호출
-  const imageSrc = uploadedImage
-  ? (() => {
-      try {
-        return URL.createObjectURL(uploadedImage);
-      } catch (error) {
-        console.error("Error creating object URL:", error);
-        return sample; // 기본 이미지로 대체
-      }
-    })()
-  : sample;
 
   return (
     <Container>
