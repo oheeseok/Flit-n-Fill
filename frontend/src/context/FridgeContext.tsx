@@ -135,11 +135,10 @@ export const FridgeProvider = ({ children }: { children: React.ReactNode }) => {
       const response = await axios.get("http://localhost:8080/api/my-fridge", {
         withCredentials: true,
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
-          'userEmail': localStorage.getItem('userEmail')
-        }
-      }
-    ); // 서버에서 데이터를 받아오는 API 경로
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          userEmail: localStorage.getItem("userEmail"),
+        },
+      }); // 서버에서 데이터를 받아오는 API 경로
       // 서버에서 받은 데이터가 리스트이므로, 각 아이템을 변환하여 새로운 리스트로 만듬
       const transformedItems = response.data.map((foodDetail: FoodDetailDto) =>
         convertToFridgeItem(foodDetail)
@@ -176,7 +175,13 @@ export const FridgeProvider = ({ children }: { children: React.ReactNode }) => {
       const response = await axios.post(
         "http://localhost:8080/api/my-fridge",
         dto,
-        { withCredentials: true }
+        {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
+          },
+        }
       ); // 서버에 아이템 추가
       setFridgeItems((prevItems) => [...prevItems, response.data]);
     } catch (error) {
@@ -189,6 +194,10 @@ export const FridgeProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       await axios.delete(`http://localhost:8080/api/my-fridge/${id}`, {
         withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          userEmail: localStorage.getItem("userEmail"),
+        },
       }); // 서버에서 아이템 삭제
       setFridgeItems((prevItems) => prevItems.filter((item) => item.id !== id));
       removeFromBucket(id);
@@ -198,25 +207,28 @@ export const FridgeProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   // 냉장고 아이템 업데이트
-  const updateFridgeItem = async (
-    id: number,
-    updatedItem: FridgeItem
-  ) => {
+  const updateFridgeItem = async (id: number, updatedItem: FridgeItem) => {
     const convertedItem = {
       foodCount: updatedItem.quantity,
       foodStorage: updatedItem.storageMethod,
       foodUnit: updatedItem.unit,
       foodProDate: updatedItem.manufactureDate,
       foodExpDate: updatedItem.expirationDate,
-      foodDescription: updatedItem.remarks
-    }
+      foodDescription: updatedItem.remarks,
+    };
 
     try {
       console.log("Updated item", convertedItem);
       await axios.put(
         `http://localhost:8080/api/my-fridge/${id}`,
         convertedItem,
-        { withCredentials: true }
+        {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
+          },
+        }
       ); // 서버에서 아이템 수정
       await fetchFridgeItems();
     } catch (error) {
