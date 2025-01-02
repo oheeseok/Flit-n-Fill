@@ -247,6 +247,11 @@ public class TradeService {
         .orElseThrow(() -> new RequestNotFoundException("tradeRequest not found"));
 
     TaskStatus taskStatus = TaskStatus.valueOf(status);
+
+    if (! tradeRequest.getTradeTaskStatus().equals(TaskStatus.PENDING)) {
+      throw new TaskStatusNotPendingException("이미 수락 또는 거절한 요청입니다.");
+    }
+
     tradeRequest.setTradeTaskStatus(taskStatus);    // ACCEPTED or DENIED
     tradeRequestRepository.save(tradeRequest);
 
