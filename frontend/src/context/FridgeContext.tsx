@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
-import { FoodCategory, FoodStorage } from "../components/enum";
 
 // 백엔드에서 받은 FoodDetailDto 타입의 데이터
 interface FoodDetailDto {
@@ -102,7 +101,7 @@ interface FridgeContextType {
   bucketItems: FridgeItem[];
   addFridgeItem: (item: FridgeItem) => void;
   removeFridgeItem: (id: number) => void;
-  updateFridgeItem: (id: number, updatedItem: Partial<FridgeItem>) => void;
+  updateFridgeItem: (updatedItem: Partial<FridgeItem>) => Promise<void>;
   filterByStorageMethod: (
     method: "REFRIGERATED" | "FROZEN" | "ROOM_TEMPERATURE"
   ) => FridgeItem[];
@@ -117,7 +116,7 @@ const FridgeContext = createContext<FridgeContextType>({
   bucketItems: [],
   addFridgeItem: () => {},
   removeFridgeItem: () => {},
-  updateFridgeItem: () => {},
+  updateFridgeItem: async () => {},
   filterByStorageMethod: () => [],
   addToBucket: () => {},
   removeFromBucket: () => {},
@@ -199,10 +198,10 @@ export const FridgeProvider = ({ children }: { children: React.ReactNode }) => {
 
   // 냉장고 아이템 업데이트
   const updateFridgeItem = async (
-    id: number,
-    updatedItem: FridgeItem
+    updatedItem: Partial<FridgeItem>
   ) => {
     const convertedItem = {
+      foodId: updatedItem.id,
       foodCount: updatedItem.quantity,
       foodStorage: updatedItem.storageMethod,
       foodUnit: updatedItem.unit,
@@ -212,9 +211,8 @@ export const FridgeProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     try {
-      console.log("Updated item", convertedItem);
       await axios.put(
-        `http://localhost:8080/api/my-fridge/${id}`,
+        `http://localhost:8080/api/my-fridge/${convertedItem.foodId}`,
         convertedItem,
         { withCredentials: true }
       ); // 서버에서 아이템 수정
