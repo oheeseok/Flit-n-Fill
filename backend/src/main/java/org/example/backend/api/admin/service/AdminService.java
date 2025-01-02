@@ -17,6 +17,7 @@ import org.example.backend.enums.NotificationType;
 import org.example.backend.enums.RequestType;
 import org.example.backend.enums.TaskStatus;
 import org.example.backend.exceptions.RequestNotFoundException;
+import org.example.backend.exceptions.TaskStatusNotPendingException;
 import org.example.backend.exceptions.UserNotFoundException;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -58,12 +59,19 @@ public class AdminService {
         Request request = requestRepository.findById(requestId)
                 .orElseThrow(() -> new RequestNotFoundException("Request not found"));
 
+//         요청 처리 한번만 가능하게 설정
+        if (!request.getResponseStatus().equals(TaskStatus.PENDING)) {
+            throw new TaskStatusNotPendingException("대기 중인 요청이 아닙니다.");
+        }
+
         TaskStatus taskStatus = TaskStatus.valueOf(adminResponseDto.getResponseStatus().toUpperCase());
         request.setResponseStatus(taskStatus);
         request.setResponseMessage(adminResponseDto.getResponseMessage());
 
+
         Request updated = requestRepository.save(request);
 
+        log.info("request 처리 시작");
         // 요청 유형에 따른 분리된 처리
         if (request.getRequestType().equals(RequestType.ADD_FOOD)) {
             handleFoodRequest(request, taskStatus, adminResponseDto);
@@ -72,6 +80,7 @@ public class AdminService {
         } else {
             throw new IllegalArgumentException("Unsupported request type: " + request.getRequestType());
         }
+        log.info("request 처리 완료");
 
         return RequestDetailDto.of(updated);
     }
