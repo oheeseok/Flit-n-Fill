@@ -4,6 +4,7 @@ import "../styles/common/SignIn.css"; // 스타일 파일 경로는 프로젝트
 
 interface UserLoginResponse {
   accessToken: string;
+  userEamil: string;
 }
 
 const SignIn: React.FC = () => {
@@ -28,6 +29,7 @@ const SignIn: React.FC = () => {
 
       // 로그인 성공 시 받은 토큰을 로컬 스토리지에 저장
       localStorage.setItem("accessToken", response.data.accessToken);
+      localStorage.setItem("userEmail", response.data.userEmail)
 
       console.log(response);
       alert("로그인 성공"); // 로그인 성공 메시지
