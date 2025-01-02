@@ -27,7 +27,7 @@ jobs:
       # 7. application.yml 파일 생성 (Secrets에서 값을 불러옴)
       - name: Create application.yml from Secret
         run: |
-          echo "${{ secrets.APPLICATION_YML }}" > Flit-n-Fill/backend/src/main/resources/application.yml
+          echo "${{ secrets.APPLICATION_YML }}" >> Flit-n-Fill/backend/src/main/resources/application.yml
 
 
       # 3. Gradle 실행 권한 부여
