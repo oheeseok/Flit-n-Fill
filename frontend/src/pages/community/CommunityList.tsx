@@ -70,18 +70,27 @@ const CommunityList = () => {
               </div>
               <div className="recipe-list-box-card-title">{post.postTitle}</div>
               <div className="recipe-list-box-card-detail">
-                {post.userProfile}
+                {post.userProfile ? (
+                    <img
+                      className="recipe-list-box-card-profile-img"
+                      src={post.userProfile}
+                      alt={post.userNickname}
+                    />
+                  ) : (
+                    <p>프로필 이미지 없음</p>
+                  )}
               </div>
               <div className="recipe-list-box-card-detail">
-                {post.userNickname}
+                <strong>작성일: </strong>
+                {new Date(post.postCreatedDate).toLocaleString("ko-KR", {
+                  year: "numeric",
+                  month: "2-digit",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: false,
+                })}
               </div>
-              <div className="recipe-list-box-card-detail">
-                <strong>작성일:</strong> {post.postCreatedDate.toLocaleString()}
-              </div>
-              {/* <div className="recipe-list-box-card-detail">
-                <strong>시간:</strong>{" "}
-                {new Date(post.meetingTime).toLocaleString()}
-              </div> */}
               <div className="recipe-list-box-card-more">
                 <Link to={`/community/detail/${post.postId}`}>Read more</Link>
               </div>
