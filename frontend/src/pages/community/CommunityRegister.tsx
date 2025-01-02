@@ -65,7 +65,11 @@ const CommunityRegister = () => {
         "/api/posts",
         formData,
         {
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: { 
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"), 
+          },
           withCredentials: true,
         }
       );

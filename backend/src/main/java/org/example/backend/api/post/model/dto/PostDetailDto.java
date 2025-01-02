@@ -31,6 +31,7 @@ public class PostDetailDto {
     private String userProfile;
     private String address;
     private Progress progress;
+    private String userEmail;
 
     public static PostDetailDto of(Post post, User user) {
         PostDetailDto dto = new PostDetailDto();
@@ -51,9 +52,11 @@ public class PostDetailDto {
         if (user != null) {
             dto.setUserNickname(user.getUserNickname());
             dto.setUserProfile(user.getUserProfile());
+            dto.setUserEmail(user.getUserEmail());
         } else {
             dto.setUserNickname(null);
             dto.setUserProfile(null);
+            dto.setUserEmail(null);
         }
         return dto;
     }

@@ -20,30 +20,15 @@ interface PostDetailDto {
   userProfile: string;
   address: string;
   progress: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "CANCELED";
+  userEmail: string;
 }
 
 const CommunityDetail = () => {
-  // const { communityData, setCommunityData } = useCommunity(); // 데이터와 설정 함수 가져오기
   const navigate = useNavigate();
   const { postId } = useParams<{ postId: string }>()  // URL에서 postId 가져오기
   const [postDetail, setPostDetail] = useState<PostDetailDto | null>(null)
-
-  // if (!communityData) {
-  //   return <div>데이터가 없습니다. 다시 시도해주세요.</div>;
-  // }
-
-  // const data: PostDetailDto = communityData as PostDetailDto
-
-  // const {
-  //   postTitle,
-  //   postContent,
-  //   meetingPlace,
-  //   meetingTime,
-  //   postPhoto1,
-  //   tradeType,
-  //   writerFoodId,
-  //   proposerFoodListId,
-  // } = data;
+  const currentUserEmail = localStorage.getItem("userEmail")
+  const [requestMade, setRequestMade] = useState<boolean>(false); // 요청 상태
 
   // 게시글 상세 데이터 가져오기
   useEffect(() => {
@@ -51,6 +36,10 @@ const CommunityDetail = () => {
       try {
         const response = await axios.get<PostDetailDto>(`/api/posts/${postId}`, {
           withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
+          },
         });
         setPostDetail(response.data);
       } catch (error) {
@@ -66,13 +55,13 @@ const CommunityDetail = () => {
     if (postId) {
       fetchPostDetail();
     }
-  }, [postId, navigate]);
+  }, [postId, navigate, currentUserEmail]);
 
   if (!postDetail) {
     return <div>로딩 중입니다...</div>;
   }
 
-  const handleRequest = async () => {
+  const handleRequest = async () => {   // 요청하기
     try {
       // 요청 데이터 생성
       const actionRequest = {
@@ -82,10 +71,14 @@ const CommunityDetail = () => {
       await axios.post(`/api/posts/${postId}/request`, actionRequest, {
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          userEmail: localStorage.getItem("userEmail"),
         },
         withCredentials: true,
+        
       });
       Swal.fire("요청 성공", "요청이 성공적으로 처리되었습니다!", "success");
+      setRequestMade(true); // 요청 상태 업데이트
     } catch (error) {
       console.error("요청 실패:", error);
       Swal.fire("요청 실패", "요청 처리 중 오류가 발생했습니다.", "error").then(
@@ -96,8 +89,36 @@ const CommunityDetail = () => {
     }
   };
 
+  const handleCancelRequest = async () => {   // 요청 취소하기
+    try {
+      // 요청 데이터 생성
+      const actionRequest = {
+        action: "CANCEL",
+      };
+  
+      await axios.post(`/api/posts/${postId}/request`, actionRequest, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          userEmail: localStorage.getItem("userEmail"),
+        },
+        withCredentials: true,
+        
+      });
+      Swal.fire("요청 취소", "요청 취소가 성공적으로 처리되었습니다!", "success");
+      setRequestMade(false); // 요청 상태 업데이트
+    } catch (error) {
+      console.error("요청 취소 실패:", error);
+      Swal.fire("요청 취소 실패", "처리 중 오류가 발생했습니다.", "error").then(
+        () => {
+          navigate(`/community/detail/${postId}`);
+        }
+      );
+    }
+  };
+
   const handleEdit = () => {
-    navigate(`/community/edit/${postId}`); // 수정 페이지?로 이동
+    navigate(`/community/edit/${postId}`); // 수정 페이지로 이동
   };
 
   const handleDelete = () => {
@@ -114,6 +135,10 @@ const CommunityDetail = () => {
         try {
           await axios.delete(`/api/posts/${postId}`, {
             withCredentials: true,
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+              userEmail: localStorage.getItem("userEmail"),
+            },
           });
 
         // setCommunityData(null); // Context에서 데이터 초기화
@@ -129,6 +154,8 @@ const CommunityDetail = () => {
       }
     });
   };
+
+  const isAuthor = postDetail.userEmail === currentUserEmail; // 작성자와 현재 사용자 비교
 
   return (
     <div className="community-detail-body">
@@ -162,7 +189,7 @@ const CommunityDetail = () => {
             minute: "2-digit",
           }).format(new Date(postDetail.postCreatedDate))}
         </div>
-        <div className="community-detail-button-container">
+        {isAuthor && (<div className="community-detail-button-container">
           <button className="community-detail-edit-button" onClick={handleEdit}>
             수정
           </button>
@@ -172,7 +199,7 @@ const CommunityDetail = () => {
           >
             삭제
           </button>
-        </div>
+        </div>)}
       </div>
 
       {/* 업로드된 이미지 */}
@@ -215,28 +242,40 @@ const CommunityDetail = () => {
 
       {/* 요청 버튼 */}
       <div className="community-detail-button-container2">
-        {postDetail.progress === "PENDING" ? (
-          <button
-            className="community-detail-button"
-            onClick={handleRequest}
-          >
-            요청하기
-          </button>
-        ) : postDetail.progress === "IN_PROGRESS" ? (
-          <button
-            className="community-detail-button"
-            disabled
-          >
-            진행중
-          </button>
-        ) : postDetail.progress === "COMPLETED" ? (
-          <button
-            className="community-detail-button"
-            disabled
-          >
-            완료
-          </button>
-        ) : null}
+        {/* 본인 게시글이 아닌 경우에만 버튼 표시 */}
+        {!isAuthor && (
+          <>
+            {postDetail.progress === "PENDING" && (
+              requestMade ? (
+                <button
+                  className="community-detail-button"
+                  onClick={handleCancelRequest}
+                >
+                  요청 취소하기
+                </button>
+              ) : (
+                <button
+                  className="community-detail-button"
+                  onClick={handleRequest}
+                >
+                  요청하기
+                </button>
+              )
+            )}
+
+            {postDetail.progress === "IN_PROGRESS" && (
+              <button className="community-detail-button" disabled>
+                거래 진행중
+              </button>
+            )}
+
+            {postDetail.progress === "COMPLETED" && (
+              <button className="community-detail-button" disabled>
+                거래 완료
+              </button>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

@@ -23,6 +23,10 @@ const CommunityEdit = () => {
       try {
         const response = await axios.get(`/api/posts/${postId}`, {
           withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
+          },
         });
         const post = response.data;
 
@@ -91,7 +95,11 @@ const CommunityEdit = () => {
         `/api/posts/${postId}`,
         formData,
         {
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: { 
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
+          },
           withCredentials: true,
         }
       );

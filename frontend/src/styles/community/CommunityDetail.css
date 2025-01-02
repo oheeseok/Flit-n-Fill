@@ -145,3 +145,15 @@
   background-color: #85b573;
   transform: translateY(-2px);
 }
+
+/* disabled 버튼 스타일 */
+.community-detail-button:disabled {
+  cursor: not-allowed; /* 마우스 커서를 '금지'로 변경 */
+  background-color: #cccccc; /* 비활성화된 배경 색상 */
+  color: #666666; /* 비활성화된 텍스트 색상 */
+}
+
+/* disabled 상태에서 hover 제거 */
+.community-detail-button:disabled:hover {
+  background-color: #cccccc; /* 동일한 배경 유지 */
+}
