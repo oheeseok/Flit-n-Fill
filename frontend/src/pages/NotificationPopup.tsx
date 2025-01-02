@@ -1,13 +1,21 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/common/NotificationPopup.css";
 import { useNotification } from "../context/NotificationContext";
 import { NotificationViewDto } from "../interfaces/NotificationInterfaces";
 import { fromEnumToDescription } from "../components/enum";
 
-const NotificationPopup: React.FC = () => {
+interface NotificationPopupProps {
+  setShowNotification: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const NotificationPopup: React.FC<NotificationPopupProps> = ({
+  setShowNotification,
+}) => {
   const { notifications, getNotificationList, markAllAsRead } =
     useNotification();
+
+  const popupRef = useRef<HTMLDivElement>(null); // 팝업 영역을 참조하기 위한 ref
 
   // 알림 목록 가져오기
   useEffect(() => {
@@ -19,6 +27,24 @@ const NotificationPopup: React.FC = () => {
   const unreadNotifications = notifications.filter(
     (notification) => !notification.notificationIsRead
   );
+
+  // 팝업 외부 클릭 시 팝업 닫기
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        popupRef.current &&
+        !popupRef.current.contains(event.target as Node)
+      ) {
+        setShowNotification(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [setShowNotification]);
 
   return (
     <div className="notification-popup">
