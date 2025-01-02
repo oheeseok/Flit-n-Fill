@@ -59,28 +59,22 @@ jobs:
           docker build -t ckdgkim/backendproject:back-${{ env.TAG }} .
           echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
           docker push ckdgkim/backendproject:back-${{ env.TAG }}
-          
 
+      # 7. EC2로 배포
       - name: Deploy to EC2 via Bastion
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.QWE_PEM }}" > ~/.ssh/qwe.pem
           chmod 600 ~/.ssh/qwe.pem
-
           # 베스천 서버로 접속
-          echo "Step 1: Connecting to Bastion server ("${{ vars.PUB_IP_A }}")"
+          echo "Step 1: Connecting to Bastion server (${ { vars.PUB_IP_A }})"
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.ssh/qwe.pem ec2-user@"${{ vars.PUB_IP_A }}" << EOF
-            echo "Connected to Bastion server ("${{ vars.PUB_IP_A }}")"
-
+            echo "Connected to Bastion server (${ { vars.PUB_IP_A }})"
             # 사내 EC2로 접속
-            echo "Step 2: Connecting to internal EC2 ("${{ vars.PRIVATE_IP_A }}")"
+            echo "Step 2: Connecting to internal EC2 (${ { vars.PRIVATE_IP_A }})"
             ssh -i /home/ec2-user/qwe.pem ec2-user@"${{ vars.PRIVATE_IP_A }}" << 'INNER_EOF'
-              echo "Connected to internal EC2 ("${{ vars.PRIVATE_IP_A }}")"
-
-#              # Docker 이미지 가져오기
-#              docker pull ckdgkim/backendproject:back-1
-
-              # Docker 이미지 가져오기 (동적 태그 사용)
+              echo "Connected to internal EC2 (${ { vars.PRIVATE_IP_A }})"
+              # Docker 이미지 가져오기
               docker pull ckdgkim/backendproject:back-${{ env.TAG }}
 
               # 네트워크 생성 (이미 존재하면 무시)
@@ -91,7 +85,7 @@ jobs:
               docker rm backend-container-c || true
 
               # 새 컨테이너 실행
-              docker run  -d --name backend-container \
+              docker run -d --name backend-container \
                 --network mynetwork \
                 -p 8080:8080 \
                 -e DB_HOST=mysql-backend \
