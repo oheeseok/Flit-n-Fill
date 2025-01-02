@@ -125,7 +125,7 @@ const FridgeRegister = () => {
   useEffect(() => {
     // 이름 및 아이콘 업데이트
     if (ingredientType === "COOKED") {
-      setIcon("/assets/instant-food.png"); // 완제품 아이콘
+      setIcon("../../assets/icons/instant-food.png"); // 완제품 아이콘
       return;
     }
     if (selectedDetailCategory) {
@@ -162,24 +162,49 @@ const FridgeRegister = () => {
   ]);
 
   const handleRegister = (): void => {
-    if (!selectedMainCategory || !selectedSubCategory) {
-      Swal.fire({
-        icon: "error",
-        title: "입력 오류",
-        text: "대분류와 중분류를 선택해주세요.",
-      });
-      return;
-    }
-
-    if (!foodListId) {
-      Swal.fire({
-        icon: "error",
-        title: "입력 오류",
-        text: "유효한 식별자를 선택해주세요.",
-      });
-      return;
-    }
-
+    // 유효성 검사 함수
+    const validateInput = (): boolean => {
+      const errorMessages = [
+        {
+          condition: quantity === "" || quantity === 0,
+          message: "수량을 입력해주세요."
+        },
+        {
+          condition: ingredientType !== "COOKED" && (!selectedMainCategory || !selectedSubCategory),
+          message: "대분류와 중분류를 선택해주세요.",
+        },
+        {
+          condition: ingredientType !== "COOKED" && !foodListId,
+          message: "유효한 식별자를 선택해주세요.",
+        },
+        {
+          condition: ingredientType === "COOKED" && !name,
+          message: "음식의 이름을 입력해주세요.",
+        },
+        {
+          condition: new Date(expirationDate) <= new Date(),
+          message: "소비기한은 오늘 이후 날짜로 설정해야 합니다."
+        }
+      ];
+  
+      for (const { condition, message } of errorMessages) {
+        if (condition) {
+          Swal.fire({
+            icon: "error",
+            title: "입력 오류",
+            text: message,
+          });
+          return false;
+        }
+      }
+  
+      return true;
+    };
+  
+    // 유효성 검사 통과하지 못하면 중단
+    if (!validateInput()) return;
+  
+    // 새로운 항목 생성
     const newItem = {
       id: Number(foodListId), // 백엔드에서 제공된 식별자를 사용
       mainCategory: selectedMainCategory,
@@ -196,15 +221,18 @@ const FridgeRegister = () => {
       icon,
       foodListId: Number(foodListId), // 타입 변환
     };
-
-    addFridgeItem(newItem); // FridgeItem에 맞는 객체 전달
-
+  
+    // 항목 추가
+    addFridgeItem(newItem);
+  
+    // 성공 메시지
     Swal.fire({
       icon: "success",
       title: "등록 완료",
       text: "냉장고에 항목이 추가되었습니다.",
     });
-
+  
+    // 폼 초기화
     resetForm();
   };
 
@@ -216,7 +244,7 @@ const FridgeRegister = () => {
     setIngredientType(value);
 
     if (value === "COOKED") {
-      setIcon("/assets/instant-food.png");
+      setIcon("/assets/instant-food.png"); 
       setName("");
       setSelectedMainCategory("");
       setSelectedSubCategory("");
@@ -367,6 +395,7 @@ const FridgeRegister = () => {
             <select
               value={selectedMainCategory}
               onChange={handleMainCategoryChangee}
+              disabled={ingredientType==="COOKED"}
             >
               <option value="">선택</option>
               {Object.keys(categories).map((mainCategory) => (
@@ -433,6 +462,7 @@ const FridgeRegister = () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="재료 이름을 입력하세요"
+              readOnly={ingredientType === "INGREDIENT"}
             />
           </div>
 
@@ -442,8 +472,9 @@ const FridgeRegister = () => {
               <input
                 type="number"
                 value={quantity}
-                onChange={(e) => setQuantity(Number(e.target.value) || "")}
+                onChange={(e) => setQuantity(Number(e.target.value) || 0)}
                 placeholder="수량 입력"
+                min="0"
               />
               <select value={unit} onChange={(e) => setUnit(e.target.value)}>
                 <option value="PIECE">개</option>
