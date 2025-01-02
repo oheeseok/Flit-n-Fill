@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 // import { communityData } from "../../data/communityData"; // 임시 데이터 가져오기
 import "../../styles/community/CommunityList.css";
@@ -16,7 +16,11 @@ interface PostSimpleDto {
   progress: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "CANCELED";
 }
 
-const CommunityList = () => {
+interface CommunityListProps {
+  filter: string; // 'ALL', 'EXCHANGE', 'SHARING'
+}
+
+const CommunityList: React.FC<CommunityListProps> = ({ filter }) => {
   const [posts, setPosts] = useState<PostSimpleDto[]>([]); // 상태로 게시글 목록 관리
   const [loading, setLoading] = useState<boolean>(true); // 로딩 상태 관리
   const [error, setError] = useState<string | null>(null); // 에러 메시지 관리
@@ -26,7 +30,11 @@ const CommunityList = () => {
       try {
         setLoading(true);
         const response = await axios.get("/api/posts", {
-          headers: { withCredentials: true },
+          withCredentials: true,
+          headers: { 
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"), 
+          },
         });
         setPosts(response.data); // 응답 데이터를 상태에 저장
       } catch (err) {
@@ -43,6 +51,11 @@ const CommunityList = () => {
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
 
+  const filteredPosts =
+    filter === "ALL"
+      ? posts
+      : posts.filter((post) => post.tradeType === filter);
+
   return (
     <div className="community-list-body">
       <div className="community-list-header">
@@ -51,7 +64,7 @@ const CommunityList = () => {
       </div>
 
       <div className="recipelistbody">
-        {posts.map((post) => (
+        {filteredPosts.map((post) => (
           <div className="recipe-list-container" key={post.postId}>
             <div className="recipe-list-box-name-title">
               [{post.tradeType === "EXCHANGE" ? "교환" : "나눔"}]

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import SearchBar from "../../components/common/SearchBar";
 import "../../styles/community/Community.css";
 import CommunityRegisterButton from "../../components/community/CommunityRegisterButton";
@@ -5,6 +6,12 @@ import "../../styles/community/CommunityList.css";
 import CommunityList from "./CommunityList";
 
 const Community = () => {
+  const [filter, setFilter] = useState<string>("ALL")   // 상태 관리: 'ALL', 'EXCHANGE', 'SHARING'
+
+  const handleFilterChange = (type: string) => {
+    setFilter(type);
+  };
+
   return (
     <div className="community-page">
       <div className="communitybody">
@@ -37,13 +44,25 @@ const Community = () => {
           </div>
 
           <div className="community-button-group">
-            <button className="community-button">전체</button>
-            <button className="community-button">교환</button>
-            <button className="community-button">나눔</button>
+            <button className="community-button"
+            onClick={() => handleFilterChange("ALL")}
+            >
+              전체
+            </button>
+            <button className="community-button"
+              onClick={() => handleFilterChange("EXCHANGE")}
+            >
+              교환
+            </button>
+            <button className="community-button"
+              onClick={() => handleFilterChange("SHARING")}
+            >
+              나눔
+            </button>
           </div>
 
           {/*  */}
-          <CommunityList />
+          <CommunityList filter={filter} />
         </div>
       </div>
     </div>
