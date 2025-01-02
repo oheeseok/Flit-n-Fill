@@ -7,9 +7,14 @@ import CommunityList from "./CommunityList";
 
 const Community = () => {
   const [filter, setFilter] = useState<string>("ALL")   // 상태 관리: 'ALL', 'EXCHANGE', 'SHARING'
+  const [query, setQuery] = useState<string>("")  // 검색어 관리
 
   const handleFilterChange = (type: string) => {
     setFilter(type);
+  };
+
+  const handleQueryChange = (searchQuery: string) => {
+    setQuery(searchQuery); // 검색어 업데이트
   };
 
   return (
@@ -20,7 +25,7 @@ const Community = () => {
         {/* 실제 컨텐츠 */}
         <div className="community-content">
           <div className="community-toregister-button">
-            <CommunityRegisterButton></CommunityRegisterButton>
+            <CommunityRegisterButton />
           </div>
           <div className="community-title">exchange & sharing</div>
           <div className="community-address">
@@ -40,7 +45,7 @@ const Community = () => {
             </div>
           </div>
           <div className="community-searchbar">
-            <SearchBar />
+            <SearchBar query={query} onQueryChange={handleQueryChange}/>
           </div>
 
           <div className="community-button-group">
@@ -62,7 +67,7 @@ const Community = () => {
           </div>
 
           {/*  */}
-          <CommunityList filter={filter} />
+          <CommunityList filter={filter} query={query} />
         </div>
       </div>
     </div>

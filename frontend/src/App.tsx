@@ -159,7 +159,7 @@ function App() {
             path="/community/list"
             element={
               <Layout>
-                <CommunityList />
+                <CommunityList query="" filter=""/>
               </Layout>
             }
           ></Route>

@@ -16,6 +16,8 @@ interface PostDetailDto {
   meetingTime: string;
   writerFoodId: number;
   proposerFoodListId: number;
+  writerFoodName: string;
+  proposerFoodName: string;
   userNickname: string;
   userProfile: string;
   address: string;
@@ -218,11 +220,11 @@ const CommunityDetail = () => {
 
       {/* 만남 장소 표시 */}
       <div className="community-detail-box-container">
-        <strong>만남 장소:</strong> {postDetail.meetingPlace}
+        <strong>만남 장소: </strong> {postDetail.meetingPlace}
       </div>
       {/* 만남 시간 표시 */}
       <div className="community-detail-box-container">
-        <strong>만남 시간:</strong> 
+        <strong>만남 시간: </strong> 
         {new Intl.DateTimeFormat("ko-KR", {
             year: "numeric",
             month: "2-digit",
@@ -232,13 +234,15 @@ const CommunityDetail = () => {
           }).format(new Date(postDetail.meetingTime))}
       </div>
 
-      {/* 작성자/제안자 음식 ID 표시 */}
+      {/* 작성자/제안자 음식 표시 */}
       <div className="community-detail-box-container">
-        <strong>작성자의 재료 ID:</strong> {postDetail.writerFoodId}
+        <strong>작성자의 재료 : </strong> {postDetail.writerFoodName}
       </div>
-      <div className="community-detail-box-container">
-        <strong>교환 원하는 재료 ID:</strong> {postDetail.proposerFoodListId}
-      </div>
+      { postDetail.tradeType !== "SHARING" && (
+        <div className="community-detail-box-container">
+          <strong>원하는 재료 :</strong> {postDetail.proposerFoodName}
+        </div>
+      )}
 
       {/* 요청 버튼 */}
       <div className="community-detail-button-container2">
