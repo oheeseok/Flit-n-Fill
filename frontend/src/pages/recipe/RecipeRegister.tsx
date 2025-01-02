@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useRecipe } from "../../context/RecipeContext";
-
+// import { useRecipe } from "../../context/RecipeContext";
 import "../../styles/recipe/RecipeRegister.css";
 import RecipeImageUploader from "../../components/recipe/RecipeImageUploader";
 import RecipeStepImageUploader from "../../components/recipe/RecipeStepImageUploader";
@@ -9,27 +8,26 @@ import RecipeDetailButton from "../../components/recipe/RecipeDetailButton";
 import RecipeCancelButton from "../../components/recipe/RecipeCancelButton";
 import Swal from "sweetalert2";
 
-interface RecipeMethod {
+// 레시피 단계의 타입 정의
+interface RecipeStepDto {
   seq: number;
-  photo: string;
+  photo: File | null; // 파일 객체 처리
   description: string;
 }
 
 const RecipeRegister = () => {
   const navigate = useNavigate();
-  const { addRecipe } = useRecipe();
+  // const { addRecipe } = useRecipe();
 
   const [recipeTitle, setRecipeTitle] = useState("");
-  const [recipeImage, setRecipeImage] = useState<string | null>(null);
+  const [recipeImage, setRecipeImage] = useState<File | null>(null); // 메인 이미지 파일
   const [recipeIngredients, setRecipeIngredients] = useState("");
-  const [recipeMethods, setRecipeMethods] = useState<RecipeMethod[]>([
-    { seq: 1, photo: "", description: "" },
+  const [recipeMethods, setRecipeMethods] = useState<RecipeStepDto[]>([
+    { seq: 1, photo: null, description: "" },
   ]);
   const [recipeIsVisibility, setRecipeIsVisibility] = useState(true);
-  const [isBookmarked] = useState(false);
 
-  const handleRegister = () => {
-    // 입력값 유효성 검사
+  const handleRegister = async () => {
     if (!recipeTitle.trim()) {
       Swal.fire({
         icon: "info",
@@ -38,6 +36,7 @@ const RecipeRegister = () => {
       });
       return;
     }
+
     if (!recipeImage) {
       Swal.fire({
         icon: "info",
@@ -46,51 +45,74 @@ const RecipeRegister = () => {
       });
       return;
     }
-    if (!recipeIngredients.trim()) {
+
+    try {
+      const formData = new FormData();
+
+      // 레시피 데이터를 JSON으로 변환
+      const recipeRegisterDto = {
+        recipeTitle,
+        recipeFoodDetails: recipeIngredients,
+        recipeSteps: recipeMethods.map((method) => ({
+          seq: method.seq,
+          description: method.description,
+        })),
+        recipeIsVisibility,
+      };
+
+      // JSON 데이터 추가
+      formData.append("recipeRegisterDto", JSON.stringify(recipeRegisterDto));
+
+      // 메인 이미지 추가
+      if (recipeImage instanceof File) {
+        formData.append("recipeMainPhoto", recipeImage);
+      }
+
+      // 단계별 이미지 추가
+      recipeMethods.forEach((method) => {
+        if (method.photo instanceof File) {
+          formData.append(`recipeStepPhotos`, method.photo);
+        }
+      });
+
+      // API 요청
+      const response = await fetch("/api/recipes", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to register recipe: ${errorText}`);
+      }
+
+      const newRecipe = await response.json();
       Swal.fire({
-        icon: "info",
-        title: "재료를 입력해주세요.",
+        icon: "success",
+        title: "레시피가 성공적으로 등록되었습니다.",
+        confirmButtonText: "확인",
+      }).then(() => {
+        navigate(`/recipe/detail/${newRecipe.recipeId}`);
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "레시피 등록에 실패했습니다.",
         confirmButtonText: "확인",
       });
-      return;
+      console.error("Error registering recipe:", error);
     }
-    for (let step of recipeMethods) {
-      if (!step.description.trim()) {
-        Swal.fire({
-          icon: "info",
-          title: `레시피를 입력해주세요.`,
-          confirmButtonText: "확인",
-        });
-        return;
-      }
-    }
-
-    const newRecipeIndex = addRecipe({
-      recipeTitle: recipeTitle,
-      recipeMainPhoto: recipeImage,
-      recipeFoodDetails: recipeIngredients,
-      recipeSteps: recipeMethods,
-      recipeIsVisibility, // 공개/비공개 상태 추가
-      isBookmarked,
-    });
-
-    // 새로 추가된 레시피의 인덱스에 따라 경로 이동
-    Swal.fire({
-      icon: "success",
-      title: "레시피가 성공적으로 등록되었습니다.",
-      confirmButtonText: "확인",
-    }).then(() => {
-      navigate(`/recipe/detail/${newRecipeIndex}`);
-    });
   };
 
+  // 레시피 단계 추가
   const addRecipeMethod = () => {
     setRecipeMethods((prev) => [
       ...prev,
-      { seq: prev.length + 1, photo: "", description: "" },
+      { seq: prev.length + 1, photo: null, description: "" },
     ]);
   };
 
+  // 레시피 단계 삭제
   const delRecipeMethod = (index: number) => {
     setRecipeMethods((prevMethods) =>
       prevMethods
@@ -99,18 +121,21 @@ const RecipeRegister = () => {
     );
   };
 
-  const handleImageChange = (photo: string) => {
-    setRecipeImage(photo);
+  // 대표 이미지 처리
+  const handleImageChange = (file: File | null) => {
+    setRecipeImage(file);
   };
 
-  const handleStepImageChange = (seq: number, photo: string): void => {
+  // 각 단계별 이미지 처리
+  const handleStepImageChange = (seq: number, file: File | null): void => {
     setRecipeMethods((prevMethods) =>
       prevMethods.map((method, i) =>
-        i === seq ? { ...method, photo } : method
+        i === seq ? { ...method, photo: file } : method
       )
     );
   };
 
+  // 각 단계 설명 처리
   const handleDescriptionChange = (
     seq: number,
     event: React.ChangeEvent<HTMLTextAreaElement>
@@ -131,7 +156,7 @@ const RecipeRegister = () => {
             <input
               type="checkbox"
               className="recipe-register-isvisibility-checkbox"
-              checked={!recipeIsVisibility} // 비공개 체크
+              checked={!recipeIsVisibility}
               onChange={(e) => setRecipeIsVisibility(!e.target.checked)}
             />
             비공개
@@ -146,21 +171,21 @@ const RecipeRegister = () => {
         </div>
         <div className="recipe-register-image">
           <RecipeImageUploader
-            uploadedImage={recipeImage}
+            uploadedImage={
+              recipeImage ? URL.createObjectURL(recipeImage) : null
+            }
             onChangeImage={handleImageChange}
           />
         </div>
       </div>
       <div className="recipe-register-ingredients-container">
         <div className="recipe-register-ingredients-title">Ingredients</div>
-        <div className="recipe-register-ingredients-textbox">
-          <textarea
-            className="recipe-register-ingredients-text"
-            placeholder="재료를 입력해 주세요. ex) 계란 10개, 사과10개"
-            value={recipeIngredients}
-            onChange={(e) => setRecipeIngredients(e.target.value)}
-          ></textarea>
-        </div>
+        <textarea
+          className="recipe-register-ingredients-textbox"
+          placeholder="재료를 입력해 주세요."
+          value={recipeIngredients}
+          onChange={(e) => setRecipeIngredients(e.target.value)}
+        ></textarea>
       </div>
       <div className="recipe-register-method-container">
         <div className="recipe-register-method-title">Recipe Steps</div>
@@ -170,7 +195,9 @@ const RecipeRegister = () => {
             <div className="recipe-register-method-box-img">
               <RecipeStepImageUploader
                 stepIndex={seq}
-                uploadedImage={method.photo}
+                uploadedImage={
+                  method.photo ? URL.createObjectURL(method.photo) : null
+                }
                 onImageChange={handleStepImageChange}
               />
             </div>

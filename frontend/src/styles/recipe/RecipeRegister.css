@@ -168,16 +168,22 @@
   font-family: Ubuntu;
   font-size: 22px;
 }
-.recipe-register-ingredients-textbox textarea {
-  width: 95%;
-  height: 95%;
-  padding: 10px;
-  border: 0px solid #ddd;
+.recipe-register-ingredients-textbox {
+  width: 92%;
+  height: 550px;
+  flex-shrink: 0;
+  padding: 0 10px;
   border-radius: 30px;
-  resize: none; /* 크기 조절 비활성화 */
-  font-size: 16px;
+  border: 1px solid #ddd;
+  border-right: 4px solid var(--light-pink, #ffcbc3);
+  border-bottom: 4px solid var(--light-pink, #ffcbc3);
+  background: #fff;
+  font-size: 18px;
   font-family: "Ubuntu", sans-serif;
   line-height: 1.5;
+  overflow-y: auto;
+  margin-top: 10px;
+  text-align: left;
 }
 
 .recipe-register-method-box textarea {

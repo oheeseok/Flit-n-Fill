@@ -1,19 +1,44 @@
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useRecipe } from "../../context/RecipeContext";
+// import { useRecipe } from "../../context/RecipeContext";
 import "../../styles/recipe/RecipeDetail.css";
 import Swal from "sweetalert2";
-import Sampleimage from "../../assets/images/samplerecipe2.png";
+import axios from "axios";
 
 const RecipeDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const { recipes, setRecipes } = useRecipe(); // setRecipes 가져오기
   const navigate = useNavigate();
-  const recipe = recipes[Number(id)];
 
+  const [recipe, setRecipe] = useState<any | null>(null); // 레시피 상태 관리
+  const [isLoading, setIsLoading] = useState<boolean>(true); // 로딩 상태 관리
+
+  // 레시피 상세 정보 API 호출
+  useEffect(() => {
+    const fetchRecipeDetail = async () => {
+      try {
+        const response = await axios.get(`/api/recipes/${id}`);
+        setRecipe(response.data); // 레시피 데이터 설정
+        setIsLoading(false); // 로딩 완료
+      } catch (error) {
+        console.error("Error fetching recipe details:", error);
+        setIsLoading(false); // 오류 발생 시 로딩 완료
+      }
+    };
+
+    fetchRecipeDetail(); // 컴포넌트가 마운트될 때 API 호출
+  }, [id]);
+
+  // 로딩 중이라면 로딩 메시지 표시
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  // 레시피가 없다면 에러 메시지 표시
   if (!recipe) {
     return <div className="recipe-detail-not-found">Recipe not found</div>;
   }
 
+  // 레시피 삭제 처리
   const handleDelete = () => {
     Swal.fire({
       title: "정말로 삭제하시겠습니까?",
@@ -25,27 +50,35 @@ const RecipeDetail = () => {
       cancelButtonText: "취소",
     }).then((result) => {
       if (result.isConfirmed) {
-        const updatedRecipes = recipes.filter(
-          (_, index) => index !== Number(id)
-        );
-        setRecipes(updatedRecipes); // 상태 업데이트
-        localStorage.setItem("recipes", JSON.stringify(updatedRecipes)); // 로컬스토리지 업데이트
-
-        Swal.fire({
-          title: "삭제 완료",
-          text: "레시피가 성공적으로 삭제되었습니다.",
-          icon: "success",
-          confirmButtonColor: "#3085d6",
-          confirmButtonText: "확인",
-        }).then(() => {
-          navigate("/recipe/list");
-        });
+        axios
+          .delete(`/api/recipes/${id}`)
+          .then(() => {
+            Swal.fire({
+              title: "삭제 완료",
+              text: "레시피가 성공적으로 삭제되었습니다.",
+              icon: "success",
+              confirmButtonColor: "#3085d6",
+              confirmButtonText: "확인",
+            }).then(() => {
+              navigate("/recipe/list"); // 삭제 후 리스트 페이지로 이동
+            });
+          })
+          .catch((error) => {
+            console.error("Failed to delete recipe:", error);
+            Swal.fire({
+              title: "삭제 실패",
+              text: "레시피 삭제에 실패했습니다.",
+              icon: "error",
+              confirmButtonText: "확인",
+            });
+          });
       }
     });
   };
 
+  // 레시피 수정 처리
   const handleEdit = () => {
-    navigate(`/recipe/edit/${id}`);
+    navigate(`/recipe/edit/${id}`); // 수정 페이지로 이동
   };
 
   return (
@@ -71,19 +104,19 @@ const RecipeDetail = () => {
       {/* Recipe Steps Section */}
       <div className="recipe-detail-steps-container">
         <div className="recipe-detail-steps-title">Recipe Steps</div>
-        {recipe.recipeSteps.map((recipeSteps) => (
-          <div key={recipeSteps.seq} className="recipe-detail-step-box">
-            <div className="recipe-detail-step-num">Step {recipeSteps.seq}</div>
+        {recipe.recipeSteps.map((step: any) => (
+          <div key={step.seq} className="recipe-detail-step-box">
+            <div className="recipe-detail-step-num">Step {step.seq}</div>
 
             <div className="recipe-detail-step-image">
               <img
-                src={recipeSteps.photo || Sampleimage}
-                alt={`Step ${recipeSteps.seq}`}
+                src={step.photo} 
+                alt={`Step ${step.seq}`}
               />
             </div>
 
             <div className="recipe-detail-step-description">
-              {recipeSteps.description}
+              {step.description}
             </div>
           </div>
         ))}

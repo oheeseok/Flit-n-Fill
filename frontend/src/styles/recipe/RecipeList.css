@@ -80,14 +80,14 @@
   padding: 10px 26px;
   box-sizing: border-box;
 }
-.recipe-list-box-card-profile-container-img {
+/* .recipe-list-box-card-profile-container-img {
   font-family: Ubuntu;
   font-size: 18px;
   width: 42px;
   height: 42px;
   border-radius: 36px;
   background: url(<path-to-image>) lightgray 50% / cover no-repeat;
-}
+} */
 .recipe-list-box-card-profile-container-name {
   color: var(--Heading-Heading-c1, #32343a);
   font-family: Ubuntu;

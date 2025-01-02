@@ -31,6 +31,7 @@
   width: 520px;
   height: 315.264px;
   object-fit: cover;
+  cursor: pointer;
 }
 
 .carousel-button {
