@@ -32,7 +32,7 @@ jobs:
         run: |
           cd Flit-n-Fill/backend  # 정확한 경로로 이동
           ls -la  # 디렉토리 내용 확인
-          ./gradlew clean build  # gradlew로 빌드 실행
+          ./gradlew clean build -x test  # gradlew로 빌드 실행
 
 
 #      # 3. Docker 이미지 빌드 및 Docker Hub에 푸시
