@@ -1,9 +1,10 @@
-package org.example.backend.security;
+package org.example.backend.security.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.backend.api.user.model.entity.User;
 import org.example.backend.api.user.repository.UserRepository;
 import org.example.backend.exceptions.UserNotFoundException;
+import org.example.backend.security.model.PrincipalDetails;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
