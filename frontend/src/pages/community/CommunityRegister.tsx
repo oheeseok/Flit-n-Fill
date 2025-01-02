@@ -2,13 +2,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import axios from "axios";
-import { useCommunity } from "../../context/CommunityContext";
+// import { useCommunity } from "../../context/CommunityContext";
 import CommunityImageUploader from "../../components/community/CommunityImageUploader";
 import "../../styles/community/CommunityRegister.css";
 
 const CommunityRegister = () => {
   const navigate = useNavigate();
-  const { setCommunityData } = useCommunity(); // Context의 데이터 설정 함수 사용
+  // const { setCommunityData } = useCommunity(); // Context의 데이터 설정 함수 사용
 
   // 상태 관리
   const [uploadedImage1, setUploadedImage1] = useState<File | null>(null);
@@ -49,7 +49,6 @@ const CommunityRegister = () => {
         postContent: content,
         meetingPlace,
         meetingTime,
-        postPhoto1: uploadedImage1 ? uploadedImage1.name : null,
         tradeType: category,
         writerFoodId,
         proposerFoodListId,
@@ -60,7 +59,7 @@ const CommunityRegister = () => {
       console.log("formData: ", formData)
 
       // Context에 데이터 저장
-      setCommunityData(communityPost);
+      // setCommunityData(communityPost);
 
       const response = await axios.post(
         "/api/posts",
@@ -124,8 +123,8 @@ const CommunityRegister = () => {
           <input
             type="radio"
             name="category"
-            value="SHARE"
-            checked={category === "SHARE"}
+            value="SHARING"
+            checked={category === "SHARING"}
             onChange={(e) => setCategory(e.target.value)}
           />
           나눔

@@ -70,10 +70,10 @@ const CommunityList = () => {
               </div>
               <div className="recipe-list-box-card-title">{post.postTitle}</div>
               <div className="recipe-list-box-card-detail">
-                {post.userNickname}
+                {post.userProfile}
               </div>
               <div className="recipe-list-box-card-detail">
-                {post.userProfile}
+                {post.userNickname}
               </div>
               <div className="recipe-list-box-card-detail">
                 <strong>작성일:</strong> {post.postCreatedDate.toLocaleString()}

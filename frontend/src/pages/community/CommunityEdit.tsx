@@ -147,8 +147,8 @@ const CommunityEdit = () => {
           <input
             type="radio"
             name="category"
-            value="SHARE"
-            checked={tradeType === "SHARE"}
+            value="SHARING"
+            checked={tradeType === "SHARING"}
             onChange={(e) => setTradeType(e.target.value)}
           />
           나눔
