@@ -1,9 +1,4 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-} from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import {
   TradeRoomSimpleDto,
@@ -31,6 +26,10 @@ export const ChatRoomProvider = ({
     try {
       const response = await axios.get("http://localhost:8080/api/trade", {
         withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          userEmail: localStorage.getItem("userEmail"),
+        },
       });
       if (response.status !== 200) {
         throw new Error("Failed to fetch traderoom list");
@@ -51,6 +50,10 @@ export const ChatRoomProvider = ({
         `http://localhost:8080/api/trade/${tradeRoomId}`,
         {
           withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
+          },
         }
       );
       if (response.status !== 200) {
