@@ -56,8 +56,10 @@ const AdminPage = () => {
         if (!isAdmin) {
             // navigate("/signin"); // 관리자 아니면 로그인 페이지로 리디렉션 (주석 처리)
             setLoading(false);
+            fetchRequestList();
         } else {
             setLoading(false); // 관리자인 경우 로딩 상태를 false로 변경
+            fetchRequestList(); // 상태 업데이트 후 요청 목록 다시 가져오기
         }
     }, [isAdmin, navigate]);
 
@@ -137,7 +139,7 @@ const AdminPage = () => {
                                         </button>
                                         <button
                                             onClick={() =>
-                                                handleUpdateRequestStatus(request.requestId, "REJECTED", "Request rejected.")
+                                                handleUpdateRequestStatus(request.requestId, "DENIED", "Request rejected.")
                                             }
                                         >
                                             Reject
