@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 // 백엔드에서 받은 FoodDetailDto 타입의 데이터
 interface FoodDetailDto {
@@ -108,6 +109,7 @@ interface FridgeContextType {
   addToBucket: (item: FridgeItem) => void;
   removeFromBucket: (id: number) => void;
   fetchFridgeItems: () => Promise<void>; // 비동기 함수로 수정
+  requestAddIngredient: (requestFood : string) => Promise<void>;
 }
 
 // 기본 Context 값 설정
@@ -121,6 +123,7 @@ const FridgeContext = createContext<FridgeContextType>({
   addToBucket: () => {},
   removeFromBucket: () => {},
   fetchFridgeItems: async () => {}, // 비어 있는 비동기 함수로 설정
+  requestAddIngredient: async() => {},
 });
 
 // Provider 컴포넌트
@@ -155,6 +158,15 @@ export const FridgeProvider = ({ children }: { children: React.ReactNode }) => {
 
   // 버킷에 아이템 추가
   const addToBucket = (item: FridgeItem) => {
+    if (item.foodListId === null) {
+      console.warn("Cooked items cannot be added to the bucket.");
+      Swal.fire({
+        icon: "warning",
+        title: "추가 불가",
+        text: "요리는 버킷에 추가할 수 없습니다.",
+      });
+      return;
+    }
     setBucketItems((prevItems) =>
       prevItems.find((prevItem) => prevItem.id === item.id)
         ? prevItems
@@ -236,6 +248,29 @@ export const FridgeProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  // 재료 등록 요청하기
+  const requestAddIngredient = async (requestFood :string) => {
+    try {
+      const response = await axios.post(
+        `http://localhost:8080/api/my-fridge/request`,
+        requestFood,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "text/plain",
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
+          },
+        }
+      );
+      console.log("재료 등록 요청 성공:", response.data);
+      return response.data; // 성공적으로 처리된 데이터를 반환
+    } catch (error: any) {
+      console.error("재료 등록 요청 중 오류 발생:", error.response?.data || error.message);
+      throw error; // 호출한 쪽에서 에러를 처리할 수 있도록 던짐
+    }
+  };
+
   // 저장 방법으로 필터링
   const filterByStorageMethod = (
     method: "REFRIGERATED" | "FROZEN" | "ROOM_TEMPERATURE"
@@ -260,6 +295,7 @@ export const FridgeProvider = ({ children }: { children: React.ReactNode }) => {
         addToBucket,
         removeFromBucket,
         fetchFridgeItems,
+        requestAddIngredient
       }}
     >
       {children}
