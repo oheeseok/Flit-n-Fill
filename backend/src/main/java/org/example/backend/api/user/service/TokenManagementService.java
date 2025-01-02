@@ -45,7 +45,7 @@ public class TokenManagementService {
         addCookie(response, "userEmail", user.getUserEmail());
         addCookie(response, "accessToken", accessToken);
 
-        return new UserLoginResponse(accessToken, refreshToken);
+        return new UserLoginResponse(accessToken, refreshToken, user.getUserEmail());
     }
 
     // 쿠키 추가

@@ -51,22 +51,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         // 쿠키에서 토큰 가져오기
-        Cookie[] cookies = request.getCookies();
+//        Cookie[] cookies = request.getCookies();
         String token = null;
         String userEmail = null;
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("accessToken".equals(cookie.getName())) {
-                    token = cookie.getValue();
-                } else if ("userEmail".equals(cookie.getName())) {
-                    userEmail = cookie.getValue();
-                }
+//        if (cookies != null) {
+//            for (Cookie cookie : cookies) {
+//                if ("accessToken".equals(cookie.getName())) {
+//                    token = cookie.getValue();
+//                } else if ("userEmail".equals(cookie.getName())) {
+//                    userEmail = cookie.getValue();
+//                }
+//
+//                if (token != null && userEmail != null) {
+//                    break;
+//                }
+//            }
+//        }
 
-                if (token != null && userEmail != null) {
-                    break;
-                }
-            }
+        String authorization = request.getHeader("Authorization");
+        if (authorization != null && authorization.startsWith("Bearer ")) {
+            // "Bearer " 다음에 오는 토큰을 추출
+            token = authorization.substring(7); // "Bearer "는 7글자
         }
+
+        userEmail = request.getHeader("userEmail");
 
 //        String token = request.getHeader("Authorization");
         log.info("[JwtAuthenticationFilter] cookie accessToken : {}", token);

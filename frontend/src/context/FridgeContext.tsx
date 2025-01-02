@@ -134,7 +134,12 @@ export const FridgeProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const response = await axios.get("http://localhost:8080/api/my-fridge", {
         withCredentials: true,
-      }); // 서버에서 데이터를 받아오는 API 경로
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+          'userEmail': localStorage.getItem('userEmail')
+        }
+      }
+    ); // 서버에서 데이터를 받아오는 API 경로
       // 서버에서 받은 데이터가 리스트이므로, 각 아이템을 변환하여 새로운 리스트로 만듬
       const transformedItems = response.data.map((foodDetail: FoodDetailDto) =>
         convertToFridgeItem(foodDetail)
