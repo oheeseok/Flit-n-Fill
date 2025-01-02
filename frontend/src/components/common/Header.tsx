@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import Icon from "../../assets/icon.png";
 import "../../styles/common/Header.css";
-import NotificationPopup from "../../pages/NotificationPopup";
+// import NotificationPopup from "../../pages/NotificationPopup";
 
 const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
