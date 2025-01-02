@@ -20,19 +20,20 @@ import RecipeRegister from "./pages/recipe/RecipeRegister";
 import RecipeList from "./pages/recipe/RecipeList";
 import RecipeDetail from "./pages/recipe/RecipeDetail";
 import RecipeEdit from "./pages/recipe/RecipeEdit";
-// import NotificationPopup from "./pages/NotificationPopup.tsx";
 import { GlobalProvider } from "./context/GlobalProvider";
 import Layout from "./components/Layout";
 import "./App.css";
-import AdminPage from "./pages/admin/AdminPage";  // AdminPage 컴포넌트 임포트
+import AdminPage from "./pages/admin/AdminPage"; // AdminPage 컴포넌트 임포트
 import { AdminProvider } from "./context/AdminProvider"; // 새로 만든 AdminProvider 가져오기
 import AdminLayout from "./components/AdminLayout"; // AdminLayout (관리자 전용 레이아웃)
+// import PushNotification from "./components/PushNotification.tsx";
 
 function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
       <GlobalProvider>
+        {/* <PushNotification /> */}
         <Routes>
           <Route
             path="/"
@@ -63,17 +64,17 @@ function App() {
             }
           /> */}
 
-            {/* AdminProvider로 감싸기 */}
-            <Route
-                path="/adminPage"
-                element={
-                    <AdminProvider>
-                        <AdminLayout>
-                            <AdminPage />
-                        </AdminLayout>
-                    </AdminProvider>
-                }
-            />
+          {/* AdminProvider로 감싸기 */}
+          <Route
+            path="/adminPage"
+            element={
+              <AdminProvider>
+                <AdminLayout>
+                  <AdminPage />
+                </AdminLayout>
+              </AdminProvider>
+            }
+          />
 
           <Route
             path="/mypage"
