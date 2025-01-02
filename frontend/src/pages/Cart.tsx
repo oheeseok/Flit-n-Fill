@@ -11,6 +11,10 @@ const Cart = () => {
     try {
       const response = await axios.get("/api/my-fridge/shoppingcart", {
         withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          userEmail: localStorage.getItem("userEmail"),
+        },
       });
       // setInputText(response.data.join("\n")); // textarea에 표시할 텍스트로 변환
       setLines(response.data); // textarea에 표시할 텍스트로 변환
@@ -53,6 +57,10 @@ const Cart = () => {
         lines, // 리스트를 전송
         {
           withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
+          },
         }
       );
       console.log("response: ", response);
