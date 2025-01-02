@@ -72,6 +72,30 @@ const CommunityDetail = () => {
     return <div>로딩 중입니다...</div>;
   }
 
+  const handleRequest = async () => {
+    try {
+      // 요청 데이터 생성
+      const actionRequest = {
+        action: "REQUEST",
+      };
+  
+      await axios.post(`/api/posts/${postId}/request`, actionRequest, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
+      Swal.fire("요청 성공", "요청이 성공적으로 처리되었습니다!", "success");
+    } catch (error) {
+      console.error("요청 실패:", error);
+      Swal.fire("요청 실패", "요청 처리 중 오류가 발생했습니다.", "error").then(
+        () => {
+          navigate(`/community/detail/${postId}`);
+        }
+      );
+    }
+  };
+
   const handleEdit = () => {
     navigate("/community/edit"); // 수정 페이지?로 이동
   };
@@ -180,7 +204,28 @@ const CommunityDetail = () => {
 
       {/* 요청 버튼 */}
       <div className="community-detail-button-container2">
-        <button className="community-detail-button">요청하기</button>
+        {postDetail.progress === "PENDING" ? (
+          <button
+            className="community-detail-button"
+            onClick={handleRequest}
+          >
+            요청하기
+          </button>
+        ) : postDetail.progress === "IN_PROGRESS" ? (
+          <button
+            className="community-detail-button"
+            disabled
+          >
+            진행중
+          </button>
+        ) : postDetail.progress === "COMPLETED" ? (
+          <button
+            className="community-detail-button"
+            disabled
+          >
+            완료
+          </button>
+        ) : null}
       </div>
     </div>
   );
