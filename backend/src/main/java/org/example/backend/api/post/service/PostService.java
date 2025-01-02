@@ -295,7 +295,7 @@ public class PostService {
     notificationService.saveTradeRequestNotification(
         writer,
         notificationType,
-        post.getTradeType().getDescription() + " 요청이 왔습니다!",
+        proposer.getUserNickname() + "님이 " + post.getTradeType().getDescription() + "을 요청합니다.",
         tradeRequest.getTradeRequestId(),
         null);
     log.info("3. save data to db --- done");
