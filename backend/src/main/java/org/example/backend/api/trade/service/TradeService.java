@@ -197,7 +197,7 @@ public class TradeService {
         NotificationType.NEW_COMMENT.getDescription()
     );
     log.info("notificationMessage: {}", notificationMessage);
-    pushNotificationService.sendPushNotification(otherUserId, notificationMessage);
+    pushNotificationService.sendPushNotification(otherUser.getUserEmail(), notificationMessage);
     log.info("2. send push --- done");
 
     // db 저장
@@ -279,7 +279,7 @@ public class TradeService {
           stat
       );
       log.info("message: {}", message);
-      pushNotificationService.sendPushNotification(proposer.getUserId(), message);
+      pushNotificationService.sendPushNotification(proposer.getUserEmail(), message);
       log.info("2. send push --- done");
 
       // db 저장
@@ -315,7 +315,7 @@ public class TradeService {
           stat
       );
       log.info("message: {}", message);
-      pushNotificationService.sendPushNotification(proposer.getUserId(), message);
+      pushNotificationService.sendPushNotification(proposer.getUserEmail(), message);
       log.info("2. send push --- done");
 
       // db 저장
@@ -379,7 +379,7 @@ public class TradeService {
             stat,
             stat
         );
-        pushNotificationService.sendPushNotification(user.getUserId(), message);
+        pushNotificationService.sendPushNotification(user.getUserEmail(), message);
 
         // db 저장
         if (stat.equals(TradeType.EXCHANGE)) {  // 교환
@@ -456,7 +456,7 @@ public class TradeService {
       String notificationMessage = String.format("[F-evel Up!] %s님이 %d f-evel 을 달성하였습니다!",
           user.getUserNickname(), newLevel);
       log.info("notificationMessage: {}", notificationMessage);
-      pushNotificationService.sendPushNotification(user.getUserId(), notificationMessage);
+      pushNotificationService.sendPushNotification(user.getUserEmail(), notificationMessage);
       log.info("3. send push --- done");
 
       // db 저장
@@ -466,7 +466,7 @@ public class TradeService {
       String notificationMessage = String.format("[F-evel Down] %s님이 %d f-evel 로 하락하였습니다. 후기를 남겨 f-evel을 올려보세요!",
           user.getUserNickname(), newLevel);
       log.info("notificationMessage: {}", notificationMessage);
-      pushNotificationService.sendPushNotification(user.getUserId(), notificationMessage);
+      pushNotificationService.sendPushNotification(user.getUserEmail(), notificationMessage);
       log.info("3. send push --- done");
 
       // db 저장
