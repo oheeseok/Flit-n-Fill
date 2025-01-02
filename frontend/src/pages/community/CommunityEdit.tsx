@@ -1,41 +1,53 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import axios from "axios";
-import { useCommunity } from "../../context/CommunityContext";
 import "../../styles/community/CommunityEdit.css";
 import CommunityImageEdit from "../../components/community/CommunityImageEdit";
 
-// interface PostUpdateDto {
-//   postTitle: string;
-//   postContent: string;
-//   postPhoto1: string;
-//   meetingPlace: string;
-//   meetingTime: string;
-//   writerFoodId: number;
-//   proposerFoodListId: number;
-// }
-
 const CommunityEdit = () => {
-  const { communityData, setCommunityData } = useCommunity();
   const navigate = useNavigate();
   const { postId } = useParams<{ postId: string }>()  // URL에서 postId 가져오기
 
-  // 상태 관리
-  const [postTitle, setPostTitle] = useState(communityData?.postTitle || "");
-  const [postContent, setPostContent] = useState(communityData?.postContent || "");
-  const [meetingPlace, setMeetingPlace] = useState(communityData?.meetingPlace || "");
-  const [meetingTime, setMeetingTime] = useState(communityData?.meetingTime || "");
+  const [postTitle, setPostTitle] = useState("");
+  const [postContent, setPostContent] = useState("");
+  const [meetingPlace, setMeetingPlace] = useState("");
+  const [meetingTime, setMeetingTime] = useState("");
   const [postPhoto1, setPostPhoto1] = useState<File | null>(null);
-  const [writerFoodId, setWriterFoodId] = useState(communityData?.writerFoodId || 0);
-  const [proposerFoodListId, setProposerFoodListId] = useState(communityData?.proposerFoodListId || 0);
-  // const [postTitle, setPostTitle] = useState("");
-  // const [postContent, setPostContent] = useState("");
-  // const [meetingPlace, setMeetingPlace] = useState("");
-  // const [meetingTime, setMeetingTime] = useState("");
-  // const [postPhoto1, setPostPhoto1] = useState<File | null>(null);
-  // const [writerFoodId, setWriterFoodId] = useState(0);
-  // const [proposerFoodListId, setProposerFoodListId] = useState(0);
+  const [writerFoodId, setWriterFoodId] = useState(0);
+  const [proposerFoodListId, setProposerFoodListId] = useState(0);
+
+  // 기존 데이터 가져오기
+  useEffect(() => {
+    const fetchPostData = async () => {
+      try {
+        const response = await axios.get(`/api/posts/${postId}`, {
+          withCredentials: true,
+        });
+        const post = response.data;
+
+        // 상태 업데이트
+        setPostTitle(post.postTitle);
+        setPostContent(post.postContent);
+        setMeetingPlace(post.meetingPlace);
+        setMeetingTime(post.meetingTime);
+        setPostPhoto1(post.postPhoto1); 
+        setWriterFoodId(post.writerFoodId);
+        setProposerFoodListId(post.proposerFoodListId);
+      } catch (error) {
+        console.error("게시글 가져오기 실패:", error);
+        Swal.fire("오류", "게시글 데이터를 가져오는 데 실패했습니다.", "error").then(
+          () => {
+            navigate("/community");
+          }
+        );
+      }
+    };
+
+    if (postId) {
+      fetchPostData();
+    }
+  }, [postId, navigate]);
 
   const handlePhoto1Change = (image: File) => setPostPhoto1(image);
 
@@ -54,19 +66,6 @@ const CommunityEdit = () => {
       });
       return;
     }
-
-    // 업데이트된 데이터 생성
-    // const updatedData = {
-    //   postTitle,
-    //   postContent,
-    //   meetingPlace,
-    //   meetingTime,
-    //   postPhoto1,
-    //   writerFoodId,
-    //   proposerFoodListId,
-    // };
-
-    // setCommunityData(updatedData); // Context 데이터 업데이트
 
     try {
       const formData = new FormData();
@@ -89,7 +88,7 @@ const CommunityEdit = () => {
 
       // 서버 요청
       const response = await axios.put(
-        `/api/posts/${postId}`, // API URL
+        `/api/posts/${postId}`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -98,8 +97,6 @@ const CommunityEdit = () => {
       );
 
       if (response.status === 200) {
-        const updatedPost = response.data;
-        setCommunityData(updatedPost); // Context 업데이트
         Swal.fire({
           icon: "success",
           title: "수정 완료",
@@ -131,29 +128,6 @@ const CommunityEdit = () => {
 
   return (
     <div className="community-edit-body">
-      {/* 교환/나눔 선택 */}
-      {/* <div className="community-edit-category">
-        <label>
-          <input
-            type="radio"
-            name="category"
-            value="EXCHANGE"
-            checked={tradeType === "EXCHANGE"}
-            onChange={(e) => setTradeType(e.target.value)}
-          />
-          교환
-        </label>
-        <label>
-          <input
-            type="radio"
-            name="category"
-            value="SHARING"
-            checked={tradeType === "SHARING"}
-            onChange={(e) => setTradeType(e.target.value)}
-          />
-          나눔
-        </label>
-      </div> */}
       {/* 제목 입력 */}
       <input
         type="text"

@@ -97,7 +97,7 @@ const CommunityDetail = () => {
   };
 
   const handleEdit = () => {
-    navigate("/community/edit"); // 수정 페이지?로 이동
+    navigate(`/community/edit/${postId}`); // 수정 페이지?로 이동
   };
 
   const handleDelete = () => {
@@ -160,7 +160,7 @@ const CommunityDetail = () => {
             day: "2-digit",
             hour: "2-digit",
             minute: "2-digit",
-          }).format(new Date(postDetail.meetingTime))}
+          }).format(new Date(postDetail.postCreatedDate))}
         </div>
         <div className="community-detail-button-container">
           <button className="community-detail-edit-button" onClick={handleEdit}>
@@ -192,6 +192,17 @@ const CommunityDetail = () => {
       {/* 만남 장소 표시 */}
       <div className="community-detail-box-container">
         <strong>만남 장소:</strong> {postDetail.meetingPlace}
+      </div>
+      {/* 만남 시간 표시 */}
+      <div className="community-detail-box-container">
+        <strong>만남 시간:</strong> 
+        {new Intl.DateTimeFormat("ko-KR", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+          }).format(new Date(postDetail.meetingTime))}
       </div>
 
       {/* 작성자/제안자 음식 ID 표시 */}

@@ -50,11 +50,29 @@ function CommunityImageEdit({
     }
   };
 
+  // 안전하게 `URL.createObjectURL` 호출
+  const imageSrc = uploadedImage
+  ? (() => {
+      try {
+        return URL.createObjectURL(uploadedImage);
+      } catch (error) {
+        console.error("Error creating object URL:", error);
+        return sample; // 기본 이미지로 대체
+      }
+    })()
+  : sample;
+
   return (
     <Container>
       <MyProfileImg
-        src={ uploadedImage ? URL.createObjectURL(uploadedImage) : sample }
-        alt="게시글글 이미지"
+        src={ 
+          typeof uploadedImage === "string"
+            ? uploadedImage // URL
+            : uploadedImage
+            ? URL.createObjectURL(uploadedImage) // File
+            : sample // 기본 이미지
+         }
+        alt="게시글 이미지"
         onClick={() => document.getElementById("file-input")?.click()}
       />
       <HiddenInput

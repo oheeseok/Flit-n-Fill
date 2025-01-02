@@ -148,7 +148,7 @@ function App() {
             }
           ></Route>
           <Route
-            path="/community/edit"
+            path="/community/edit/:postId"
             element={
               <Layout>
                 <CommunityEdit />
