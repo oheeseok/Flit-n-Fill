@@ -59,6 +59,13 @@ jobs:
           docker build -t ckdgkim/backendproject:back-${{ env.TAG }} .
           echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
           docker push ckdgkim/backendproject:back-${{ env.TAG }}
+          
+
+      # 7. application.yml 파일 생성 (Secrets에서 값을 불러옴)
+      - name: Create application.yml from Secret
+        run: |
+          echo "${{ secrets.APPLICATION_YML }}" > Flit-n-Fill/backend/src/main/resources/application.yml
+
 
       # 7. EC2로 배포
       - name: Deploy to EC2 via Bastion
