@@ -97,6 +97,10 @@ public class TradeService {
 
       tradeRoomDtos.add(simple);
     }
+
+    // 마지막 메시지 시간 기준으로 정렬 (역순)
+    tradeRoomDtos.sort((dto1, dto2) -> dto2.getLastMessageTime().compareTo(dto1.getLastMessageTime()));
+
     return tradeRoomDtos;
   }
 
@@ -216,7 +220,9 @@ public class TradeService {
     // 거래 상태 업데이트
     if (trade.getProgress().equals(Progress.COMPLETED)) {
       throw new IllegalStateException("이미 완료된 거래입니다.");
-    } else if (status.equals("COMPLETED")) {
+    } else if (trade.getProgress().equals(Progress.CANCELED)) {
+      throw new IllegalStateException("이미 취소한 거래입니다.");
+    }else if (status.equals("COMPLETED")) {
       trade.setProgress(Progress.COMPLETED);
       post.setProgress(Progress.COMPLETED);
     } else if (status.equals("CANCELED")) {
