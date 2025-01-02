@@ -67,7 +67,7 @@ jobs:
           echo "${{ secrets.QWE_PEM }}" > ~/.ssh/qwe.pem
           chmod 600 ~/.ssh/qwe.pem
           # 베스천 서버로 접속
-          echo "Step 1: Connecting to Bastion server (${ { vars.PUB_IP_A }})"
+          echo "Step 1: Connecting to Bastion server (${{ vars.PUB_IP_A }})"
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.ssh/qwe.pem ec2-user@"${{ vars.PUB_IP_A }}" << EOF
             echo "Connected to Bastion server (${ { vars.PUB_IP_A }})"
             # 사내 EC2로 접속
