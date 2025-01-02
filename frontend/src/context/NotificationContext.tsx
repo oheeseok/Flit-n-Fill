@@ -11,6 +11,7 @@ const NotificationContext = createContext<NotificationContextType>({
   notifications: [],
   setNotifications: () => {},
   getNotificationList: async () => {},
+  markAllAsRead: async () => {},
 });
 
 // Provider 컴포넌트
@@ -50,6 +51,10 @@ export const NotificationProvider = ({
         "http://localhost:8080/api/notifications/read",
         {
           withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
+          },
         }
       );
       if (response.status !== 200) {

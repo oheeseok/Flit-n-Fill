@@ -104,6 +104,8 @@ const ChatRoom: React.FC = () => {
         {
           headers: {
             "Content-Type": "text/plain", // 헤더 설정
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
           },
           withCredentials: true, // 쿠키와 인증 정보를 포함하여 요청 보냄
         }
@@ -140,6 +142,8 @@ const ChatRoom: React.FC = () => {
         {
           headers: {
             "Content-Type": "text/plain", // 헤더 설정
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
           },
           withCredentials: true, // 쿠키와 인증 정보를 포함하여 요청 보냄
         }
@@ -198,6 +202,8 @@ const ChatRoom: React.FC = () => {
         {
           headers: {
             "Content-Type": "application/json", // 헤더 설정
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
           },
           withCredentials: true, // 쿠키와 인증 정보를 포함하여 요청 보냄
         }
