@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "../../styles/community/CommunityList.css";
@@ -16,16 +16,28 @@ interface PostSimpleDto {
   postContent: string;
 }
 
+// interface CommunityListProps {
+//   filter: string; // 'ALL', 'EXCHANGE', 'SHARING'
+//   posts: PostSimpleDto[]; // 검색어
+// }
 interface CommunityListProps {
   filter: string; // 'ALL', 'EXCHANGE', 'SHARING'
-  query: string; // 검색어
 }
 
-const CommunityList: React.FC<CommunityListProps> = ({ filter, query }) => {
+const CommunityList: React.FC<CommunityListProps> = ({ filter }) => {
   const [posts, setPosts] = useState<PostSimpleDto[]>([]); // 상태로 게시글 목록 관리
   // const [queryFilteredPosts, setQueryFilteredPosts] = useState<PostSimpleDto[]>([]);
   const [loading, setLoading] = useState<boolean>(true); // 로딩 상태 관리
   const [error, setError] = useState<string | null>(null); // 에러 메시지 관리
+
+  const [searchParams] = useSearchParams() //===
+  const searchQuery = searchParams.get("searchQuery") || ""  //===
+  console.log("search-query keyword: ", searchQuery)  //===
+
+  // const filteredPosts =
+  //   filter === "ALL"
+  //     ? posts
+  //     : posts.filter((post) => post.tradeType === filter);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -40,7 +52,7 @@ const CommunityList: React.FC<CommunityListProps> = ({ filter, query }) => {
         // }
 
         const response = await axios.get("/api/posts", {
-          params: { "search-query": query },
+          params: { "search-query": searchQuery },  //
           withCredentials: true,
           headers: { 
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -58,7 +70,12 @@ const CommunityList: React.FC<CommunityListProps> = ({ filter, query }) => {
     };
 
     fetchPosts();
-  }, [query]);
+  }, [searchQuery]);
+
+  // 필터 및 검색 적용
+  const filteredPosts = posts.filter((post) => {
+    return filter === "ALL" || post.tradeType === filter;
+  });
 
 
   // useEffect(() => {
@@ -75,17 +92,13 @@ const CommunityList: React.FC<CommunityListProps> = ({ filter, query }) => {
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
 
-  const filteredPosts =
-    filter === "ALL"
-      ? posts
-      : posts.filter((post) => post.tradeType === filter);
 
   return (
     <div className="community-list-body">
       <div className="community-list-header">
-        <h1>지역 이름 넣을거임</h1>
+        <h1>지역 이름 넣을까 목록이라고 쓸까</h1>
       </div>
-
+      {/* <button onClick={() => setSearchParams({searchQuery: `${query}`})}>Query String 바꾸기</button> */}
       <div className="recipelistbody">
         {filteredPosts.map((post) => (
           <div className="recipe-list-container" key={post.postId}>
@@ -116,7 +129,7 @@ const CommunityList: React.FC<CommunityListProps> = ({ filter, query }) => {
                   )}{post.userNickname}
               </div>
               <div className="recipe-list-box-card-detail">
-                작성일 : 
+                작성일 : {" "}
                 {new Date(post.postCreatedDate).toLocaleString("ko-KR", {
                   year: "numeric",
                   month: "2-digit",

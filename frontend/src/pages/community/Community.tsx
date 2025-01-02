@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import SearchBar from "../../components/common/SearchBar";
 import "../../styles/community/Community.css";
 import CommunityRegisterButton from "../../components/community/CommunityRegisterButton";
@@ -8,14 +9,54 @@ import CommunityList from "./CommunityList";
 const Community = () => {
   const [filter, setFilter] = useState<string>("ALL")   // 상태 관리: 'ALL', 'EXCHANGE', 'SHARING'
   const [query, setQuery] = useState<string>("")  // 검색어 관리
+  // const [posts, setPosts] = useState([])
 
-  const handleFilterChange = (type: string) => {
-    setFilter(type);
+  // const handleFilterChange = (type: string) => {
+  //   setFilter(type);
+  // };
+
+  const handleQueryChange = (newQuery: string) => {
+    setQuery(newQuery); // 검색어 업데이트
   };
 
-  const handleQueryChange = (searchQuery: string) => {
-    setQuery(searchQuery); // 검색어 업데이트
-  };
+  // const handleSearch = async () => {
+  //   try {
+  //     const response = await axios.get("/api/posts", {
+  //       params: { "search-query": query },
+  //       withCredentials: true,
+  //       headers: {
+  //         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+  //         userEmail: localStorage.getItem("userEmail"),
+  //       },
+  //     });
+  //     setPosts(response.data); // 검색 결과로 상태 업데이트
+  //   } catch (error) {
+  //     console.error("검색 요청 실패:", error);
+  //     alert("검색 중 오류가 발생했습니다.");
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   // 기본 게시글 가져오기
+  //   const fetchPosts = async () => {
+  //     try {
+  //       const response = await axios.get("/api/posts", {
+  //         withCredentials: true,
+  //         headers: {
+  //           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+  //           userEmail: localStorage.getItem("userEmail"),
+  //         },
+  //       });
+  //       setPosts(response.data);
+  //     } catch (error) {
+  //       console.error("게시글 목록 가져오기 실패:", error);
+  //       alert("게시글 목록을 가져오는 중 오류가 발생했습니다.");
+  //     }
+  //   };
+
+  //   fetchPosts();
+  // }, []);
+
 
   return (
     <div className="community-page">
@@ -50,24 +91,24 @@ const Community = () => {
 
           <div className="community-button-group">
             <button className="community-button"
-            onClick={() => handleFilterChange("ALL")}
+            onClick={() => setFilter("ALL")}
             >
               전체
             </button>
             <button className="community-button"
-              onClick={() => handleFilterChange("EXCHANGE")}
+              onClick={() => setFilter("EXCHANGE")}
             >
               교환
             </button>
             <button className="community-button"
-              onClick={() => handleFilterChange("SHARING")}
+              onClick={() => setFilter("SHARING")}
             >
               나눔
             </button>
           </div>
 
           {/*  */}
-          <CommunityList filter={filter} query={query} />
+          <CommunityList filter={filter}/>
         </div>
       </div>
     </div>
