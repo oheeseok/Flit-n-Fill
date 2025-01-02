@@ -9,15 +9,26 @@ const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [showNotification, setShowNotification] = useState<boolean>(false);
   const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+
   const navigate = useNavigate();
+
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
+    const userProfile = localStorage.getItem("userProfile");
+
     if (token) {
       setIsLoggedIn(true);
     }
-  }, []);
 
+    // userProfile이 null이면 기본 아이콘, 아니면 userProfile에 저장된 이미지 불러오기
+    if (userProfile !== "undefined" && userProfile !== null) {
+      setProfileImage(userProfile);
+    } else {
+      setProfileImage("/assets/user-icon.png"); // 기본 아이콘
+    }
+  }, []);
   const toggleNotification = () => {
     setShowNotification((prev) => !prev);
   };
@@ -46,6 +57,10 @@ const Header = () => {
     });
   };
 
+  const handleMenuClick = () => {
+    toggleUserMenu();
+  }
+
   return (
     <div className="header">
       <Link to="/" className="logo">
@@ -69,29 +84,29 @@ const Header = () => {
               <img src="/assets/notification-icon.png" alt="notification" />
             </a>
             {/* 알림 팝업 */}
-            {showNotification && (
-              <NotificationPopup setShowNotification={setShowNotification} />
-            )}
+              {showNotification && (
+                  <NotificationPopup setShowNotification={setShowNotification} />
+              )}
 
             {/* 사용자 메뉴 버튼 */}
             <a href="#" className="header-user" onClick={toggleUserMenu}>
-              <img src="/assets/user-icon.png" alt="user" />
+              <img src={profileImage || "/assets/user-icon.png"} alt="user" />
             </a>
             {/* 사용자 메뉴창 */}
             {showUserMenu && (
               <div className="header-user-menu">
                 <ul>
                   <li>
-                    <Link to="/mypage">회원 정보 수정</Link>
+                    <Link to="/mypage" onClick={handleMenuClick}>회원 정보 수정</Link>
                   </li>
                   <li>
-                    <Link to="#">내 게시글 보기</Link>
+                    <Link to="#" onClick={handleMenuClick}>내 게시글 보기</Link>
                   </li>
                   <li>
-                    <Link to="#">내 거래글 보기</Link>
+                    <Link to="#" onClick={handleMenuClick}>내 거래글 보기</Link>
                   </li>
                   <li>
-                    <Link to="#">내 레시피 보기</Link>
+                    <Link to="#" onClick={handleMenuClick}>내 레시피 보기</Link>
                   </li>
                   <li>
                     <a href="#" onClick={handleLogout}>
@@ -112,5 +127,4 @@ const Header = () => {
     </div>
   );
 };
-
 export default Header;

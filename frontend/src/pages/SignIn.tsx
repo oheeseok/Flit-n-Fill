@@ -5,6 +5,7 @@ import "../styles/common/SignIn.css"; // 스타일 파일 경로는 프로젝트
 interface UserLoginResponse {
   accessToken: string;
   userEmail: string;
+  userProfile: string;
 }
 
 const SignIn: React.FC = () => {
@@ -16,7 +17,6 @@ const SignIn: React.FC = () => {
   const handleLogin = async () => {
     try {
       // API 요청을 보냄 (localhost:8080)
-      console.log("handleLogin()");
       const response = await axios.post<UserLoginResponse>(
         "http://localhost:8080/api/user/login",
         {
@@ -24,15 +24,14 @@ const SignIn: React.FC = () => {
           userPassword: password,
         },
         {
-          withCredentials: true, // CORS 에러를   하기 위해 credentials: 'include'로 설정
+          withCredentials: true, // CORS 에러를 ��하기 위해 credentials: 'include'로 설정
         }
       );
 
       // 로그인 성공 시 받은 토큰을 로컬 스토리지에 저장
-      console.log(`response.data.accessToken: ${response.data.accessToken}`);
-      console.log(`response.data.userEmail: ${response.data.userEmail}`);
       localStorage.setItem("accessToken", response.data.accessToken);
       localStorage.setItem("userEmail", response.data.userEmail);
+      localStorage.setItem("userProfile", response.data.userProfile);
 
       console.log(response);
       alert("로그인 성공"); // 로그인 성공 메시지

@@ -11,6 +11,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -37,7 +38,7 @@ public class BlackList {
 
   @Column(nullable = false)
   @NotNull
-  private LocalDate reportedDate;
+  private LocalDateTime reportedDate;
 
   @Column(nullable = false)
   @NotNull
