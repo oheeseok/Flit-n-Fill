@@ -59,9 +59,7 @@ jobs:
           docker build -t ckdgkim/backendproject:back-${{ env.TAG }} .
           echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
           docker push ckdgkim/backendproject:back-${{ env.TAG }}
-
-
-
+          
 
       - name: Deploy to EC2 via Bastion
         run: |
@@ -107,5 +105,5 @@ jobs:
               exit
             INNER_EOF
 
-            eixt
+            exit
           EOF
