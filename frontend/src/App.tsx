@@ -172,7 +172,7 @@ function App() {
             }
           />
           <Route
-            path="/chatroom"
+            path="/chatroom/:tradeRoomId"
             element={
               <Layout>
                 <ChatRoom />
@@ -180,7 +180,7 @@ function App() {
             }
           />
           <Route
-            path="/chatroom/after"
+            path="/feedback/:tradeRoomId"
             element={
               <Layout>
                 <ChatRoomAfter />

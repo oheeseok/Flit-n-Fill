@@ -11,6 +11,7 @@ import org.example.backend.api.user.model.entity.User;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserInfoDto {
+    private Long userId;
     private String userName;
     private String userEmail;
     private String userNickname;
@@ -21,6 +22,7 @@ public class UserInfoDto {
 
     public static UserInfoDto of(User user) {
         return new UserInfoDto(
+                user.getUserId(),
                 user.getUserName(),
                 user.getUserEmail(),
                 user.getUserNickname(),

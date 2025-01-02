@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.backend.api.recipe.model.dto.*;
 import org.example.backend.api.recipe.service.RecipeService;
-import org.example.backend.api.s3.S3Service;
 import org.example.backend.exceptions.UserIdNullException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,7 +26,9 @@ public class RecipeController {
     @GetMapping
     public ResponseEntity<Object> getAllRecipes(HttpServletRequest request,
                                                 @RequestParam(value = "search-query", required = false) String keyword,
-                                                @RequestParam(value = "src", required = false) String src) {
+                                                @RequestParam(value = "src", required = false) String src,
+                                                @RequestParam(value = "page", defaultValue = "0") int page,  // 기본 값 0
+                                                @RequestParam(value = "size", defaultValue = "18") int size) {
 
         Long userId = (Long) request.getAttribute("userId");
         if (userId == null) {
@@ -43,7 +44,7 @@ public class RecipeController {
                 result = recipeService.searchRecipes(userId, keyword); // keyword만 사용하여 검색
             }
         } else {
-            result = recipeService.getAllRecipes(userId); // 모든 레시피 조회
+            result = recipeService.getAllRecipes(userId, page, size); // 모든 레시피 조회
         }
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
