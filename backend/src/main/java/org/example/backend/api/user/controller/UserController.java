@@ -13,7 +13,7 @@ import org.example.backend.api.user.service.UserService;
 import org.example.backend.exceptions.LoginFailedException;
 import org.example.backend.exceptions.UserIdNullException;
 import org.example.backend.exceptions.UserNotFoundException;
-import org.example.backend.security.PrincipalDetails;
+import org.example.backend.security.model.PrincipalDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
