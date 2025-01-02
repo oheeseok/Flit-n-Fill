@@ -55,7 +55,7 @@ jobs:
       # 6. Docker 이미지 빌드 및 푸시
       - name: Build and Push Docker Image
         run: |
-          cd cicdtest4/backend
+          cd Flit-n-Fill/backend
           docker build -t ckdgkim/backendproject:back-${{ env.TAG }} .
           echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
           docker push ckdgkim/backendproject:back-${{ env.TAG }}
