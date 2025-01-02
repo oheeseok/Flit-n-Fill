@@ -44,8 +44,11 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
       const response = await axios.get<User>(
         "http://localhost:8080/api/user/info",
         {
-          // headers: { Authorization: `Bearer ${accessToken}` }, // Authorization 헤더 추가
           withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
+          },
         }
       );
 
@@ -72,6 +75,10 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
         {
           // headers: { Authorization: `Bearer ${accessToken}` },
           withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
+          },
         }
       );
 
@@ -124,6 +131,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     setUser(null);
     setAccessToken(null);
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("userEmail");
     alert("로그아웃 되었습니다.");
   };
 

@@ -151,7 +151,7 @@ public class AdminService {
         BlackList blackList = new BlackList();
         blackList.setReporter(request.getRequestUser());
         blackList.setReported(request.getReportedUser());
-        blackList.setReportedDate(LocalDate.now());
+        blackList.setReportedDate(LocalDateTime.now());
         blackList.setReportReason(request.getResponseMessage());
 
         blackListRepository.save(blackList);

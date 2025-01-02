@@ -1,0 +1,49 @@
+/* src/styles/admin/AdminPage.css */
+
+/* AdminPage의 전체 컨테이너 스타일 */
+.admin-page-container {
+    width: 100%;
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    margin: 0 auto;
+}
+
+/* 제목 스타일 */
+.admin-page-container h1 {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* 설명 텍스트 스타일 */
+.admin-page-container p {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 30px;
+}
+
+/* 관리 페이지의 구체적인 콘텐츠 스타일 */
+.admin-page-container .content {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 버튼 스타일 */
+.admin-page-container .btn {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.admin-page-container .btn:hover {
+    background-color: #45a049;
+}

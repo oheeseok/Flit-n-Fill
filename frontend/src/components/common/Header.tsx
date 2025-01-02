@@ -10,7 +10,7 @@ const Header = () => {
   const [showNotification, setShowNotification] = useState<boolean>(false);
   const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
-  
+
   const navigate = useNavigate();
 
 
@@ -84,15 +84,9 @@ const Header = () => {
               <img src="/assets/notification-icon.png" alt="notification" />
             </a>
             {/* 알림 팝업 */}
-            {showNotification && <NotificationPopup />}
-
-            {/* 알림창 */}
-            {showNotification && (
-              <div className="header-notification-popup">
-                <p>New notification!</p>
-                <p>No new messages</p>
-              </div>
-            )}
+              {showNotification && (
+                  <NotificationPopup setShowNotification={setShowNotification} />
+              )}
 
             {/* 사용자 메뉴 버튼 */}
             <a href="#" className="header-user" onClick={toggleUserMenu}>
@@ -133,5 +127,4 @@ const Header = () => {
     </div>
   );
 };
-
 export default Header;

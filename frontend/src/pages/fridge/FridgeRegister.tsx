@@ -58,6 +58,10 @@ const FridgeRegister = () => {
       try {
         const response = await axios.get("http://localhost:8080/api/foodlist", {
           withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
+          },
         });
 
         const groupedData = response.data.reduce(
@@ -131,9 +135,11 @@ const FridgeRegister = () => {
     if (selectedDetailCategory) {
       setName(selectedDetailCategory);
       const newicon =
-          "../../assets/icons/" + categories[selectedMainCategory]?.중분류[selectedSubCategory]?.소분류[
-          selectedDetailCategory
-        ]?.foodListIcon + ".png" || "";
+        "../../assets/icons/" +
+          categories[selectedMainCategory]?.중분류[selectedSubCategory]?.소분류[
+            selectedDetailCategory
+          ]?.foodListIcon +
+          ".png" || "";
       const newfoodListId =
         categories[selectedMainCategory]?.중분류[selectedSubCategory]?.소분류[
           selectedDetailCategory
@@ -143,9 +149,13 @@ const FridgeRegister = () => {
     } else if (selectedSubCategory) {
       setName(selectedSubCategory);
       const newicon =
-          "../../assets/icons/" + categories[selectedMainCategory]?.중분류[selectedSubCategory]?.foodListIcon + ".png" || "";
+        "../../assets/icons/" +
+          categories[selectedMainCategory]?.중분류[selectedSubCategory]
+            ?.foodListIcon +
+          ".png" || "";
       const newfoodListId =
-        categories[selectedMainCategory]?.중분류[selectedSubCategory]?.foodListId || "";
+        categories[selectedMainCategory]?.중분류[selectedSubCategory]
+          ?.foodListId || "";
       setIcon(newicon);
       setFoodListId(newfoodListId.toString());
     } else {
@@ -167,10 +177,12 @@ const FridgeRegister = () => {
       const errorMessages = [
         {
           condition: quantity === "" || quantity === 0,
-          message: "수량을 입력해주세요."
+          message: "수량을 입력해주세요.",
         },
         {
-          condition: ingredientType !== "COOKED" && (!selectedMainCategory || !selectedSubCategory),
+          condition:
+            ingredientType !== "COOKED" &&
+            (!selectedMainCategory || !selectedSubCategory),
           message: "대분류와 중분류를 선택해주세요.",
         },
         {
@@ -183,10 +195,10 @@ const FridgeRegister = () => {
         },
         {
           condition: new Date(expirationDate) <= new Date(),
-          message: "소비기한은 오늘 이후 날짜로 설정해야 합니다."
-        }
+          message: "소비기한은 오늘 이후 날짜로 설정해야 합니다.",
+        },
       ];
-  
+
       for (const { condition, message } of errorMessages) {
         if (condition) {
           Swal.fire({
@@ -197,13 +209,13 @@ const FridgeRegister = () => {
           return false;
         }
       }
-  
+
       return true;
     };
-  
+
     // 유효성 검사 통과하지 못하면 중단
     if (!validateInput()) return;
-  
+
     // 새로운 항목 생성
     const newItem = {
       id: Number(foodListId), // 백엔드에서 제공된 식별자를 사용
@@ -221,17 +233,17 @@ const FridgeRegister = () => {
       icon,
       foodListId: Number(foodListId), // 타입 변환
     };
-  
+
     // 항목 추가
     addFridgeItem(newItem);
-  
+
     // 성공 메시지
     Swal.fire({
       icon: "success",
       title: "등록 완료",
       text: "냉장고에 항목이 추가되었습니다.",
     });
-  
+
     // 폼 초기화
     resetForm();
   };
@@ -244,7 +256,7 @@ const FridgeRegister = () => {
     setIngredientType(value);
 
     if (value === "COOKED") {
-      setIcon("/assets/instant-food.png"); 
+      setIcon("/assets/instant-food.png");
       setName("");
       setSelectedMainCategory("");
       setSelectedSubCategory("");
@@ -287,7 +299,7 @@ const FridgeRegister = () => {
   // };
 
   const handleMainCategoryChangee = (
-      e: React.ChangeEvent<HTMLSelectElement>
+    e: React.ChangeEvent<HTMLSelectElement>
   ) => {
     const newCategory = e.target.value;
 
@@ -307,9 +319,7 @@ const FridgeRegister = () => {
     setFoodListId("");
   };
 
-  const handleSubCategoryChange = (
-      e: React.ChangeEvent<HTMLSelectElement>
-  ) => {
+  const handleSubCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newSubCategory = e.target.value;
 
     // Sub Category 변경 시 상태 초기화
@@ -328,7 +338,7 @@ const FridgeRegister = () => {
   };
 
   const handleDetailCategoryChange = (
-      e: React.ChangeEvent<HTMLSelectElement>
+    e: React.ChangeEvent<HTMLSelectElement>
   ) => {
     const newDetailCategory = e.target.value;
 
@@ -395,7 +405,7 @@ const FridgeRegister = () => {
             <select
               value={selectedMainCategory}
               onChange={handleMainCategoryChangee}
-              disabled={ingredientType==="COOKED"}
+              disabled={ingredientType === "COOKED"}
             >
               <option value="">선택</option>
               {Object.keys(categories).map((mainCategory) => (

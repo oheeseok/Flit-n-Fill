@@ -10,7 +10,11 @@ const Cart = () => {
   const getMyCart = async () => {
     try {
       const response = await axios.get("/api/my-fridge/shoppingcart", {
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          userEmail: localStorage.getItem("userEmail"),
+        },
       });
       // setInputText(response.data.join("\n")); // textarea에 표시할 텍스트로 변환
       setLines(response.data); // textarea에 표시할 텍스트로 변환
@@ -70,7 +74,11 @@ const Cart = () => {
         "/api/my-fridge/shoppingcart", // 백엔드 API 경로
         lines, // 리스트를 전송
         {
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
+          },
         }
       );
       console.log("response: ", response);
