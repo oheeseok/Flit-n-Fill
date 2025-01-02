@@ -12,6 +12,7 @@ const Cart = () => {
       const response = await axios.get("/api/my-fridge/shoppingcart", {
         withCredentials: true,
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           userEmail: localStorage.getItem("userEmail"),
         },
@@ -58,6 +59,7 @@ const Cart = () => {
         {
           withCredentials: true,
           headers: {
+            "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
             userEmail: localStorage.getItem("userEmail"),
           },

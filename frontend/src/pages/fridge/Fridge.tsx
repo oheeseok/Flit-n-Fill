@@ -95,6 +95,7 @@ const Fridge: React.FC = () => {
       if (!validateInput()) return;
   
       let updatedItem: Partial<FridgeItem> = {
+        id: editingItemId,
         quantity: editedQuantity === "" ? 0 : editedQuantity,
         unit: editedUnit,
         expirationDate: editedExpirationDate,
@@ -104,7 +105,7 @@ const Fridge: React.FC = () => {
       };
   
       // 업데이트된 항목 전송
-      updateFridgeItem(editingItemId, updatedItem)
+      updateFridgeItem(updatedItem)
         .then(() => {
           // 성공 시 알림
           Swal.fire({
