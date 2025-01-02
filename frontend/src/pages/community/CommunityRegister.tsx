@@ -1,14 +1,35 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import axios from "axios";
-// import { useCommunity } from "../../context/CommunityContext";
 import CommunityImageUploader from "../../components/community/CommunityImageUploader";
 import "../../styles/community/CommunityRegister.css";
 
+interface FoodDetailDto {
+  foodId: number;
+  foodListName: string;
+  foodRegistDate: string;
+  foodCount: number;
+  foodUnit: string;
+  foodProDate: string;
+  foodExpDate: string;
+  foodStorage: string;
+  foodIsThaw: boolean;
+  foodDescription: string;
+  foodListIcon: string;
+  foodListId: number;
+}
+
+interface FoodListViewDto {
+  foodListId: number;
+  foodListGroup: string;
+  foodListType: string;
+  foodListProduct: string;
+  foodListIcon: number;
+}
+
 const CommunityRegister = () => {
   const navigate = useNavigate();
-  // const { setCommunityData } = useCommunity(); // Context의 데이터 설정 함수 사용
 
   // 상태 관리
   const [uploadedImage1, setUploadedImage1] = useState<File | null>(null);
@@ -19,9 +40,57 @@ const CommunityRegister = () => {
   const [category, setCategory] = useState<string>("EXCHANGE");
   const [writerFoodId, setWriterFoodId] = useState<number>(0);
   const [proposerFoodListId, setProposerFoodListId] = useState<number>(0);
+  const [fridgeItems, setFridgeItems] = useState<FoodDetailDto[]>([])
+  const [foodList, setFoodList] = useState<FoodListViewDto[]>([])
 
   // 이미지 업로드 핸들러
   const handleImage1Change = (image: File) => setUploadedImage1(image);
+
+  // 음식 리스트 가져오기
+  useEffect(() => {
+    const fetchFoodList = async () => {
+      try {
+        const response = await axios.get<FoodListViewDto[]>(
+          "/api/foodlist",
+          {
+            withCredentials: true,
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+              userEmail: localStorage.getItem("userEmail"),
+            },
+          }
+        );
+        console.log("foodList: ", response.data)
+        setFoodList(response.data); // 가져온 데이터를 상태에 저장
+      } catch (error) {
+        console.error("음식 리스트를 가져오는 데 실패했습니다:", error);
+      }
+    };
+
+    fetchFoodList();
+  }, []);
+
+  // 작성자의 재료 목록 가져오기
+  useEffect(() => {
+    const fetchFridgeItems = async () => {
+      try {
+        const response = await axios.get<FoodDetailDto[]>("http://localhost:8080/api/my-fridge", {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
+          },
+        });
+        console.log("fridge items: ", response.data)
+        setFridgeItems(response.data);
+      } catch (error) {
+        console.error("작성자의 재료를 가져오는 데 실패했습니다:", error);
+        Swal.fire("오류", "작성자의 재료를 가져오는 데 실패했습니다.", "error");
+      }
+    };
+
+    fetchFridgeItems();
+  }, []);
 
   const handleRegister = async () => {
     // 필수 입력값 확인
@@ -62,12 +131,12 @@ const CommunityRegister = () => {
         "/api/posts",
         formData,
         {
+          withCredentials: true,
           headers: { 
             "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
             userEmail: localStorage.getItem("userEmail"), 
           },
-          withCredentials: true,
         }
       );
 
@@ -159,25 +228,35 @@ const CommunityRegister = () => {
         placeholder="만남 시간을 입력하세요"
       />
       {/* 작성자/제안자 음식 ID */}
-      작성자의 재료
-      <input
-        type="number"
+      나의 재료
+      <select
         className="community-register-text"
         value={writerFoodId}
         onChange={(e) => setWriterFoodId(Number(e.target.value))}
-        placeholder="작성자 음식 ID를 입력하세요"
-      />
+      >
+        <option value="">재료를 선택하세요</option>
+        {fridgeItems.map((item) => (
+          <option key={item.foodId} value={item.foodId}>
+            {item.foodListName}
+          </option>
+        ))}
+      </select>
       { category !== "SHARING" && (
-        <>
-          교환원하는 재료
-          <input
-            type="number"
+        <div>
+          원하는 재료
+          <select
             className="community-register-text"
             value={proposerFoodListId}
             onChange={(e) => setProposerFoodListId(Number(e.target.value))}
-            placeholder="제안자 음식 리스트 ID를 입력하세요"
-          />
-        </>
+          >
+            <option value="">재료를 선택하세요</option>
+            {foodList.map((food) => (
+              <option key={food.foodListId} value={food.foodListId}>
+                {food.foodListProduct !== null ? food.foodListProduct : food.foodListType}
+              </option>
+            ))}
+          </select>
+        </div>
       )}
       
       {/* 내용 입력 */}
@@ -190,16 +269,16 @@ const CommunityRegister = () => {
       {/* 등록/취소 버튼 */}
       <div className="community-register-button-container">
         <button
-          className="community-register-register-button"
-          onClick={handleRegister}
-        >
-          등록
-        </button>
-        <button
           className="community-register-cancel-button"
           onClick={handleCancel}
         >
           취소
+        </button>
+        <button
+          className="community-register-register-button"
+          onClick={handleRegister}
+        >
+          등록
         </button>
       </div>
     </div>

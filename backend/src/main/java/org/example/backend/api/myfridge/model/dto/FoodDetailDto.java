@@ -26,6 +26,7 @@ public class FoodDetailDto {
     private boolean foodIsThaw;
     private String foodDescription;
     private String foodListIcon;
+    private Long foodListId;
 
     public static FoodDetailDto of(Food food) {
         String foodListName = food.getFoodListName();
@@ -42,7 +43,8 @@ public class FoodDetailDto {
                 food.getFoodStorage(),
                 food.isFoodIsThaw(),
                 food.getFoodDescription(),
-                foodListIcon
+                foodListIcon,
+                food.getFoodList().getFoodListId()
         );
         return dto;
     }
