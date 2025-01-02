@@ -58,9 +58,6 @@ const CommunityRegister = () => {
 
       console.log("formData: ", formData)
 
-      // Context에 데이터 저장
-      // setCommunityData(communityPost);
-
       const response = await axios.post(
         "/api/posts",
         formData,
@@ -84,7 +81,6 @@ const CommunityRegister = () => {
         });
       }
 
-
     } catch (error) {
       console.error("게시글 등록 실패:", error);
       Swal.fire({
@@ -93,9 +89,6 @@ const CommunityRegister = () => {
         text: "게시물 등록 중 오류가 발생했습니다.",
       });
     }
-
-
-    
   };
 
   const handleCancel = () => {
@@ -174,14 +167,19 @@ const CommunityRegister = () => {
         onChange={(e) => setWriterFoodId(Number(e.target.value))}
         placeholder="작성자 음식 ID를 입력하세요"
       />
-      교환원하는 재료
-      <input
-        type="number"
-        className="community-register-text"
-        value={proposerFoodListId}
-        onChange={(e) => setProposerFoodListId(Number(e.target.value))}
-        placeholder="제안자 음식 리스트 ID를 입력하세요"
-      />
+      { category !== "SHARING" && (
+        <>
+          교환원하는 재료
+          <input
+            type="number"
+            className="community-register-text"
+            value={proposerFoodListId}
+            onChange={(e) => setProposerFoodListId(Number(e.target.value))}
+            placeholder="제안자 음식 리스트 ID를 입력하세요"
+          />
+        </>
+      )}
+      
       {/* 내용 입력 */}
       <textarea
         className="community-register-box-input"
