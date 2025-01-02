@@ -118,10 +118,25 @@ const CommunityDetail = () => {
 
       {/* 작성자 정보 */}
       <div className="community-detail-profile-container">
-        <div className="community-detail-profile-container-profile">{postDetail.userProfile}</div>
+        <div className="community-detail-profile-container-profile">
+          {postDetail.userProfile ? (
+                <img
+                  className="community-detail-profile-container-profile"
+                  src={postDetail.userProfile}
+                />
+              ) : (
+                <p>프로필 이미지 없음</p>
+              )}
+        </div>
         <div className="community-detail-profile-container-name">{postDetail.userNickname || "알 수 없음"}</div>
         <div className="community-detail-profile-container-time">
-          {new Date(postDetail.meetingTime).toLocaleString()}
+          {new Intl.DateTimeFormat("ko-KR", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+          }).format(new Date(postDetail.meetingTime))}
         </div>
         <div className="community-detail-button-container">
           <button className="community-detail-edit-button" onClick={handleEdit}>

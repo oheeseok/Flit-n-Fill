@@ -74,14 +74,13 @@ const CommunityList = () => {
                     <img
                       className="recipe-list-box-card-profile-img"
                       src={post.userProfile}
-                      alt={post.userNickname}
                     />
                   ) : (
                     <p>프로필 이미지 없음</p>
-                  )}
+                  )}{post.userNickname}
               </div>
               <div className="recipe-list-box-card-detail">
-                <strong>작성일: </strong>
+                작성일 : 
                 {new Date(post.postCreatedDate).toLocaleString("ko-KR", {
                   year: "numeric",
                   month: "2-digit",

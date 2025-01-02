@@ -156,7 +156,7 @@ function App() {
             }
           ></Route>
           <Route
-            path="/community/detail"
+            path="/community/detail/:postId"
             element={
               <Layout>
                 <CommunityDetail />
