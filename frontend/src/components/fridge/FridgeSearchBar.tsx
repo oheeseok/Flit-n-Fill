@@ -4,17 +4,18 @@ import SearchIcon from "../common/SearchIcon";
 import Swal from "sweetalert2";
 
 interface FridgeSearchBarProps {
-  categories: {
+  categories: 
+  {
     [mainCategory: string]: {
       대분류: string; // 대분류
       중분류: {
         [subCategory: string]: {
-          icon: string; // 중분류 아이콘
-          foodListId: string; // foodListId
+          icon: number; // 중분류 아이콘
+          foodListId: number; // foodListId
           소분류: {
             [detailCategory: string]: {
-              icon: string; // 소분류 아이콘
-              foodListId: string; // foodListId
+              icon: number; // 소분류 아이콘
+              foodListId: number; // foodListId
             };
           } | null; // 소분류가 없을 수 있음
         };
