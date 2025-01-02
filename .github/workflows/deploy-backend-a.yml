@@ -69,11 +69,11 @@ jobs:
           # 베스천 서버로 접속
           echo "Step 1: Connecting to Bastion server (${{ vars.PUB_IP_A }})"
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.ssh/qwe.pem ec2-user@"${{ vars.PUB_IP_A }}" << EOF
-            echo "Connected to Bastion server (${ { vars.PUB_IP_A }})"
+            echo "Connected to Bastion server (${{ vars.PUB_IP_A }})"
             # 사내 EC2로 접속
-            echo "Step 2: Connecting to internal EC2 (${ { vars.PRIVATE_IP_A }})"
-            ssh -i /home/ec2-user/qwe.pem ec2-user@"${{ vars.PRIVATE_IP_A }}" << 'INNER_EOF'
-              echo "Connected to internal EC2 (${ { vars.PRIVATE_IP_A }})"
+            echo "Step 2: Connecting to internal EC2 (${{ vars.PRIVATE_IP_A }})"
+            ssh -i home/ec2-user/qwe.pem ec2-user@"${{ vars.PRIVATE_IP_A }}" << 'INNER_EOF'
+              echo "Connected to internal EC2 (${{ vars.PRIVATE_IP_A }})"
               # Docker 이미지 가져오기
               docker pull ckdgkim/backendproject:back-${{ env.TAG }}
 
