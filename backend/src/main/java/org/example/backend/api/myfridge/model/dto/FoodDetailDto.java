@@ -25,11 +25,11 @@ public class FoodDetailDto {
     private FoodStorage foodStorage;
     private boolean foodIsThaw;
     private String foodDescription;
-    private int foodListIcon;
+    private String foodListIcon;
 
     public static FoodDetailDto of(Food food) {
         String foodListName = food.getFoodListName();
-        int foodListIcon = food.getFoodList() == null ? 0 : food.getFoodList().getFoodListIcon();
+        String foodListIcon = food.getFoodList() == null ? "instant-food" : String.valueOf(food.getFoodList().getFoodListIcon());
 
         FoodDetailDto dto = new FoodDetailDto(
                 food.getFoodId(),
