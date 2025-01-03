@@ -77,8 +77,10 @@ public class RecipeService {
    * @return recipeTitle이나 recipeFoodDetails에 keyword가 포함된 레시피
    */
   public List<RecipeSimpleDto> searchRecipes(Long userId, String keyword) {
+    log.info("Executing search for keyword: {}", keyword);
     List<String> bookmarkedRecipeIds = bookmarkedRecipeRepository.findRecipeIdsByUserId(userId);
     List<Recipe> recipes = recipeRepository.findByRecipeTitleContainingIgnoreCaseOrRecipeFoodDetailsContainingIgnoreCase(keyword, keyword, Sort.by(Sort.Direction.DESC, "recipeCreatedDate"));
+    log.info("Number of recipes found: {}", recipes.size()); // 검색된 레시피 수 로그
     return recipes.stream()
         .map(recipe -> {
           User user = recipe.getUserId() != null ? userRepository.findById(recipe.getUserId()).orElse(null) : null;
@@ -188,6 +190,7 @@ public class RecipeService {
     for (int i = 0; i < newRecipeSteps.size(); i++) {
       RecipeStepDto newStep = newRecipeSteps.get(i);
       MultipartFile newPhoto = stepPhotos.get(i);
+      String backupPhotoUrl = "";
 
       if (i < oldRecipeSteps.size()) {
         RecipeStepDto oldStep = oldRecipeSteps.get(i);
@@ -195,7 +198,9 @@ public class RecipeService {
 
         if (oldPhotoUrl != null && !oldPhotoUrl.isEmpty() && !oldPhotoUrl.equals(RECIPE_STEP_DEFAULT_IMG_URL)) {
 //          log.info("기존 사진 삭제: {}", oldPhotoUrl);
-          s3Service.deleteFile(oldPhotoUrl);
+//          s3Service.deleteFile(oldPhotoUrl);
+          log.info("updateRecipe - 기존 사진 삭제 안함");
+          backupPhotoUrl = oldPhotoUrl;
         }
       }
 
@@ -204,7 +209,8 @@ public class RecipeService {
         newStep.setPhoto(newPhotoUrl);
 //        log.info("새 사진 업로드 완료: {}", newPhotoUrl);
       } else {
-        newStep.setPhoto(RECIPE_STEP_DEFAULT_IMG_URL);
+//        newStep.setPhoto(RECIPE_STEP_DEFAULT_IMG_URL);
+        newStep.setPhoto(backupPhotoUrl);
       }
     }
 

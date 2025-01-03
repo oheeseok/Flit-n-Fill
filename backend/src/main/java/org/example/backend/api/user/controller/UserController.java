@@ -72,6 +72,7 @@ public class UserController {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(userService.getUserInfoByEmail(userEmail));
         } catch (Exception e) {
+
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원 조회 중 오류가 발생했습니다.");
         }
     }
@@ -89,6 +90,7 @@ public class UserController {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(userService.updateUserInfo(userEmail, updateDto, userProfile));
         } catch (Exception e) {
+            log.info(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원 정보 수정 중 오류가 발생했습니다.");
         }
     }

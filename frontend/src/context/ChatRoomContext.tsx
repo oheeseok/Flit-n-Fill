@@ -6,6 +6,7 @@ import {
   TraderoomContextType,
 } from "../interfaces/TradeRoomInterfaces";
 
+
 const apiUrl = import.meta.env.VITE_API_URL;
 
 // Context 기본 값

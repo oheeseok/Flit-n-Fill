@@ -2,11 +2,11 @@ import React, { createContext, useContext, useState } from "react";
 import axios from "axios";
 
 // Recipe 데이터 인터페이스
+
 export interface RecipePageResponse {
   content: RecipeSimpleDto[]; // 레시피 목록
   totalPages: number; // 전체 페이지 수
 }
-
 export interface RecipeSimpleDto {
   recipeId: string;
   recipeTitle: string;
@@ -47,57 +47,59 @@ interface RecipeDetailDto {
 }
 
 interface RecipeContextType {
-  recipes: RecipeSimpleDto[];
-  setRecipes: React.Dispatch<React.SetStateAction<RecipeSimpleDto[]>>;
+  recipes: (RecipeSimpleDto | RecipeDetailDto)[];
+  setRecipes: React.Dispatch<
+    React.SetStateAction<(RecipeSimpleDto | RecipeDetailDto)[]>
+  >;
+  // addRecipe의 recipeMainPhoto와 recipeStepPhotos를 string으로 변경
   addRecipe: (
     recipe: RecipeRegisterDto & {
-      recipeMainPhoto: string;
-      recipeStepPhotos: string[];
+      recipeMainPhoto: string; // 업로드된 파일 URL
+      recipeStepPhotos: string[]; // 각 단계별 업로드된 파일 URL 배열
     }
   ) => Promise<RecipeDetailDto>;
-  toggleBookmark: (recipeId: string) => Promise<void>;
+  toggleBookmark: (recipeId: string) => void;
   fetchRecipes: (params?: {
     sort?: string;
     search?: string;
     page?: number;
-    size?: number;
-  }) => Promise<RecipePageResponse>;
+    limit?: number;
+  }) => Promise<RecipeSimpleDto[]>;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
-  searchRecipes: () => Promise<void>;
   getRecipeDetail: (recipeId: string) => Promise<RecipeDetailDto>;
 }
 
 const RecipeContext = createContext<RecipeContextType>({
   recipes: [],
   setRecipes: () => {},
-  addRecipe: async () => Promise.resolve({} as RecipeDetailDto),
-  toggleBookmark: async () => Promise.resolve(),
-  fetchRecipes: async () => Promise.resolve({ content: [], totalPages: 0 }),
+  addRecipe: async () => Promise.resolve({} as RecipeDetailDto), // Default return type
+  toggleBookmark: () => {},
+  fetchRecipes: async () => Promise.resolve([]),
   searchQuery: "",
   setSearchQuery: () => {},
-  searchRecipes: async () => Promise.resolve(),
   getRecipeDetail: async () => Promise.resolve({} as RecipeDetailDto),
 });
 
 export const RecipeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [recipes, setRecipes] = useState<RecipeSimpleDto[]>([]);
+  const [recipes, setRecipes] = useState<(RecipeSimpleDto | RecipeDetailDto)[]>(
+    []
+  ); // Update state to hold both types
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   const fetchRecipes = async (params?: {
+    sort?: string;
     search?: string;
-    src?: string;
     page?: number;
-    size?: number;
-  }): Promise<RecipePageResponse> => {
+    limit?: number;
+  }): Promise<RecipeSimpleDto[]> => {
     try {
-      // 검색 쿼리와 src, 페이지 및 사이즈를 포함한 요청
-      const response = await axios.get<RecipePageResponse>("/api/recipes", {
+      const response = await axios.get<RecipeSimpleDto[]>("/api/recipes", {
         params: {
-          "search-query": params?.search || "", // search-query를 사용하여 검색어 전달
-          src: params?.src || "", // src를 설정할 수 있음, 기본적으로 비어있음
-          page: params?.page || 1, // 기본 페이지 0
-          size: params?.size || 18, // 기본 사이즈 18
+          sort: params?.sort || "popular",
+          search: params?.search || "",
+          page: params?.page || 1,
+          limit: params?.limit || 10,
         },
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -105,9 +107,11 @@ export const RecipeProvider = ({ children }: { children: React.ReactNode }) => {
         },
         withCredentials: true,
       });
-      console.log("Response data:", response.data); // 응답 데이터 확인
-      // 응답 데이터 처리
-      return response.data;
+
+      const fetchedRecipes = response.data;
+      setRecipes(fetchedRecipes);
+
+      return fetchedRecipes;
     } catch (error) {
       console.error("Failed to fetch recipes:", error);
       throw error;
@@ -121,11 +125,11 @@ export const RecipeProvider = ({ children }: { children: React.ReactNode }) => {
       const response = await axios.get<RecipeDetailDto>(
         `/api/recipes/${recipeId}`,
         {
+          withCredentials: true,
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
             userEmail: localStorage.getItem("userEmail"),
           },
-          withCredentials: true,
         }
       );
       return response.data;
@@ -137,30 +141,33 @@ export const RecipeProvider = ({ children }: { children: React.ReactNode }) => {
 
   const addRecipe = async (
     recipe: RecipeRegisterDto & {
-      recipeMainPhoto: string;
-      recipeStepPhotos: string[];
+      recipeMainPhoto: string; // URL로 처리
+      recipeStepPhotos: string[]; // URL 배열로 처리
     }
   ): Promise<RecipeDetailDto> => {
     try {
       const formData = new FormData();
-      formData.append(
-        "recipeRegisterDto",
-        JSON.stringify({
-          recipeTitle: recipe.recipeTitle,
-          recipeFoodDetails: recipe.recipeFoodDetails,
-          recipeSteps: recipe.recipeSteps,
-          recipeIsVisibility: recipe.recipeIsVisibility,
-        })
-      );
-      if (recipe.recipeMainPhoto) {
-        formData.append("recipeMainPhoto", recipe.recipeMainPhoto);
-      }
-      recipe.recipeStepPhotos.forEach((photo) =>
-        formData.append("recipeStepPhotos", photo)
-      );
 
+      const recipeRegisterDtoJson = JSON.stringify({
+        recipeTitle: recipe.recipeTitle,
+        recipeFoodDetails: recipe.recipeFoodDetails,
+        recipeSteps: recipe.recipeSteps.map((step) => ({
+          seq: step.seq,
+          description: step.description,
+          photo:
+            step.photo ||
+            "https://flitnfill.s3.ap-northeast-2.amazonaws.com/default-img/recipe-step-default-img.png",
+        })),
+        recipeIsVisibility: recipe.recipeIsVisibility,
+      });
+
+      formData.append("recipeRegisterDto", recipeRegisterDtoJson);
+      formData.append("recipeMainPhoto", recipe.recipeMainPhoto);
+
+      // POST 요청
       const response = await axios.post("/api/recipes", formData, {
         headers: {
+          // Content-Type은 FormData 사용 시 자동으로 설정되므로 생략
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           userEmail: localStorage.getItem("userEmail"),
         },
@@ -168,7 +175,7 @@ export const RecipeProvider = ({ children }: { children: React.ReactNode }) => {
       });
 
       const addedRecipe = response.data;
-      setRecipes((prev) => [...prev, addedRecipe]);
+      setRecipes((prevRecipes) => [...prevRecipes, addedRecipe]);
       return addedRecipe;
     } catch (error) {
       console.error("Failed to add recipe:", error);
@@ -176,41 +183,39 @@ export const RecipeProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const searchRecipes = async (): Promise<void> => {
-    try {
-      const response = await fetchRecipes({
-        search: searchQuery.trim() || "", // 검색어가 없으면 빈 문자열로 처리
-      });
-      setRecipes(response.content || response); // API 응답 구조에 따라 수정 필요
-    } catch (error) {
-      console.error("Failed to search recipes:", error);
-    }
-  };
+  const toggleBookmark = async (recipeId: string) => {
+    // 상태 업데이트 전에 현재 상태를 기반으로 업데이트
+    setRecipes((prevRecipes) => {
+      return prevRecipes.map((recipe) =>
+        recipe.recipeId === recipeId
+          ? { ...recipe, recipeIsBookmarked: !recipe.recipeIsBookmarked }
+          : recipe
+      );
+    });
 
-  const toggleBookmark = async (recipeId: string): Promise<void> => {
     try {
-      const response = await axios.patch(`/api/recipes/${recipeId}`, null, {
+      // 서버에 북마크 상태를 업데이트하는 요청 보내기
+      await axios.patch(`/api/recipes/${recipeId}`, null, {
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           userEmail: localStorage.getItem("userEmail"),
         },
         withCredentials: true,
       });
-
-      if (response.status === 200) {
-        setRecipes((prev) =>
-          prev.map((recipe) =>
-            recipe.recipeId === recipeId
-              ? { ...recipe, recipeIsBookmarked: !recipe.recipeIsBookmarked }
-              : recipe
-          )
-        );
-      }
     } catch (error) {
       console.error("Failed to toggle bookmark:", error);
+      // 서버 요청 실패시 상태를 원래대로 되돌리기
+      setRecipes((prevRecipes) =>
+        prevRecipes.map((recipe) =>
+          recipe.recipeId === recipeId
+            ? { ...recipe, recipeIsBookmarked: !recipe.recipeIsBookmarked }
+            : recipe
+        )
+      );
+      alert("Failed to toggle bookmark.");
     }
   };
-
   return (
     <RecipeContext.Provider
       value={{
@@ -220,7 +225,6 @@ export const RecipeProvider = ({ children }: { children: React.ReactNode }) => {
         toggleBookmark,
         fetchRecipes,
         searchQuery,
-        searchRecipes,
         setSearchQuery,
         getRecipeDetail,
       }}

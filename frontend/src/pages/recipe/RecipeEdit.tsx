@@ -1,50 +1,75 @@
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useRecipe } from "../../context/RecipeContext";
-
 import "../../styles/recipe/RecipeEdit.css";
 import RecipeImageUploader from "../../components/recipe/RecipeImageUploader";
 import RecipeStepImageUploader from "../../components/recipe/RecipeStepImageUploader";
 import RecipeDetailButton from "../../components/recipe/RecipeDetailButton";
 import RecipeCancelButton from "../../components/recipe/RecipeCancelButton";
 import Swal from "sweetalert2";
+import axios from "axios";
 
-interface RecipeMethod {
+interface RecipeStepDto {
   seq: number;
-  photo: string;
+  photo: File | string | null; // 파일 또는 URL 처리
   description: string;
 }
 
 const RecipeEdit = () => {
   const { id } = useParams<{ id: string }>();
-  const { recipes, setRecipes } = useRecipe();
   const navigate = useNavigate();
-  const recipe = recipes[Number(id)];
 
-  if (!recipe) {
-    Swal.fire({
-      icon: "error",
-      title: "레시피를 찾을 수 없습니다.",
-      confirmButtonText: "확인",
-    }).then(() => navigate("/recipe/list"));
-    return null;
-  }
+  const [recipeTitle, setRecipeTitle] = useState("");
+  const [recipeImage, setRecipeImage] = useState<File | string | null>(null);
+  const [recipeIngredients, setRecipeIngredients] = useState("");
+  const [recipeMethods, setRecipeMethods] = useState<RecipeStepDto[]>([]);
+  const [recipeIsVisibility, setRecipeIsVisibility] = useState(true);
+  // const [isLoading, setIsLoading] = useState(false);
 
-  const [recipeTitle, setRecipeTitle] = useState(recipe.recipeTitle);
-  const [recipeImage, setRecipeImage] = useState<string | null>(
-    recipe.recipeMainPhoto
-  );
-  const [recipeIngredients, setRecipeIngredients] = useState(
-    recipe.recipeFoodDetails
-  );
-  const [recipeMethods, setRecipeMethods] = useState<RecipeMethod[]>(
-    recipe.recipeSteps
-  );
-  const [recipeIsVisibility, setRecipeIsVisibility] = useState(
-    recipe.recipeIsVisibility
-  );
+  const fetchRecipeDetail = async () => {
+    try {
+      const response = await axios.get(`/api/recipes/${id}`, {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          userEmail: localStorage.getItem("userEmail"),
+        },
+      });
+      const recipe = response.data;
 
-  const handleSave = () => {
+      setRecipeTitle(recipe.recipeTitle);
+      setRecipeImage(recipe.recipeMainPhoto);
+      setRecipeIngredients(recipe.recipeFoodDetails);
+
+      const steps = recipe.recipeSteps.map((step: any, index: number) => ({
+        seq: index + 1,
+        photo:
+          step.photo ||
+          "https://flitnfill.s3.ap-northeast-2.amazonaws.com/default-img/recipe-step-default-img.png", // 기본 이미지
+        description: step.description,
+      }));
+
+      setRecipeMethods(steps);
+
+      console.log(
+        "Loaded Step Photos:",
+        steps.map((step: RecipeStepDto) => step.photo)
+      );
+
+      setRecipeIsVisibility(recipe.recipeIsVisibility);
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "레시피를 불러오는데 실패했습니다.",
+        confirmButtonText: "확인",
+      }).then(() => navigate("/recipe/list"));
+    }
+  };
+
+  React.useEffect(() => {
+    fetchRecipeDetail();
+  }, [id]);
+
+  const handleSave = async () => {
     if (!recipeTitle.trim()) {
       Swal.fire({
         icon: "info",
@@ -53,14 +78,16 @@ const RecipeEdit = () => {
       });
       return;
     }
+
     if (!recipeImage) {
       Swal.fire({
         icon: "info",
-        title: "대표 이미지를 업로드해주세요.",
+        title: "메인 이미지를 추가해주세요.",
         confirmButtonText: "확인",
       });
       return;
     }
+
     if (!recipeIngredients.trim()) {
       Swal.fire({
         icon: "info",
@@ -69,46 +96,130 @@ const RecipeEdit = () => {
       });
       return;
     }
-    for (let step of recipeMethods) {
-      if (!step.description.trim()) {
-        Swal.fire({
-          icon: "info",
-          title: `레시피를 입력해주세요.`,
-          confirmButtonText: "확인",
-        });
-        return;
-      }
-    }
 
-    const updatedRecipes = recipes.map((r, index) =>
-      index === Number(id)
-        ? {
-            ...r,
-            recipeTitle,
-            recipeMainPhoto: recipeImage,
-            recipeFoodDetails: recipeIngredients,
-            recipeSteps: recipeMethods,
-            recipeIsVisibility,
-          }
-        : r
+    const missingSteps = recipeMethods.some(
+      (method) => !method.description.trim()
     );
 
-    setRecipes(updatedRecipes);
-    localStorage.setItem("recipes", JSON.stringify(updatedRecipes));
+    if (missingSteps) {
+      Swal.fire({
+        icon: "info",
+        title: "모든 스텝의 설명을 입력해주세요.",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
 
-    Swal.fire({
-      icon: "success",
-      title: "레시피가 성공적으로 수정되었습니다.",
-      confirmButtonText: "확인",
-    }).then(() => {
-      navigate(`/recipe/detail/${id}`);
-    });
+    try {
+      const formData = new FormData();
+
+      // 레시피 데이터 생성
+      const recipeUpdateDto = {
+        recipeTitle,
+        recipeFoodDetails: recipeIngredients,
+        recipeSteps: recipeMethods.map((method) => {
+          // 스텝 이미지가 파일이 아니면 기존 이미지 URL을 사용
+          if (method.photo instanceof File) {
+            return {
+              seq: method.seq,
+              description: method.description,
+              photo: "", // 업로드된 파일은 FormData에서 처리
+            };
+          } else if (typeof method.photo === "string" && method.photo) {
+            // 이미지 URL이 있으면 그대로 사용
+            return {
+              seq: method.seq,
+              description: method.description,
+              photo: method.photo,
+            };
+          } else if (method.photo === null) {
+            // 스텝 이미지가 null인 경우 기본 이미지 URL로 설정
+            return {
+              seq: method.seq,
+              description: method.description,
+              photo:
+                "https://flitnfill.s3.ap-northeast-2.amazonaws.com/default-img/recipe-step-default-img.png",
+            };
+          }
+          // 이미지가 없으면 기본 이미지 URL로 설정
+          return {
+            seq: method.seq,
+            description: method.description,
+            photo:
+              "https://flitnfill.s3.ap-northeast-2.amazonaws.com/default-img/recipe-step-default-img.png",
+          };
+        }),
+      };
+
+      formData.append("recipeUpdateDto", JSON.stringify(recipeUpdateDto));
+
+      // 메인 이미지 파일 추가
+      if (recipeImage instanceof File) {
+        formData.append("recipeMainPhoto", recipeImage);
+      }
+
+      // 새로 추가된 스텝 이미지를 FormData에 추가
+      const stepPhotos = recipeMethods
+        .filter((method) => method.photo instanceof File)
+        .map((method) => method.photo as File);
+
+      stepPhotos.forEach((photo) => {
+        formData.append("recipeStepPhotos", photo);
+      });
+
+      // 기존 스텝 이미지를 유지할 데이터도 명시적으로 추가
+      const existingStepPhotos = recipeMethods
+        .filter((method) => typeof method.photo === "string")
+        .map(
+          (method) =>
+            method.photo ||
+            "https://flitnfill.s3.ap-northeast-2.amazonaws.com/default-img/recipe-step-default-img.png"
+        );
+
+      formData.append("existingStepPhotos", JSON.stringify(existingStepPhotos));
+
+      console.log("FormData Debug:", {
+        recipeUpdateDto,
+        existingStepPhotos,
+        stepPhotos,
+      });
+
+      // 서버에 PUT 요청 (axios 사용)
+      const response = await axios.put(`/api/recipes/${id}`, formData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          userEmail: localStorage.getItem("userEmail"),
+          // "Content-Type" 제거: axios는 자동으로 처리함
+        },
+        withCredentials: true,
+      });
+
+      if (response.status === 200) {
+        Swal.fire({
+          icon: "success",
+          title: "레시피가 성공적으로 수정되었습니다.",
+          confirmButtonText: "확인",
+        }).then(() => navigate(`/recipe/detail/${id}`));
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "레시피 수정에 실패했습니다.",
+        confirmButtonText: "확인",
+      });
+      console.error("Error updating recipe:", error);
+    }
   };
 
   const addRecipeMethod = () => {
     setRecipeMethods((prev) => [
       ...prev,
-      { seq: prev.length + 1, photo: "", description: "" },
+      {
+        seq: prev.length + 1,
+        photo:
+          "https://flitnfill.s3.ap-northeast-2.amazonaws.com/default-img/recipe-step-default-img.png", // 디폴트 이미지 설정
+        description: "",
+      },
     ]);
   };
 
@@ -120,14 +231,14 @@ const RecipeEdit = () => {
     );
   };
 
-  const handleImageChange = (photo: string) => {
-    setRecipeImage(photo);
+  const handleImageChange = (file: File | null) => {
+    setRecipeImage(file);
   };
 
-  const handleStepImageChange = (seq: number, photo: string): void => {
+  const handleStepImageChange = (seq: number, file: File | null): void => {
     setRecipeMethods((prevMethods) =>
       prevMethods.map((method, i) =>
-        i === seq ? { ...method, photo } : method
+        i === seq ? { ...method, photo: file || method.photo } : method
       )
     );
   };
@@ -167,21 +278,23 @@ const RecipeEdit = () => {
         </div>
         <div className="recipe-edit-image">
           <RecipeImageUploader
-            uploadedImage={recipeImage}
+            uploadedImage={
+              recipeImage instanceof File
+                ? URL.createObjectURL(recipeImage)
+                : recipeImage
+            }
             onChangeImage={handleImageChange}
           />
         </div>
       </div>
       <div className="recipe-edit-ingredients-container">
         <div className="recipe-edit-ingredients-title">Ingredients</div>
-        <div className="recipe-edit-ingredients-textbox">
-          <textarea
-            className="recipe-edit-ingredients-text"
-            placeholder="재료를 입력해 주세요. ex) 계란 10개, 사과10개"
-            value={recipeIngredients}
-            onChange={(e) => setRecipeIngredients(e.target.value)}
-          ></textarea>
-        </div>
+        <textarea
+          className="recipe-edit-ingredients-textbox"
+          placeholder="재료를 입력해 주세요."
+          value={recipeIngredients}
+          onChange={(e) => setRecipeIngredients(e.target.value)}
+        ></textarea>
       </div>
       <div className="recipe-edit-method-container">
         <div className="recipe-edit-method-title">Recipe Steps</div>
@@ -191,7 +304,11 @@ const RecipeEdit = () => {
             <div className="recipe-edit-method-box-img">
               <RecipeStepImageUploader
                 stepIndex={seq}
-                uploadedImage={method.photo}
+                uploadedImage={
+                  method.photo instanceof File
+                    ? URL.createObjectURL(method.photo)
+                    : method.photo
+                }
                 onImageChange={handleStepImageChange}
               />
             </div>
@@ -216,7 +333,7 @@ const RecipeEdit = () => {
         </button>
       </div>
       <div className="recipe-edit-to-recipedetail-button-container">
-        <RecipeDetailButton onClick={handleSave} />
+        <RecipeDetailButton onClick={handleSave} label="수정하기" />
         <RecipeCancelButton />
       </div>
     </div>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import profileImg from "../../assets/images/samplerecipe.jpg";
 
@@ -18,39 +18,41 @@ const MyProfileImg = styled.img`
   border-radius: 30px;
   object-fit: cover;
   cursor: pointer;
-  border: 1px solid #d9d9d9; /* 디폴트 테두리 */
+  border: 1px solid #d9d9d9;
   &:hover {
-    border: 1px solid #ffcbc3; /* 호버 시 강조 효과 */
+    border: 1px solid #ffcbc3;
     box-shadow: 0 0 10px rgba(255, 203, 195, 1);
   }
 `;
 
 interface RecipeImageUploaderProps {
-  onChangeImage: (image: string) => void;
-  uploadedImage: string | null;
+  onChangeImage: (file: File | null) => void; // 파일 객체 전달
+  uploadedImage: string | null; // 서버에서 받은 미리보기 이미지 URL
 }
 
 function RecipeImageUploader({
   onChangeImage,
   uploadedImage,
 }: RecipeImageUploaderProps) {
+  const [preview, setPreview] = useState<string | null>(uploadedImage); // 미리보기 이미지 상태
+
+  // uploadedImage가 변경될 때 preview 상태를 업데이트
+  useEffect(() => {
+    setPreview(uploadedImage);
+  }, [uploadedImage]);
+
   const onChangeFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (reader.result) {
-          onChangeImage(reader.result as string);
-        }
-      };
-      reader.readAsDataURL(file);
+      setPreview(URL.createObjectURL(file)); // 선택한 파일의 미리보기 URL 생성
+      onChangeImage(file); // 파일 객체 전달
     }
   };
 
   return (
     <Container>
       <MyProfileImg
-        src={uploadedImage || profileImg}
+        src={preview || profileImg}
         alt="레시피 이미지"
         onClick={() => document.getElementById("file-input")?.click()}
       />

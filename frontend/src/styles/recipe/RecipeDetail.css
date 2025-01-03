@@ -75,15 +75,17 @@
   width: 92%;
   height: 550px;
   flex-shrink: 0;
+  padding: 0 10px;
   border-radius: 30px;
   border-right: 4px solid var(--light-pink, #ffcbc3);
   border-bottom: 4px solid var(--light-pink, #ffcbc3);
   background: #fff;
-  font-size: 16px;
+  font-size: 18px;
   font-family: "Ubuntu", sans-serif;
   line-height: 1.5;
   overflow-y: auto;
   margin-top: 10px;
+  text-align: left;
 }
 
 /* Steps Section */

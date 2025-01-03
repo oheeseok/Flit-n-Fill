@@ -2,9 +2,10 @@ import "../../styles/recipe/RecipeRegisterButton.css";
 
 interface RecipeDetailButtonProps {
   onClick: () => void; // 클릭 이벤트 핸들러를 props로 전달
+  label: string; // 버튼 텍스트를 위한 label 추가
 }
 
-const RecipeDetailButton = ({ onClick }: RecipeDetailButtonProps) => {
+const RecipeDetailButton = ({ onClick, label }: RecipeDetailButtonProps) => {
   return (
     <button className="recipe-detail-button" onClick={onClick}>
       <svg
@@ -39,7 +40,7 @@ const RecipeDetailButton = ({ onClick }: RecipeDetailButtonProps) => {
           strokeLinejoin="round"
         />
       </svg>
-      등록하기
+      {label}
     </button>
   );
 };
