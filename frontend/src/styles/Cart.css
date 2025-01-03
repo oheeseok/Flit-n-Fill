@@ -76,11 +76,14 @@
   border: 1px solid #ccc;
   border-radius: 5px;
   font-size: 14px;
+  height: 20px;
+  padding-top: 8px;
+  resize: none;
 }
 
 .add-button {
   margin-left: 10px;
-  padding: 5px 10px;
+  padding: 10px 15px;
   background-color: #007bff;
   color: #fff;
   border: none;
@@ -100,6 +103,7 @@
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  margin-left: 10px;
 }
 
 .save-cart-button:hover {
