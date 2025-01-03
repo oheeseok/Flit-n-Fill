@@ -42,6 +42,7 @@ const AdminPage = () => {
                 }
             });
 
+
             // 응답이 배열인지 확인하고, 각 요청에 isOpen 상태를 추가
             if (Array.isArray(response.data)) {
                 const requestsWithState = response.data.map((request: RequestDetailDto) => ({
@@ -100,7 +101,7 @@ const AdminPage = () => {
         const data: AdminResponseDto = { responseStatus, responseMessage };
 
         try {
-            await axios.patch(`${apiUrl}/api/admin/requests/${requestId}``, data, {
+            await axios.patch(`${apiUrl}/api/admin/requests/${requestId}`, data, {
                 withCredentials: true,
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
