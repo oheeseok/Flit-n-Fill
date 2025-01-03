@@ -29,6 +29,7 @@ interface FoodListViewDto {
 }
 
 const CommunityRegister = () => {
+  const apiUrl = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
 
   // 상태 관리
@@ -51,7 +52,7 @@ const CommunityRegister = () => {
     const fetchFoodList = async () => {
       try {
         const response = await axios.get<FoodListViewDto[]>(
-          "/api/foodlist",
+          `${apiUrl}/api/foodlist`,
           {
             withCredentials: true,
             headers: {
@@ -74,7 +75,7 @@ const CommunityRegister = () => {
   useEffect(() => {
     const fetchFridgeItems = async () => {
       try {
-        const response = await axios.get<FoodDetailDto[]>("http://localhost:8080/api/my-fridge", {
+        const response = await axios.get<FoodDetailDto[]>(`${apiUrl}/api/my-fridge`, {
           withCredentials: true,
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,

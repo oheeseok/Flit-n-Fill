@@ -2,7 +2,6 @@ import { useParams, useNavigate } from "react-router-dom"; // useNavigate 추가
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2"; // SweetAlert2 추가
 import axios from "axios";
-// import { useCommunity } from "../../context/CommunityContext";
 import "../../styles/community/CommunityDetail.css";
 
 interface PostDetailDto {
@@ -26,6 +25,7 @@ interface PostDetailDto {
 }
 
 const CommunityDetail = () => {
+  const apiUrl = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
   const { postId } = useParams<{ postId: string }>()  // URL에서 postId 가져오기
   const [postDetail, setPostDetail] = useState<PostDetailDto | null>(null)
@@ -36,7 +36,7 @@ const CommunityDetail = () => {
   useEffect(() => {
     const fetchPostDetail = async () => {
       try {
-        const response = await axios.get<PostDetailDto>(`/api/posts/${postId}`, {
+        const response = await axios.get<PostDetailDto>(`${apiUrl}/api/posts/${postId}`, {
           withCredentials: true,
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -70,7 +70,7 @@ const CommunityDetail = () => {
         action: "REQUEST",
       };
   
-      await axios.post(`/api/posts/${postId}/request`, actionRequest, {
+      await axios.post(`${apiUrl}/api/posts/${postId}/request`, actionRequest, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -98,7 +98,7 @@ const CommunityDetail = () => {
         action: "CANCEL",
       };
   
-      await axios.post(`/api/posts/${postId}/request`, actionRequest, {
+      await axios.post(`${apiUrl}/api/posts/${postId}/request`, actionRequest, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -135,7 +135,7 @@ const CommunityDetail = () => {
       if (result.isConfirmed) {
         // 데이터 삭제 처리
         try {
-          await axios.delete(`/api/posts/${postId}`, {
+          await axios.delete(`${apiUrl}/api/posts/${postId}`, {
             withCredentials: true,
             headers: {
               Authorization: `Bearer ${localStorage.getItem("accessToken")}`,

@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { useState } from "react";
 import SearchBar from "../../components/common/SearchBar";
 import "../../styles/community/Community.css";
 import CommunityRegisterButton from "../../components/community/CommunityRegisterButton";
@@ -10,9 +9,34 @@ const Community = () => {
   const [filter, setFilter] = useState<string>("ALL")   // 상태 관리: 'ALL', 'EXCHANGE', 'SHARING'
   const [query, setQuery] = useState<string>("")  // 검색어 관리
 
+  // const [searchParams, setSearchParams] = useSearchParams();
+
   const handleQueryChange = (newQuery: string) => {
     setQuery(newQuery); // 검색어 업데이트
   };
+  // const handleQueryChange = (newQuery: string) => {
+  //   const updatedParams = {
+  //     ...Object.fromEntries(searchParams.entries()),
+  //     searchQuery: newQuery,
+  //   };
+  //   setSearchParams(updatedParams);
+  // };
+
+  //
+  // const handleFilterChange = (filter: string) => {
+  //   const updatedParams = {
+  //     ...Object.fromEntries(searchParams.entries()),
+  //     tradeType: filter,
+  //   };
+  //   setSearchParams(updatedParams); // tradeType 업데이트
+  // };
+  // const handleFilterChange = (newFilter: string) => {
+  //   const updatedParams = {
+  //     ...Object.fromEntries(searchParams.entries()),
+  //     tradeType: newFilter,
+  //   };
+  //   setSearchParams(updatedParams);
+  // };
 
   return (
     <div className="community-page">

@@ -6,6 +6,7 @@ import "../../styles/community/CommunityEdit.css";
 import CommunityImageEdit from "../../components/community/CommunityImageEdit";
 
 const CommunityEdit = () => {
+  const apiUrl = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
   const { postId } = useParams<{ postId: string }>()  // URL에서 postId 가져오기
 
@@ -21,7 +22,7 @@ const CommunityEdit = () => {
   useEffect(() => {
     const fetchPostData = async () => {
       try {
-        const response = await axios.get(`/api/posts/${postId}`, {
+        const response = await axios.get(`${apiUrl}/api/posts/${postId}`, {
           withCredentials: true,
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -92,7 +93,7 @@ const CommunityEdit = () => {
 
       // 서버 요청
       const response = await axios.put(
-        `/api/posts/${postId}`,
+        `${apiUrl}/api/posts/${postId}`,
         formData,
         {
           headers: { 

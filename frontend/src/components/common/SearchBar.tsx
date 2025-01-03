@@ -1,22 +1,30 @@
 // import { useRecipe } from "../../context/RecipeContext";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import "../../styles/common/SearchBar.css";
 import SearchIcon from "./SearchIcon";
 import Swal from "sweetalert2";
 
 interface SearchBarProps {
   query: string; // 현재 검색어
+  // tradeType: string; // 현재 tradeType 필터
   onQueryChange: (newQuery: string) => void; // 검색어 변경 핸들러
+  // onTradeTypeChange: (newTradeType: string) => void; // 필터 변경 핸들러
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ query, onQueryChange }) => {
   // const { setSearchQuery } = useRecipe(); // Context에서 setSearchQuery만 사용
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams()
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     onQueryChange(event.target.value); // 검색어 상태 업데이트
   };
+
+  // const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  //   const newTradeType = event.target.value;
+  //   // onTradeTypeChange(newTradeType); // tradeType 상태 업데이트
+  //   setSearchParams({ searchQuery: query, tradeType: newTradeType }); // URL query string 업데이트
+  // };
 
   // 엔터 키를 눌렀을 때
   // const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -44,6 +52,12 @@ const SearchBar: React.FC<SearchBarProps> = ({ query, onQueryChange }) => {
     }
     // navigate(`/community/list?query=${query}`); // 검색 결과 페이지로 이동 
     // onSearch()
+    // setSearchParams({ searchQuery: query }); // URL query string 업데이트
+    // 기존 query string 유지하면서 searchQuery와 tradeType 업데이트
+    // const updatedParams = {
+    //   ...Object.fromEntries(searchParams.entries()),
+    //   searchQuery: query,
+    // };
     setSearchParams({ searchQuery: query }); // URL query string 업데이트
   };
 
