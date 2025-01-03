@@ -81,8 +81,7 @@ const Header = () => {
         <Link to="/recipe">recipe</Link>
         <Link to="/community">community</Link>
         <Link to="/cart">cart</Link>
-        <Link to="/adminpage">adminpage</Link>{" "}
-        {/* adminpage로 이동하는 링크 추가 */}
+        <Link to="/adminpage">adminpage</Link> {/* adminpage로 이동하는 링크 추가 */}
         {/* 로그인 상태에 따라 메뉴 다르게 표시 */}
         {isLoggedIn ? (
           <>

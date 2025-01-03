@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -14,4 +16,6 @@ public class UserLoginResponse {
     private String refreshToken;
     private String userEmail;
     private String userProfile;
+    private boolean isBlacked;
+    private LocalDateTime blacklistExpiryDate;
 }

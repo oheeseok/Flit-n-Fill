@@ -27,6 +27,7 @@ import AdminPage from "./pages/admin/AdminPage"; // AdminPage 컴포넌트 임�
 import { AdminProvider } from "./context/AdminProvider"; // 새로 만든 AdminProvider 가져오기
 import AdminLayout from "./components/AdminLayout"; // AdminLayout (관리자 전용 레이아웃)
 // import SseTest from "./pages/SseTest.tsx";
+import PrivateRoute from "./route/PrivateRoute.tsx";
 
 function App() {
   return (
@@ -43,26 +44,6 @@ function App() {
             }
           />
 
-          {/* /home 경로 추가 */}
-          {/* <Route
-            path="/home"
-            element={
-              <Layout>
-                <Home />
-              </Layout>
-            }
-          /> */}
-
-          {/* 로그인한 사용자 전용 홈 경로 */}
-          {/* <Route
-            path="/signinhome"
-            element={
-              <Layout>
-                <SignInHome /> 
-              </Layout>
-            }
-          /> */}
-
           {/* AdminProvider로 감싸기 */}
           <Route
             path="/adminPage"
@@ -78,25 +59,31 @@ function App() {
           <Route
             path="/mypage"
             element={
-              <Layout>
-                <MyPage />
-              </Layout>
+              <PrivateRoute allowedPages={["mypage"]}>
+                <Layout>
+                  <MyPage />
+                </Layout>
+              </PrivateRoute>
             }
           />
           <Route
             path="/fridge"
             element={
-              <Layout>
-                <Fridge />
-              </Layout>
+              <PrivateRoute allowedPages={["fridge"]}>
+                <Layout>
+                  <Fridge />
+                </Layout>
+              </PrivateRoute>
             }
           />
           <Route
             path="/fridge/register"
             element={
-              <Layout>
-                <FridgeRegister />
-              </Layout>
+              <PrivateRoute allowedPages={["fridge"]}>
+                <Layout>
+                  <FridgeRegister />
+                </Layout>
+              </PrivateRoute>
             }
           />
           <Route
@@ -142,73 +129,91 @@ function App() {
           <Route
             path="/community"
             element={
-              <Layout>
-                <Community />
-              </Layout>
+              <PrivateRoute allowedPages={["community"]}>
+                <Layout>
+                  <Community />
+                </Layout>
+              </PrivateRoute>
             }
           />
           <Route
             path="/community/register"
             element={
+              <PrivateRoute allowedPages={["community"]}>
               <Layout>
                 <CommunityRegister />
               </Layout>
+              </PrivateRoute>
             }
           ></Route>
           <Route
             path="/community/list"
             element={
+              <PrivateRoute allowedPages={["community"]}>
               <Layout>
                 <CommunityList />
               </Layout>
+              </PrivateRoute>
             }
           ></Route>
           <Route
             path="/community/edit"
             element={
+              <PrivateRoute allowedPages={["community"]}>
               <Layout>
                 <CommunityEdit />
               </Layout>
+              </PrivateRoute>
             }
           ></Route>
           <Route
             path="/community/detail"
             element={
+              <PrivateRoute allowedPages={["community"]}>
               <Layout>
                 <CommunityDetail />
               </Layout>
+              </PrivateRoute>
             }
           ></Route>
           <Route
             path="/chatroomlist"
             element={
+              <PrivateRoute allowedPages={["community"]}>
               <Layout>
                 <ChatRoomList />
               </Layout>
+              </PrivateRoute>
             }
           />
           <Route
             path="/chatroom/:tradeRoomId"
             element={
+              <PrivateRoute allowedPages={["community"]}>
               <Layout>
                 <ChatRoom />
               </Layout>
+              </PrivateRoute>
             }
           />
           <Route
             path="/feedback/:tradeRoomId"
             element={
+              <PrivateRoute allowedPages={["community"]}>
               <Layout>
                 <ChatRoomAfter />
               </Layout>
+              </PrivateRoute>
             }
           />
           <Route
             path="/cart"
             element={
-              <Layout>
-                <Cart />
-              </Layout>
+              <PrivateRoute allowedPages={["cart"]}>
+                <Layout>
+                  <Cart />
+                </Layout>
+              </PrivateRoute>
             }
           />
           {/* <Route
@@ -227,14 +232,6 @@ function App() {
               </Layout>
             }
           />
-          {/* <Route
-            path="/signinhome"
-            element={
-              <Layout>
-                <SignInHome />
-              </Layout>
-            }
-          /> */}
           <Route
             path="/signup"
             element={

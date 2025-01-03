@@ -8,7 +8,11 @@ interface UserLoginResponse {
   accessToken: string;
   userEmail: string;
   userProfile: string;
+  blacked: boolean;
+  blacklistExpiryDate: Date;
 }
+const apiUrl = import.meta.env.VITE_API_URL;
+console.log(apiUrl); // http://localhost:8080
 
 const SignIn: React.FC = () => {
   const { startSSE } = useSSEContext();
@@ -30,12 +34,20 @@ const SignIn: React.FC = () => {
           withCredentials: true, // CORS 에러를 해결하기 위해 credentials: 'include'로 설정
         }
       );
+      console.log("response data:",response.data);
 
       // 로그인 성공 시 받은 토큰을 로컬 스토리지에 저장
       localStorage.setItem("accessToken", response.data.accessToken);
       localStorage.setItem("userEmail", response.data.userEmail);
       localStorage.setItem("userProfile", response.data.userProfile);
 
+      console.log("response data:",response.data);
+      if (response.data.blacked) {
+        const expiryDate = new Date(response.data.blacklistExpiryDate);
+        const formattedDate = `${expiryDate.getFullYear()}년 ${expiryDate.getMonth() + 1}월 ${expiryDate.getDate()}일 ${expiryDate.getHours()}시 ${expiryDate.getMinutes()}분`;
+        localStorage.setItem("isBlacked", "true")
+        localStorage.setItem("balcklistExpiryDate", formattedDate);
+      }
       console.log(response);
       alert("로그인 성공"); // 로그인 성공 메시지
 
