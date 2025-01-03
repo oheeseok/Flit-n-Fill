@@ -467,7 +467,19 @@ public class RecipeService {
 
   public List<RecipeSimpleDto> searchRecipesByFoods(Long userId, List<String> foods) {
     List<String> bookmarkedRecipeIds = bookmarkedRecipeRepository.findRecipeIdsByUserId(userId);
-    List<Recipe> recipes = recipeRepository.findRecipesByFoods(userId, foods);
+
+    // 동적 Criteria 생성
+    List<Criteria> foodCriteriaList = foods.stream()
+            .map(food -> Criteria.where("recipeFoodDetails").regex("(?i).*" + food + ".*"))
+            .toList();
+
+    // 모든 조건을 AND로 묶음
+    Criteria criteria = new Criteria().andOperator(foodCriteriaList.toArray(new Criteria[0]));
+
+    // MongoDB Query 생성
+    Query query = new Query(criteria);
+    List<Recipe> recipes = mongoTemplate.find(query, Recipe.class);
+
     return recipes.stream()
         .map(recipe -> {
           User user = recipe.getUserId() != null ? userRepository.findById(recipe.getUserId()).orElse(null) : null;
