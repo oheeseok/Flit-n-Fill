@@ -33,7 +33,6 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({
   }, []);
 
   // 팝업 외부 클릭 시 팝업 닫기
-  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         popupRef.current &&
@@ -42,13 +41,14 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({
         setShowNotification(false);
       }
     };
-
+    
+  useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [setShowNotification]);
+  }, []);
 
   const handleRequest = async (state: string, notificationId: number) => {
     try {
@@ -169,7 +169,7 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({
     }
   };
   return (
-    <div className="notification-popup">
+    <div className="notification-popup" ref={popupRef}>
       <div className="notification-header">
         <button onClick={() => markAllAsRead()}>전체 읽음</button>
         <button onClick={handleDeleteAll}>전체 삭제</button>
