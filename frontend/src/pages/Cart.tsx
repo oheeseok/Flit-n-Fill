@@ -104,14 +104,14 @@ const Cart = () => {
               placeholder="사야할 재료를 입력해주세요."
               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange(e)}
             />
-            <button className="add-button" onClick={handleAddLine}>
-              추가
-            </button>
           </div>
-        </div>
+        <button className="add-button" onClick={handleAddLine}>
+          추가
+        </button>
         <button className="save-cart-button" onClick={handleSave}>
           저장하기
         </button>
+        </div>
       </div>
     </div>
   );
