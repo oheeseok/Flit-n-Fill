@@ -7,6 +7,7 @@ import RecipeStepImageUploader from "../../components/recipe/RecipeStepImageUplo
 import RecipeDetailButton from "../../components/recipe/RecipeDetailButton";
 import RecipeCancelButton from "../../components/recipe/RecipeCancelButton";
 import Swal from "sweetalert2";
+import axios from "axios";
 
 // 레시피 단계의 타입 정의
 interface RecipeStepDto {
@@ -76,17 +77,20 @@ const RecipeRegister = () => {
       });
 
       // API 요청
-      const response = await fetch("/api/recipes", {
-        method: "POST",
-        body: formData,
+      const response = await axios.post("/api/recipes", formData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          userEmail: localStorage.getItem("userEmail"),
+        },
+        withCredentials: true, // 쿠키 포함 설정
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to register recipe: ${errorText}`);
-      }
+      // if (!response.ok) {
+      //   const errorText = await response.text();
+      //   throw new Error(`Failed to register recipe: ${errorText}`);
+      // }
 
-      const newRecipe = await response.json();
+      const newRecipe = response.data;
       Swal.fire({
         icon: "success",
         title: "레시피가 성공적으로 등록되었습니다.",
@@ -222,7 +226,7 @@ const RecipeRegister = () => {
         </button>
       </div>
       <div className="recipe-register-to-recipedetail-button-container">
-        <RecipeDetailButton onClick={handleRegister} />
+        <RecipeDetailButton onClick={handleRegister} label="등록하기" />
         <RecipeCancelButton />
       </div>
     </div>

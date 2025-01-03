@@ -6,6 +6,9 @@ import {
   TraderoomContextType,
 } from "../interfaces/TradeRoomInterfaces";
 
+
+const apiUrl = import.meta.env.VITE_API_URL; 
+
 // Context 기본 값
 const ChatRoomContext = createContext<TraderoomContextType>({
   traderooms: [],
@@ -24,7 +27,7 @@ export const ChatRoomProvider = ({
 
   const getTradeRoomList = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/trade", {
+      const response = await axios.get(`${apiUrl}/api/trade`, {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,

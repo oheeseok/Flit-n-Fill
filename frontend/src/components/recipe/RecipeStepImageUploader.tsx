@@ -44,9 +44,13 @@ function RecipeStepImageUploader({
   const onChangeFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const previewURL = URL.createObjectURL(file); // 파일의 미리보기 URL 생성
-      setPreview(previewURL); // 미리보기 상태 업데이트
+      const previewURL = URL.createObjectURL(file);
+      setPreview(previewURL); // 미리보기 URL 업데이트
       onImageChange(stepIndex, file); // 파일 객체 전달
+    } else {
+      // 파일이 없을 경우 null을 처리
+      setPreview(null); // 미리보기 이미지도 null로 처리
+      onImageChange(stepIndex, null); // null을 전달
     }
   };
 

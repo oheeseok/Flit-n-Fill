@@ -23,16 +23,15 @@ const RecipeEdit = () => {
   const [recipeIngredients, setRecipeIngredients] = useState("");
   const [recipeMethods, setRecipeMethods] = useState<RecipeStepDto[]>([]);
   const [recipeIsVisibility, setRecipeIsVisibility] = useState(true);
-  // const [isLoading, setIsLoading] = useState(false);
 
   const fetchRecipeDetail = async () => {
     try {
       const response = await axios.get(`/api/recipes/${id}`, {
-        withCredentials: true,
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           userEmail: localStorage.getItem("userEmail"),
         },
+        withCredentials: true,
       });
       const recipe = response.data;
 
@@ -44,17 +43,11 @@ const RecipeEdit = () => {
         seq: index + 1,
         photo:
           step.photo ||
-          "https://flitnfill.s3.ap-northeast-2.amazonaws.com/default-img/recipe-step-default-img.png", // 기본 이미지
+          "https://flitnfill.s3.ap-northeast-2.amazonaws.com/default-img/recipe-step-default-img.png",
         description: step.description,
       }));
 
       setRecipeMethods(steps);
-
-      console.log(
-        "Loaded Step Photos:",
-        steps.map((step: RecipeStepDto) => step.photo)
-      );
-
       setRecipeIsVisibility(recipe.recipeIsVisibility);
     } catch (error) {
       Swal.fire({
@@ -113,75 +106,49 @@ const RecipeEdit = () => {
     try {
       const formData = new FormData();
 
-      // 레시피 데이터 생성
       const recipeUpdateDto = {
         recipeTitle,
         recipeFoodDetails: recipeIngredients,
         recipeSteps: recipeMethods.map((method) => {
-          // 스텝 이미지가 파일이 아니면 기존 이미지 URL을 사용
           if (method.photo instanceof File) {
             return {
               seq: method.seq,
               description: method.description,
-              photo: "", // 업로드된 파일은 FormData에서 처리
+              photo: "",
             };
-          } else if (typeof method.photo === "string" && method.photo) {
-            // 이미지 URL이 있으면 그대로 사용
+          } else {
             return {
               seq: method.seq,
               description: method.description,
-              photo: method.photo,
+              photo: method.photo || "",
             };
           }
-          // 이미지가 없으면 기본 이미지 URL로 설정
-          return {
-            seq: method.seq,
-            description: method.description,
-            photo:
-              "https://flitnfill.s3.ap-northeast-2.amazonaws.com/default-img/recipe-step-default-img.png",
-          };
         }),
       };
 
       formData.append("recipeUpdateDto", JSON.stringify(recipeUpdateDto));
 
-      // 메인 이미지 파일 추가
       if (recipeImage instanceof File) {
         formData.append("recipeMainPhoto", recipeImage);
       }
 
-      // 새로 추가된 스텝 이미지를 FormData에 추가
-      const stepPhotos = recipeMethods
+      recipeMethods
         .filter((method) => method.photo instanceof File)
-        .map((method) => method.photo as File);
+        .forEach((method) => {
+          formData.append("recipeStepPhotos", method.photo as File);
+        });
 
-      stepPhotos.forEach((photo) => {
-        formData.append("recipeStepPhotos", photo);
-      });
-
-      // 기존 스텝 이미지를 유지할 데이터도 명시적으로 추가
       const existingStepPhotos = recipeMethods
         .filter((method) => typeof method.photo === "string")
-        .map(
-          (method) =>
-            method.photo ||
-            "https://flitnfill.s3.ap-northeast-2.amazonaws.com/default-img/recipe-step-default-img.png"
-        );
+        .map((method) => method.photo);
 
       formData.append("existingStepPhotos", JSON.stringify(existingStepPhotos));
 
-      console.log("FormData Debug:", {
-        recipeUpdateDto,
-        existingStepPhotos,
-        stepPhotos,
-      });
-
-      // 서버에 PUT 요청 (axios 사용)
       const response = await axios.put(`/api/recipes/${id}`, formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           userEmail: localStorage.getItem("userEmail"),
-          // "Content-Type" 제거: axios는 자동으로 처리함
+          "Content-Type": "multipart/form-data",
         },
         withCredentials: true,
       });
@@ -192,6 +159,8 @@ const RecipeEdit = () => {
           title: "레시피가 성공적으로 수정되었습니다.",
           confirmButtonText: "확인",
         }).then(() => navigate(`/recipe/detail/${id}`));
+      } else {
+        throw new Error("Failed to update recipe");
       }
     } catch (error) {
       Swal.fire({
@@ -201,49 +170,6 @@ const RecipeEdit = () => {
       });
       console.error("Error updating recipe:", error);
     }
-  };
-
-  const addRecipeMethod = () => {
-    setRecipeMethods((prev) => [
-      ...prev,
-      {
-        seq: prev.length + 1,
-        photo:
-          "https://flitnfill.s3.ap-northeast-2.amazonaws.com/default-img/recipe-step-default-img.png", // 디폴트 이미지 설정
-        description: "",
-      },
-    ]);
-  };
-
-  const delRecipeMethod = (index: number) => {
-    setRecipeMethods((prevMethods) =>
-      prevMethods
-        .filter((_, i) => i !== index)
-        .map((method, idx) => ({ ...method, seq: idx + 1 }))
-    );
-  };
-
-  const handleImageChange = (file: File | null) => {
-    setRecipeImage(file);
-  };
-
-  const handleStepImageChange = (seq: number, file: File | null): void => {
-    setRecipeMethods((prevMethods) =>
-      prevMethods.map((method, i) =>
-        i === seq ? { ...method, photo: file || method.photo } : method
-      )
-    );
-  };
-
-  const handleDescriptionChange = (
-    seq: number,
-    event: React.ChangeEvent<HTMLTextAreaElement>
-  ) => {
-    setRecipeMethods((prevMethods) =>
-      prevMethods.map((method, i) =>
-        i === seq ? { ...method, description: event.target.value } : method
-      )
-    );
   };
 
   return (
@@ -275,7 +201,7 @@ const RecipeEdit = () => {
                 ? URL.createObjectURL(recipeImage)
                 : recipeImage
             }
-            onChangeImage={handleImageChange}
+            onChangeImage={(file) => setRecipeImage(file)}
           />
         </div>
       </div>
@@ -301,17 +227,40 @@ const RecipeEdit = () => {
                     ? URL.createObjectURL(method.photo)
                     : method.photo
                 }
-                onImageChange={handleStepImageChange}
+                onImageChange={(file) =>
+                  setRecipeMethods((prevMethods) =>
+                    prevMethods.map((m, i) =>
+                      i === seq
+                        ? {
+                            ...m,
+                            photo: file as unknown as File | string | null,
+                          }
+                        : m
+                    )
+                  )
+                }
               />
             </div>
             <textarea
               value={method.description}
-              onChange={(e) => handleDescriptionChange(seq, e)}
+              onChange={(e) =>
+                setRecipeMethods((prevMethods) =>
+                  prevMethods.map((m, i) =>
+                    i === seq ? { ...m, description: e.target.value } : m
+                  )
+                )
+              }
               placeholder="조리 방법을 입력해 주세요."
             ></textarea>
             <button
               className="recipe-edit-method-box-remove"
-              onClick={() => delRecipeMethod(seq)}
+              onClick={() =>
+                setRecipeMethods((prevMethods) =>
+                  prevMethods
+                    .filter((_, i) => i !== seq)
+                    .map((m, i) => ({ ...m, seq: i + 1 }))
+                )
+              }
             >
               -
             </button>
@@ -319,7 +268,12 @@ const RecipeEdit = () => {
         ))}
         <button
           className="recipe-edit-method-box-add-button"
-          onClick={addRecipeMethod}
+          onClick={() =>
+            setRecipeMethods((prev) => [
+              ...prev,
+              { seq: prev.length + 1, photo: null, description: "" },
+            ])
+          }
         >
           +
         </button>

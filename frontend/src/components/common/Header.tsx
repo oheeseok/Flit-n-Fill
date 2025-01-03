@@ -13,7 +13,6 @@ const Header = () => {
 
   const navigate = useNavigate();
 
-
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
     const userProfile = localStorage.getItem("userProfile");
@@ -59,72 +58,80 @@ const Header = () => {
 
   const handleMenuClick = () => {
     toggleUserMenu();
-  }
+  };
 
   return (
-      <div className="header">
-        <Link to="/" className="logo">
-          <img src={Icon} alt="Flit-n-Fill" />
-        </Link>
+    <div className="header">
+      <Link to="/" className="logo">
+        <img src={Icon} alt="Flit-n-Fill" />
+      </Link>
 
-        <ul className="headermenu">
-          <Link to="/fridge">fridge</Link>
-          <Link to="/recipe">recipe</Link>
-          <Link to="/community">community</Link>
-          <Link to="/cart">cart</Link>
+      <ul className="headermenu">
+        <Link to="/fridge">fridge</Link>
+        <Link to="/recipe">recipe</Link>
+        <Link to="/community">community</Link>
+        <Link to="/cart">cart</Link>
 
-          {/* 로그인 상태에 따라 메뉴 다르게 표시 */}
-          {isLoggedIn ? (
-              <>
-                <a
-                    href="#"
-                    className="header-notification"
-                    onClick={toggleNotification}
-                >
-                  <img src="/assets/notification-icon.png" alt="notification" />
-                </a>
-                {/* 알림 팝업 */}
-                {showNotification && (
-                    <NotificationPopup setShowNotification={setShowNotification} />
-                )}
+        {/* 로그인 상태에 따라 메뉴 다르게 표시 */}
+        {isLoggedIn ? (
+          <>
+            <a
+              href="#"
+              className="header-notification"
+              onClick={toggleNotification}
+            >
+              <img src="/assets/notification-icon.png" alt="notification" />
+            </a>
+            {/* 알림 팝업 */}
+            {showNotification && (
+              <NotificationPopup setShowNotification={setShowNotification} />
+            )}
 
-                {/* 사용자 메뉴 버튼 */}
-                <a href="#" className="header-user" onClick={toggleUserMenu}>
-                  <img src={profileImage || "/assets/user-icon.png"} alt="user" />
-                </a>
-                {/* 사용자 메뉴창 */}
-                {showUserMenu && (
-                    <div className="header-user-menu">
-                      <ul>
-                        <li>
-                          <Link to="/mypage" onClick={handleMenuClick}>회원 정보 수정</Link>
-                        </li>
-                        <li>
-                          <Link to="#" onClick={handleMenuClick}>내 게시글 보기</Link>
-                        </li>
-                        <li>
-                          <Link to="#" onClick={handleMenuClick}>내 거래글 보기</Link>
-                        </li>
-                        <li>
-                          <Link to="#" onClick={handleMenuClick}>내 레시피 보기</Link>
-                        </li>
-                        <li>
-                          <a href="#" onClick={handleLogout}>
-                            Logout
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
-                )}
-              </>
-          ) : (
-              <>
-                <Link to="/signin">sign in</Link>
-                <Link to="/signup">sign up</Link>
-              </>
-          )}
-        </ul>
-      </div>
+            {/* 사용자 메뉴 버튼 */}
+            <a href="#" className="header-user" onClick={toggleUserMenu}>
+              <img src={profileImage || "/assets/user-icon.png"} alt="user" />
+            </a>
+            {/* 사용자 메뉴창 */}
+            {showUserMenu && (
+              <div className="header-user-menu">
+                <ul>
+                  <li>
+                    <Link to="/mypage" onClick={handleMenuClick}>
+                      회원 정보 수정
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="#" onClick={handleMenuClick}>
+                      내 게시글 보기
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="#" onClick={handleMenuClick}>
+                      내 거래글 보기
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="#" onClick={handleMenuClick}>
+                      내 레시피 보기
+                    </Link>
+                  </li>
+                  <li>
+                    <a href="#" onClick={handleLogout}>
+                      Logout
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            <Link to="/signin">sign in</Link>
+            <Link to="/signup">sign up</Link>
+          </>
+        )}
+      </ul>
+    </div>
   );
 };
 export default Header;

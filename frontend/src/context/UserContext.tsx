@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import axios from "axios"; // DB와 통신할 때 사용할 라이브러리
+import Swal from "sweetalert2";
 
 // 사용자 타입 정의
 interface User {
@@ -29,6 +30,7 @@ interface UserContextType {
     },
     userProfileFile: File | null
   ) => Promise<User>; // 반환 타입을 `Promise<User>`로 수정
+  deleteUserAccount: (password: string) => Promise<void>; // 여기서 함수 추가
   logout: () => void;
 }
 
@@ -131,7 +133,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
         formData,
         {
           headers: {
-            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
           },
           withCredentials: true,
         }
@@ -144,6 +147,53 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  const deleteUserAccount = async (password: string): Promise<void> => {
+    if (!accessToken) {
+      console.warn("No access token available.");
+      return;
+    }
+
+    try {
+      const userLoginDto = {
+        userEmail: localStorage.getItem("userEmail"),
+        userPassword: password, // 비밀번호 추가
+      };
+
+      const response = await axios.delete("/api/user/info", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          userEmail: localStorage.getItem("userEmail"),
+        },
+        data: userLoginDto, // @RequestBody로 비밀번호 포함
+        withCredentials: true,
+      });
+
+      if (response.status === 200) {
+        setUser(null);
+        setAccessToken(null);
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("userEmail");
+
+        // 삭제 성공 후 알림
+        Swal.fire({
+          icon: "success",
+          title: "회원 탈퇴 성공",
+          text: "계정이 성공적으로 삭제되었습니다.",
+          confirmButtonText: "확인",
+        });
+      }
+    } catch (error) {
+      console.error("Failed to delete user account:", error);
+
+      // 에러 처리
+      Swal.fire({
+        icon: "error",
+        title: "회원 탈퇴 실패",
+        text: "회원 탈퇴 중 오류가 발생했습니다.",
+        confirmButtonText: "확인",
+      });
+    }
+  };
   // 로그아웃 함수
   const logout = () => {
     setUser(null);
@@ -163,6 +213,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
         fetchUserData,
         updateUserInfo,
         updateUserInfoWithFile, // `Promise<User>` 반환
+        deleteUserAccount,
         logout,
       }}
     >

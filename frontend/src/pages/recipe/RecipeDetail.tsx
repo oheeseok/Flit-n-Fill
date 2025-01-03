@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-// import { useRecipe } from "../../context/RecipeContext";
 import "../../styles/recipe/RecipeDetail.css";
 import Swal from "sweetalert2";
 import axios from "axios";
@@ -10,30 +9,78 @@ const RecipeDetail = () => {
   const navigate = useNavigate();
 
   const [recipe, setRecipe] = useState<any | null>(null); // 레시피 상태 관리
+  const [userNickname, setUserNickname] = useState<string | null>(null); // 로그인 사용자 닉네임
+  const [isOwner, setIsOwner] = useState<boolean>(false); // 소유 여부
   const [isLoading, setIsLoading] = useState<boolean>(true); // 로딩 상태 관리
 
-  // 레시피 상세 정보 API 호출
+  // 현재 로그인한 사용자 정보 가져오기
+  const fetchUserNickname = async () => {
+    try {
+      const response = await axios.get("/api/user/info", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          userEmail: localStorage.getItem("userEmail"),
+        },
+        withCredentials: true,
+      });
+      return response.data.userNickname; // 사용자 닉네임 반환
+    } catch (error) {
+      console.error("Error fetching logged-in user:", error);
+      return null;
+    }
+  };
+  console.log(userNickname);
+  // 레시피 상세 정보 및 사용자 닉네임 비교
   useEffect(() => {
     const fetchRecipeDetail = async () => {
       try {
-        const response = await axios.get(`/api/recipes/${id}`);
-        setRecipe(response.data); // 레시피 데이터 설정
-        setIsLoading(false); // 로딩 완료
+        setIsLoading(true);
+
+        // 사용자 닉네임 가져오기
+        const loggedInNickname = await fetchUserNickname();
+        setUserNickname(loggedInNickname);
+
+        // 레시피 정보 가져오기
+        const response = await axios.get(`/api/recipes/${id}`, {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
+          },
+        });
+
+        const recipeData = response.data;
+        setRecipe(recipeData);
+
+        // 닉네임 비교하여 소유 여부 판단
+        if (loggedInNickname && recipeData.userNickname === loggedInNickname) {
+          setIsOwner(true);
+        } else {
+          setIsOwner(false);
+        }
+
+        console.log("Logged-in user:", loggedInNickname);
+        console.log("Fetched recipe:", recipeData);
       } catch (error) {
         console.error("Error fetching recipe details:", error);
-        setIsLoading(false); // 오류 발생 시 로딩 완료
+        Swal.fire({
+          icon: "error",
+          title: "레시피를 불러오는데 실패했습니다.",
+          confirmButtonText: "확인",
+        });
+        navigate("/recipe/list");
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchRecipeDetail(); // 컴포넌트가 마운트될 때 API 호출
-  }, [id]);
+    fetchRecipeDetail();
+  }, [id]); // `id`가 변경될 때만 실행
 
-  // 로딩 중이라면 로딩 메시지 표시
   if (isLoading) {
     return <div>Loading...</div>;
   }
 
-  // 레시피가 없다면 에러 메시지 표시
   if (!recipe) {
     return <div className="recipe-detail-not-found">Recipe not found</div>;
   }
@@ -51,7 +98,13 @@ const RecipeDetail = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .delete(`/api/recipes/${id}`)
+          .delete(`/api/recipes/${id}`, {
+            withCredentials: true,
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+              userEmail: localStorage.getItem("userEmail"),
+            },
+          })
           .then(() => {
             Swal.fire({
               title: "삭제 완료",
@@ -60,7 +113,7 @@ const RecipeDetail = () => {
               confirmButtonColor: "#3085d6",
               confirmButtonText: "확인",
             }).then(() => {
-              navigate("/recipe/list"); // 삭제 후 리스트 페이지로 이동
+              navigate("/recipe/list");
             });
           })
           .catch((error) => {
@@ -76,14 +129,12 @@ const RecipeDetail = () => {
     });
   };
 
-  // 레시피 수정 처리
   const handleEdit = () => {
-    navigate(`/recipe/edit/${id}`); // 수정 페이지로 이동
+    navigate(`/recipe/edit/${id}`);
   };
 
   return (
     <div className="recipe-detail-body">
-      {/* Recipe Title Section */}
       <div className="recipe-detail-title-container">
         <div className="recipe-detail-title">{recipe.recipeTitle}</div>
         {recipe.recipeMainPhoto && (
@@ -93,7 +144,6 @@ const RecipeDetail = () => {
         )}
       </div>
 
-      {/* Ingredients Section */}
       <div className="recipe-detail-ingredients-container">
         <div className="recipe-detail-ingredients-title">Ingredients</div>
         <div className="recipe-detail-ingredients-text">
@@ -101,20 +151,14 @@ const RecipeDetail = () => {
         </div>
       </div>
 
-      {/* Recipe Steps Section */}
       <div className="recipe-detail-steps-container">
         <div className="recipe-detail-steps-title">Recipe Steps</div>
         {recipe.recipeSteps.map((step: any) => (
           <div key={step.seq} className="recipe-detail-step-box">
             <div className="recipe-detail-step-num">Step {step.seq}</div>
-
             <div className="recipe-detail-step-image">
-              <img
-                src={step.photo} 
-                alt={`Step ${step.seq}`}
-              />
+              <img src={step.photo} alt={`Step ${step.seq}`} />
             </div>
-
             <div className="recipe-detail-step-description">
               {step.description}
             </div>
@@ -122,19 +166,23 @@ const RecipeDetail = () => {
         ))}
       </div>
 
-      {/* Action Buttons */}
-      <div className="recipe-detail-action-container">
-        <button
-          className="recipe-detail-edit-button"
-          onClick={handleEdit}
-          style={{ marginRight: "20px" }}
-        >
-          수정하기
-        </button>
-        <button className="recipe-detail-delete-button" onClick={handleDelete}>
-          삭제하기
-        </button>
-      </div>
+      {isOwner && (
+        <div className="recipe-detail-action-container">
+          <button
+            className="recipe-detail-edit-button"
+            onClick={handleEdit}
+            style={{ marginRight: "20px" }}
+          >
+            수정하기
+          </button>
+          <button
+            className="recipe-detail-delete-button"
+            onClick={handleDelete}
+          >
+            삭제하기
+          </button>
+        </div>
+      )}
     </div>
   );
 };

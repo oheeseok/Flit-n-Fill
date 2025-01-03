@@ -8,6 +8,7 @@ interface RecipeImages {
   name: string;
   img: string;
 }
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const RecipeCarousel: React.FC = () => {
   const [recipes, setRecipes] = useState<RecipeImages[]>([]); // 레시피 데이터를 상태로 관리
@@ -19,7 +20,17 @@ const RecipeCarousel: React.FC = () => {
     // API에서 오늘의 레시피 데이터를 가져옵니다.
     const fetchTodaysRecipes = async () => {
       try {
-        const response = await axios.get("/api/recipes/todays-recipe");
+        const response = await axios.get(
+          `${apiUrl}/api/recipes/todays-recipe`,
+          {
+            withCredentials: true,
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+              userEmail: localStorage.getItem("userEmail"),
+            },
+          }
+        );
+
         const recipeData = response.data;
 
         // 받아온 데이터를 carousel에 맞는 형식으로 변환
@@ -45,7 +56,7 @@ const RecipeCarousel: React.FC = () => {
     if (!isLoading) {
       const interval = setInterval(() => {
         setCurrentIndex((prevIndex) => (prevIndex + 1) % recipes.length);
-      }, 5000); // 5초마다 자동 슬라이드
+      }, 3000); // 5초마다 자동 슬라이드
 
       return () => clearInterval(interval); // 컴포넌트가 언마운트될 때 인터벌 클리어
     }
