@@ -157,7 +157,7 @@ public class UserService {
         user.setUserPhone(updateDto.getUserPhone() != null ? updateDto.getUserPhone() : user.getUserPassword());
         user.setUserAddress(updateDto.getUserAddress() != null ? updateDto.getUserAddress() : user.getUserAddress());
         if (userProfile != null && !userProfile.equals(PROFILE_DEFAULT_IMG_URL)) {
-            s3Service.deleteFile(user.getUserProfile());
+//            s3Service.deleteFile(user.getUserProfile());
             String newProfile = s3Service.uploadFile(userProfile, "users/profile");
             user.setUserProfile(newProfile);
         } else {  // 프로필 삭제 시 기본 프로필로 변경
@@ -194,7 +194,7 @@ public class UserService {
         log.info("레시피 유저 아이디 null 설정완료");
         // 사용자 삭제
         if (user.getUserProfile() != null && !user.getUserProfile().isEmpty() && !user.getUserProfile().equals(PROFILE_DEFAULT_IMG_URL)) {
-            s3Service.deleteFile(user.getUserProfile());
+//            s3Service.deleteFile(user.getUserProfile());
         }
         userRepository.delete(user);
     }

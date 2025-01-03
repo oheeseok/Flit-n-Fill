@@ -82,8 +82,11 @@ public class SpringConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedOrigin("http://localhost:5173"); // React 개발 서버 주소
+        configuration.addAllowedOrigin("http://54.180.201.220/");
+        configuration.addAllowedOrigin("http://54.180.201.220"); // React 개발 서버 주소
         configuration.addAllowedOrigin("http://3.39.21.24"); // React 개발 서버 주소
         configuration.addAllowedOrigin("http://52-1068271922.ap-northeast-2.elb.amazonaws.com/"); // React 개발 서버 주소
+        configuration.addAllowedOrigin("http://www.flitnfill.kro.kr/"); // React 개발 서버 주소
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
         configuration.setAllowCredentials(true);

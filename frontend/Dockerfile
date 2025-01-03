@@ -13,6 +13,9 @@ RUN npm install
 # 애플리케이션 소스 코드 복사
 COPY . .
 
+# 환경 변수 설정
+ENV VITE_API_URL=http://www.flitnfill.kro.kr
+
 # 리액트 애플리케이션을 빌드
 RUN npm run build
 

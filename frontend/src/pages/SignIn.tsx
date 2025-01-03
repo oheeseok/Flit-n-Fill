@@ -23,7 +23,8 @@ const SignIn: React.FC = () => {
     try {
       // API 요청을 보냄 (localhost:8080)
       const response = await axios.post<UserLoginResponse>(
-        `${apiUrl}/api/user/login`,
+        // `${apiUrl}/api/user/login`,
+          "http://www.flitnfill.kro.kr/api/user/login", // 하드코딩된 URL
         {
           userEmail: email,
           userPassword: password,
@@ -59,7 +60,7 @@ const SignIn: React.FC = () => {
       }
 
       // 로그인 후 대시보드로 리디렉션
-      window.location.href = "/"; // 홈 페이지로 리디렉션
+      // window.location.href = "/"; // 홈 페이지로 리디렉션
     } catch (error: any) {
       // 에러 처리
       if (error.response) {
