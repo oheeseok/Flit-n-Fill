@@ -4,7 +4,7 @@ import "../../styles/fridge/FridgeRegister.css";
 import { useFridge } from "../../context/FridgeContext";
 import axios from "axios";
 const apiUrl = import.meta.env.VITE_API_URL;
-import FridgeSearchBar from "../../components/fridge/FridgeSearchBar.tsx";
+// import FridgeSearchBar from "../../components/fridge/FridgeSearchBar.tsx";
 
 const FridgeRegister = () => {
   const { addFridgeItem, requestAddIngredient } = useFridge();
@@ -296,8 +296,8 @@ const FridgeRegister = () => {
 
     try {
       // string 그대로 전달
-      requestAddIngredient(requestContext); 
-  
+      requestAddIngredient(requestContext);
+
       Swal.fire({
         icon: "success",
         title: "등록 완료",
@@ -313,23 +313,23 @@ const FridgeRegister = () => {
         text: "재료 등록 요청에 하였습니다.",
       });
     }
-  }
+  };
 
   // onSearch 함수 정의
-  const handleSearch = (
-    mainCategory: string,
-    subCategory?: string,
-    detailCategory?: string
-  ) => {
-    console.log(mainCategory, subCategory, detailCategory);
-    setSelectedMainCategory(mainCategory || "");
-    setSelectedSubCategory(subCategory || "");
-    setSelectedDetailCategory(detailCategory || "");
+  // const handleSearch = (
+  //   mainCategory: string,
+  //   subCategory?: string,
+  //   detailCategory?: string
+  // ) => {
+  //   console.log(mainCategory, subCategory, detailCategory);
+  //   setSelectedMainCategory(mainCategory || "");
+  //   setSelectedSubCategory(subCategory || "");
+  //   setSelectedDetailCategory(detailCategory || "");
 
-    console.log("selectedMain:", selectedMainCategory);
-    console.log("selectedSub:", selectedSubCategory);
-    console.log("selectedDetail:", selectedDetailCategory);
-  };
+  //   console.log("selectedMain:", selectedMainCategory);
+  //   console.log("selectedSub:", selectedSubCategory);
+  //   console.log("selectedDetail:", selectedDetailCategory);
+  // };
 
   const handleMainCategoryChangee = (
     e: React.ChangeEvent<HTMLSelectElement>
@@ -417,13 +417,13 @@ const FridgeRegister = () => {
         </div>
 
         {/* 서치바 */}
-        <div className="fridge-register-searchbar">
+        {/* <div className="fridge-register-searchbar">
           <FridgeSearchBar
             onSearch={handleSearch}
             categories={categories}
             disabled={ingredientType === "COOKED"}
           ></FridgeSearchBar>
-        </div>
+        </div> */}
 
         {/* 아이콘 표시 */}
         {icon && (
@@ -632,7 +632,10 @@ const FridgeRegister = () => {
 
         {/* 버튼 */}
         <div className="fridge-register-buttons">
-        <button className="fridge-register-cancel-button" onClick={() => setRequestPopupOpen(true)}>
+          <button
+            className="fridge-register-cancel-button"
+            onClick={() => setRequestPopupOpen(true)}
+          >
             {/* <svg
               xmlns="http://www.w3.org/2000/svg"
               width="20"
@@ -679,8 +682,8 @@ const FridgeRegister = () => {
           </button>
         </div>
       </div>
-       {/* 수정 팝업 */}
-       {requestPopupOpen && (
+      {/* 수정 팝업 */}
+      {requestPopupOpen && (
         <div className="edit-popup">
           <h3>재료 등록 요청하기</h3>
           <div>

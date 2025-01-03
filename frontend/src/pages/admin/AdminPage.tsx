@@ -22,8 +22,6 @@ interface AdminResponseDto {
     responseMessage: string;
 }
 
-const apiUrl = import.meta.env.VITE_API_URL;
-
 const AdminPage = () => {
     const { isAdmin, accessToken } = useContext(AdminContext)!; // 관리자인지 확인
     const navigate = useNavigate();
