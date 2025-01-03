@@ -86,16 +86,16 @@ const Header = () => {
               onClick={toggleNotification}
             >
               <img src="/assets/notification-icon.png" alt="notification" />
-            </a>
+            
             {/* 알림 팝업 */}
             {showNotification && (
               <NotificationPopup setShowNotification={setShowNotification} />
             )}
-
+            </a>
             {/* 사용자 메뉴 버튼 */}
             <a href="#" className="header-user" onClick={toggleUserMenu}>
               <img src={profileImage || "/assets/user-icon.png"} alt="user" />
-            </a>
+            
             {/* 사용자 메뉴창 */}
             {showUserMenu && (
               <div className="header-user-menu">
@@ -128,6 +128,7 @@ const Header = () => {
                 </ul>
               </div>
             )}
+            </a>
           </>
         ) : (
           <>
