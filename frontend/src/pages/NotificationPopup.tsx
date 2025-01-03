@@ -33,22 +33,22 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({
   }, []);
 
   // 팝업 외부 클릭 시 팝업 닫기
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      popupRef.current &&
+      !popupRef.current.contains(event.target as Node)
+    ) {
+      setShowNotification(false);
+    }
+  };
+    
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        popupRef.current &&
-        !popupRef.current.contains(event.target as Node)
-      ) {
-        setShowNotification(false);
-      }
-    };
-
     document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [setShowNotification]);
+  }, []);
 
   const handleRequest = async (state: string, notificationId: number) => {
     try {
@@ -169,7 +169,7 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({
     }
   };
   return (
-    <div className="notification-popup">
+    <div className="notification-popup" ref={popupRef}>
       <div className="notification-header">
         <button onClick={() => markAllAsRead()}>전체 읽음</button>
         <button onClick={handleDeleteAll}>전체 삭제</button>
@@ -186,6 +186,7 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({
               <p>
                 [{fromEnumToDescription(notification.notificationType)} 알림]
               </p>
+              
               <p>{notification.notificationMessage}</p>
               {!notification.notificationIsRead && (
                 <button
@@ -195,41 +196,40 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({
                   읽음
                 </button>
               )}
-              <button
-                onClick={() =>
-                  handleDelete(
-                    notification.notificationId,
-                    notification.notificationIsRead
-                  )
-                }
-                style={{ backgroundColor: "gray", color: "white" }}
-              >
-                삭제
-              </button>
-              {(notification.notificationType === "TRADE_REQUEST" ||
-                notification.notificationType === "SHARE_REQUEST") && (
-                <div>
-                  <button
-                    style={{ backgroundColor: "green", color: "white" }}
-                    onClick={() =>
-                      handleRequest(
-                        RESPONSE_ACCEPT,
-                        notification.notificationId
-                      )
-                    }
-                  >
-                    수락
-                  </button>
-                  <button
-                    style={{ backgroundColor: "red", color: "white" }}
-                    onClick={() =>
-                      handleRequest(RESPONSE_DENY, notification.notificationId)
-                    }
-                  >
-                    거절
-                  </button>
-                </div>
-              )}
+              <div className="notification-button">
+                <button className="notification-button-delete"
+                  onClick={() =>
+                    handleDelete(
+                      notification.notificationId,
+                      notification.notificationIsRead
+                    )
+                  }
+                >
+                  삭제
+                </button>
+                {(notification.notificationType === "TRADE_REQUEST" ||
+                  notification.notificationType === "SHARE_REQUEST") && (
+                  <div>
+                    <button className="notification-button-accept"
+                      onClick={() =>
+                        handleRequest(
+                          RESPONSE_ACCEPT,
+                          notification.notificationId
+                        )
+                      }
+                    >
+                      수락
+                    </button>
+                    <button className="notification-button-deny"
+                      onClick={() =>
+                        handleRequest(RESPONSE_DENY, notification.notificationId)
+                      }
+                    >
+                      거절
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           ))
         ) : (

@@ -70,6 +70,17 @@ const CommunityDetail = () => {
         action: "REQUEST",
       };
   
+      // 로딩 상태 표시
+      Swal.fire({
+        title: "처리 중...",
+        html: "<div class='spinner'></div>", // 커스텀 로딩 애니메이션
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          Swal.showLoading(); // 기본 로딩 애니메이션 표시
+        },
+      });
+
       await axios.post(`${apiUrl}/api/posts/${postId}/request`, actionRequest, {
         headers: {
           "Content-Type": "application/json",
@@ -79,6 +90,7 @@ const CommunityDetail = () => {
         withCredentials: true,
         
       });
+      
       Swal.fire("요청 성공", "요청이 성공적으로 처리되었습니다!", "success");
       setRequestMade(true); // 요청 상태 업데이트
     } catch (error) {
@@ -98,6 +110,16 @@ const CommunityDetail = () => {
         action: "CANCEL",
       };
   
+      // 로딩 상태 표시
+      Swal.fire({
+        title: "처리 중...",
+        html: "<div class='spinner'></div>", // 커스텀 로딩 애니메이션
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          Swal.showLoading(); // 기본 로딩 애니메이션 표시
+        },
+      });
       await axios.post(`${apiUrl}/api/posts/${postId}/request`, actionRequest, {
         headers: {
           "Content-Type": "application/json",
