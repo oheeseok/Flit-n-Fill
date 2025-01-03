@@ -20,14 +20,28 @@ public class PushNotificationService {
 
   // 클라이언트가 SSE 연결을 구독하는 메서드
   public SseEmitter subscribe(String userEmail) {
+    // 이미 구독이 되어 있는 경우 기존 emitter를 반환
+    if (emitters.containsKey(userEmail)) {
+      log.info("[SseEmitter] Already subscribed for user {}", userEmail);
+      return emitters.get(userEmail); // 기존 emitter 반환
+    }
+
+    // 구독이 안되어 있는 경우에만 새로운 emitter 생성
     SseEmitter emitter = new SseEmitter(Long.MAX_VALUE); // 0L: timeout 무제한
     emitters.put(userEmail, emitter);
+    log.info("[SseEmitter] emitter.put({})", userEmail);
 
     // 연결이 완료되거나 오류가 발생하면 emitter를 제거
-    emitter.onCompletion(() -> emitters.remove(userEmail));
-    emitter.onTimeout(() -> emitters.remove(userEmail));
+    emitter.onCompletion(() -> {
+      emitters.remove(userEmail);
+      log.info("[SseEmitter] emitter.onCompletion({})", userEmail);
+    });
+    emitter.onTimeout(() -> {
+      emitters.remove(userEmail);
+      log.info("[SseEmitter] emitter.onTimeout({})", userEmail);
+    });
     emitter.onError((e) -> {
-      log.info("SSE connection error for user {}: {}", userEmail, e.getMessage());
+      log.info("[SseEmitter] SSE connection error for user {}: {}", userEmail, e.getMessage());
       emitters.remove(userEmail);
     });
 
