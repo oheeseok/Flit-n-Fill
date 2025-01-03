@@ -73,10 +73,10 @@ const Fridge: React.FC = () => {
           },
           {
             condition: new Date(editedExpirationDate) <= new Date(),
-            message: "소비기한은 오늘 이후 날짜로 설정해야 합니다."
-          }
+            message: "소비기한은 오늘 이후 날짜로 설정해야 합니다.",
+          },
         ];
-  
+
         for (const { condition, message } of errorMessages) {
           if (condition) {
             Swal.fire({
@@ -87,13 +87,13 @@ const Fridge: React.FC = () => {
             return false;
           }
         }
-  
+
         return true;
       };
-  
+
       // 유효성 검사 통과하지 못하면 중단
       if (!validateInput()) return;
-  
+
       let updatedItem: Partial<FridgeItem> = {
         id: editingItemId,
         quantity: editedQuantity === "" ? 0 : editedQuantity,
@@ -103,7 +103,7 @@ const Fridge: React.FC = () => {
         storageMethod: editedStorageMethod,
         remarks: editedRemarks,
       };
-  
+
       // 업데이트된 항목 전송
       updateFridgeItem(updatedItem)
         .then(() => {
@@ -123,7 +123,7 @@ const Fridge: React.FC = () => {
           });
           console.error("Error updating fridge item", error);
         });
-  
+
       setEditingItemId(null);
     }
   };
@@ -133,13 +133,29 @@ const Fridge: React.FC = () => {
     items: FridgeItem[],
     storageMethod: "REFRIGERATED" | "FROZEN" | "ROOM_TEMPERATURE"
   ) => {
+    const [selectedItemIds, setSelectedItemIds] = useState<number[]>([]); // 다중 선택 상태 관리
+
+    const handleItemClick = (id: number, foodListId: number | undefined) => {
+      if(foodListId === null) {
+        return;
+      }
+      setSelectedItemIds((prev) =>
+        prev.includes(id)
+          ? prev.filter((itemId) => itemId !== id)
+          : [...prev, id]
+      ); // 이미 선택된 경우 제거, 아니면 추가
+    };
+
     return items
       .filter((item) => item.storageMethod === storageMethod)
       .map((item) => (
         <div
-          className="fridge-item"
+          className={`fridge-item ${
+            selectedItemIds.includes(item.id) ? "selected" : ""
+          }`}
           key={item.id} // number 타입 id 사용
           style={{ position: "relative" }}
+          onClick={() => handleItemClick(item.id, item.foodListId)}
         >
           <div className="fridge-item-name">{item.name}</div>
           <img
@@ -155,13 +171,17 @@ const Fridge: React.FC = () => {
               src="/assets/edit.png"
               alt="수정"
               className="fridge-item-edit-icon"
-              onClick={() => handleEditClick(item.id)}
+              onClick={(e) =>{
+                e.stopPropagation();
+                handleEditClick(item.id);
+              }}
             />
             <img
               src="/assets/delete.png"
               alt="삭제"
               className="fridge-item-delete-icon"
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 Swal.fire({
                   title: "삭제하시겠습니까?",
                   text: `${item.name}을(를) 삭제하시겠습니까?`,
@@ -205,18 +225,7 @@ const Fridge: React.FC = () => {
             className="fridge-item-icon"
             src={item.icon}
             alt={item.name}
-            onClick={() => {
-              if (item.foodListId !== undefined) {
-                addToBucket(item); // 버킷에 추가
-              } else {
-                console.warn("Cooked items cannot be added to the bucket.");
-                Swal.fire({
-                  icon: "warning",
-                  title: "추가 불가",
-                  text: "조리된 항목은 버킷에 추가할 수 없습니다.",
-                });
-              }
-            }} // 버킷에 추가
+            onClick={() => addToBucket(item)} // 버킷에 추가
           />
           <div className="fridge-item-expiration">{item.expirationDate}</div>
           <div className="fridge-item-actions">
