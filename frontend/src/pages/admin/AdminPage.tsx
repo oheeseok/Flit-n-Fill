@@ -100,7 +100,7 @@ const AdminPage = () => {
         const data: AdminResponseDto = { responseStatus, responseMessage };
 
         try {
-            await axios.patch(`${apiUrl}/api/admin/requests/${requestId}``, data, {
+            await axios.patch(`${apiUrl}/api/admin/requests/${requestId}`, data, {
                 withCredentials: true,
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
