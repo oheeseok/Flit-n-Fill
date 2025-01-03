@@ -23,21 +23,16 @@ interface CommunityListProps {
 const CommunityList: React.FC<CommunityListProps> = ({ filter }) => {
   const apiUrl = import.meta.env.VITE_API_URL;
   const [posts, setPosts] = useState<PostSimpleDto[]>([]); // 상태로 게시글 목록 관리
-  // const [queryFilteredPosts, setQueryFilteredPosts] = useState<PostSimpleDto[]>([]);
   const [loading, setLoading] = useState<boolean>(true); // 로딩 상태 관리
   const [error, setError] = useState<string | null>(null); // 에러 메시지 관리
 
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get("searchQuery") || "";
-  // const tradeType = searchParams.get("tradeType") || "ALL"; // 필터 타입 (기본값: ALL)
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
         setLoading(true);
-        // const params: Record<string, string> = {};
-        // if (searchQuery) params["search-query"] = searchQuery;
-        // if (tradeType !== "ALL") params.tradeType = tradeType;
 
         const response = await axios.get(`${apiUrl}/api/posts`, {
           params: { "search-query": searchQuery },
@@ -64,14 +59,6 @@ const CommunityList: React.FC<CommunityListProps> = ({ filter }) => {
   const filteredPosts = posts.filter((post) => {
     return filter === "ALL" || post.tradeType === filter;
   });
-
-  // const queryFilteredPosts = tradeTypeFilteredPosts.filter((post) => {
-  //   return (
-  //     searchQuery ||
-  //     post.postTitle.includes(searchQuery) ||
-  //     post.postContent.includes(searchQuery)
-  //   );
-  // });
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
