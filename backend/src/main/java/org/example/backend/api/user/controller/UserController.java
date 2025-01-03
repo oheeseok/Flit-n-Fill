@@ -13,7 +13,7 @@ import org.example.backend.api.user.service.UserService;
 import org.example.backend.exceptions.LoginFailedException;
 import org.example.backend.exceptions.UserIdNullException;
 import org.example.backend.exceptions.UserNotFoundException;
-import org.example.backend.security.PrincipalDetails;
+import org.example.backend.security.model.PrincipalDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -48,6 +48,7 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserLoginDto userLoginDto, HttpServletResponse response) {
         try {
+            log.info("login email: {}", userLoginDto.getUserEmail());
             UserLoginResponse login = userService.login(userLoginDto, response);
 
 //            return ResponseEntity.status(HttpStatus.OK).body("로그인에 성공하였습니다.");

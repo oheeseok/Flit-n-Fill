@@ -1,7 +1,6 @@
 package org.example.backend.security;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +9,7 @@ import org.example.backend.api.user.model.entity.User;
 import org.example.backend.api.user.repository.UserRepository;
 import org.example.backend.api.user.service.TokenManagementService;
 import org.example.backend.exceptions.UserNotFoundException;
+import org.example.backend.security.model.PrincipalDetails;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;

@@ -35,7 +35,6 @@ const AdminPage = () => {
     const fetchRequestList = async () => {
         try {
             const response = await axios.get(`${apiUrl}/api/admin/requests`, {
-            // const response = await axios.get("http://localhost:8080/api/admin/requests", {
                 withCredentials: true,
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
@@ -75,7 +74,6 @@ const AdminPage = () => {
     // 요청 상세 정보 가져오기
     const fetchRequestDetail = async (requestId: string) => {
         try {
-            // const response = await axios.get(`http://localhost:8080/api/admin/requests/${requestId}`, {
             const response = await axios.get(`${apiUrl}/api/admin/requests/${requestId}`, {
                 withCredentials: true,
                 headers: {
@@ -102,8 +100,7 @@ const AdminPage = () => {
         const data: AdminResponseDto = { responseStatus, responseMessage };
 
         try {
-            await axios.patch(`http://localhost:8080/api/admin/requests/${requestId}`, data, {
-            // await axios.patch(`${apiUrl}/api/admin/requests/${requestId}`, data, {
+            await axios.patch(`${apiUrl}/api/admin/requests/${requestId}``, data, {
                 withCredentials: true,
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,

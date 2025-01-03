@@ -29,9 +29,10 @@ const Header = () => {
       setProfileImage("/assets/user-icon.png"); // 기본 아이콘
     }
   }, []);
-  // const toggleNotification = () => {
-  //   setShowNotification((prev) => !prev);
-  // };
+  
+  const toggleNotification = () => {
+    setShowNotification((prev) => !prev);
+  };
 
   const toggleUserMenu = () => {
     setShowUserMenu((prev) => !prev);
@@ -49,7 +50,7 @@ const Header = () => {
       cancelButtonText: "취소",
     }).then((result) => {
       if (result.isConfirmed) {
-        localStorage.removeItem("accessToken");
+        localStorage.clear();
         setIsLoggedIn(false);
         Swal.fire("로그아웃 완료", "로그아웃 되었습니다.", "success");
         navigate("/");

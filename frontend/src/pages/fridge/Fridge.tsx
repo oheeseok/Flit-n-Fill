@@ -205,7 +205,18 @@ const Fridge: React.FC = () => {
             className="fridge-item-icon"
             src={item.icon}
             alt={item.name}
-            onClick={() => addToBucket(item)} // 버킷에 추가
+            onClick={() => {
+              if (item.foodListId !== undefined) {
+                addToBucket(item); // 버킷에 추가
+              } else {
+                console.warn("Cooked items cannot be added to the bucket.");
+                Swal.fire({
+                  icon: "warning",
+                  title: "추가 불가",
+                  text: "조리된 항목은 버킷에 추가할 수 없습니다.",
+                });
+              }
+            }} // 버킷에 추가
           />
           <div className="fridge-item-expiration">{item.expirationDate}</div>
           <div className="fridge-item-actions">
