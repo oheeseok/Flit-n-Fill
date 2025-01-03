@@ -151,13 +151,13 @@ function App() {
             element={
               <PrivateRoute allowedPages={["community"]}>
               <Layout>
-                <CommunityList />
+                <CommunityList filter=""/>
               </Layout>
               </PrivateRoute>
             }
           ></Route>
           <Route
-            path="/community/edit"
+            path="/community/edit/:postId"
             element={
               <PrivateRoute allowedPages={["community"]}>
               <Layout>
@@ -167,7 +167,7 @@ function App() {
             }
           ></Route>
           <Route
-            path="/community/detail"
+            path="/community/detail/:postId"
             element={
               <PrivateRoute allowedPages={["community"]}>
               <Layout>

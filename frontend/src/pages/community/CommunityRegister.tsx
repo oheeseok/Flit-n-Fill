@@ -1,20 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { useCommunity } from "../../context/CommunityContext";
+import axios from "axios";
 import CommunityImageUploader from "../../components/community/CommunityImageUploader";
 import "../../styles/community/CommunityRegister.css";
 
+interface FoodDetailDto {
+  foodId: number;
+  foodListName: string;
+  foodRegistDate: string;
+  foodCount: number;
+  foodUnit: string;
+  foodProDate: string;
+  foodExpDate: string;
+  foodStorage: string;
+  foodIsThaw: boolean;
+  foodDescription: string;
+  foodListIcon: string;
+  foodListId: number;
+}
+
+interface FoodListViewDto {
+  foodListId: number;
+  foodListGroup: string;
+  foodListType: string;
+  foodListProduct: string;
+  foodListIcon: number;
+}
+
 const CommunityRegister = () => {
+  const apiUrl = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
-  const { setCommunityData } = useCommunity(); // Context의 데이터 설정 함수 사용
 
   // 상태 관리
-  const [uploadedImage1, setUploadedImage1] = useState<string | null>(null);
-  const [
-    uploadedImage2,
-    // setUploadedImage2
-  ] = useState<string | null>(null);
+  const [uploadedImage1, setUploadedImage1] = useState<File | null>(null);
   const [title, setTitle] = useState<string>("");
   const [content, setContent] = useState<string>("");
   const [meetingPlace, setMeetingPlace] = useState<string>("");
@@ -22,12 +41,63 @@ const CommunityRegister = () => {
   const [category, setCategory] = useState<string>("EXCHANGE");
   const [writerFoodId, setWriterFoodId] = useState<number>(0);
   const [proposerFoodListId, setProposerFoodListId] = useState<number>(0);
+  const [fridgeItems, setFridgeItems] = useState<FoodDetailDto[]>([])
+  const [foodList, setFoodList] = useState<FoodListViewDto[]>([])
 
   // 이미지 업로드 핸들러
-  const handleImage1Change = (image: string) => setUploadedImage1(image);
-  // const handleImage2Change = (image: string) => setUploadedImage2(image);
+  const handleImage1Change = (image: File) => setUploadedImage1(image);
 
-  const handleRegister = () => {
+  // 음식 리스트 가져오기
+  useEffect(() => {
+    const fetchFoodList = async () => {
+      try {
+        const response = await axios.get<FoodListViewDto[]>(
+          `${apiUrl}/api/foodlist`,
+          {
+            withCredentials: true,
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+              userEmail: localStorage.getItem("userEmail"),
+            },
+          }
+        );
+        console.log("foodList: ", response.data)
+        setFoodList(response.data); // 가져온 데이터를 상태에 저장
+      } catch (error) {
+        console.error("음식 리스트를 가져오는 데 실패했습니다:", error);
+      }
+    };
+
+    fetchFoodList();
+  }, []);
+
+  // 작성자의 재료 목록 가져오기
+  useEffect(() => {
+    const fetchFridgeItems = async () => {
+      try {
+        const response = await axios.get<FoodDetailDto[]>(`${apiUrl}/api/my-fridge`, {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
+          },
+        });
+        const uniqueItems = Array.from(
+          new Map(response.data.map((item) => [item.foodListName, item])).values()
+        );
+
+        console.log("fridge items: ", response.data)
+        setFridgeItems(uniqueItems);
+      } catch (error) {
+        console.error("작성자의 재료를 가져오는 데 실패했습니다:", error);
+        Swal.fire("오류", "작성자의 재료를 가져오는 데 실패했습니다.", "error");
+      }
+    };
+
+    fetchFridgeItems();
+  }, []);
+
+  const handleRegister = async () => {
     // 필수 입력값 확인
     if (
       !title.trim() ||
@@ -35,8 +105,6 @@ const CommunityRegister = () => {
       !meetingPlace.trim() ||
       !meetingTime.trim() ||
       !uploadedImage1
-      // ||
-      // !uploadedImage2
     ) {
       Swal.fire({
         icon: "warning",
@@ -46,31 +114,55 @@ const CommunityRegister = () => {
       return;
     }
 
+    try {
+      const formData = new FormData();
+
     // JSON 데이터 생성
-    const communityPost = {
-      postTitle: title,
-      postContent: content,
-      meetingPlace,
-      meetingTime,
-      postPhoto1: uploadedImage1,
-      postPhoto2: uploadedImage2,
-      tradeType: category,
-      writerFoodId,
-      proposerFoodListId,
-    };
+      const communityPost = {
+        postTitle: title,
+        postContent: content,
+        meetingPlace,
+        meetingTime,
+        tradeType: category,
+        writerFoodId,
+        proposerFoodListId,
+      };
+      formData.append("postRegisterDto", JSON.stringify(communityPost))
+      formData.append("postMainPhoto", uploadedImage1)
 
-    console.log("등록 데이터:", communityPost);
+      console.log("formData: ", formData)
 
-    // Context에 데이터 저장
-    setCommunityData(communityPost);
+      const response = await axios.post(
+        "/api/posts",
+        formData,
+        {
+          withCredentials: true,
+          headers: { 
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"), 
+          },
+        }
+      );
 
-    Swal.fire({
-      icon: "success",
-      title: "등록 성공",
-      text: "게시물이 성공적으로 등록되었습니다!",
-    }).then(() => {
-      navigate("/community/detail");
-    });
+      if (response.status === 201) {
+        Swal.fire({
+          icon: "success",
+          title: "등록 성공",
+          text: "게시물이 성공적으로 등록되었습니다!",
+        }).then(() => {
+          navigate("/community");
+        });
+      }
+
+    } catch (error) {
+      console.error("게시글 등록 실패:", error);
+      Swal.fire({
+        icon: "error",
+        title: "등록 실패",
+        text: "게시물 등록 중 오류가 발생했습니다.",
+      });
+    }
   };
 
   const handleCancel = () => {
@@ -102,8 +194,8 @@ const CommunityRegister = () => {
           <input
             type="radio"
             name="category"
-            value="SHARE"
-            checked={category === "SHARE"}
+            value="SHARING"
+            checked={category === "SHARING"}
             onChange={(e) => setCategory(e.target.value)}
           />
           나눔
@@ -141,22 +233,37 @@ const CommunityRegister = () => {
         placeholder="만남 시간을 입력하세요"
       />
       {/* 작성자/제안자 음식 ID */}
-      작성자의 재료
-      <input
-        type="number"
+      나의 재료
+      <select
         className="community-register-text"
         value={writerFoodId}
         onChange={(e) => setWriterFoodId(Number(e.target.value))}
-        placeholder="작성자 음식 ID를 입력하세요"
-      />
-      교환원하는 재료
-      <input
-        type="number"
-        className="community-register-text"
-        value={proposerFoodListId}
-        onChange={(e) => setProposerFoodListId(Number(e.target.value))}
-        placeholder="제안자 음식 리스트 ID를 입력하세요"
-      />
+      >
+        <option value="">재료를 선택하세요</option>
+        {fridgeItems.map((item) => (
+          <option key={item.foodId} value={item.foodId}>
+            {item.foodListName}
+          </option>
+        ))}
+      </select>
+      { category !== "SHARING" && (
+        <div>
+          원하는 재료
+          <select
+            className="community-register-text"
+            value={proposerFoodListId}
+            onChange={(e) => setProposerFoodListId(Number(e.target.value))}
+          >
+            <option value="">재료를 선택하세요</option>
+            {foodList.map((food) => (
+              <option key={food.foodListId} value={food.foodListId}>
+                {food.foodListProduct !== null ? food.foodListProduct : food.foodListType}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+      
       {/* 내용 입력 */}
       <textarea
         className="community-register-box-input"
@@ -167,16 +274,16 @@ const CommunityRegister = () => {
       {/* 등록/취소 버튼 */}
       <div className="community-register-button-container">
         <button
-          className="community-register-register-button"
-          onClick={handleRegister}
-        >
-          등록
-        </button>
-        <button
           className="community-register-cancel-button"
           onClick={handleCancel}
         >
           취소
+        </button>
+        <button
+          className="community-register-register-button"
+          onClick={handleRegister}
+        >
+          등록
         </button>
       </div>
     </div>
