@@ -28,6 +28,8 @@ bin/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+local.env
+.env
 
 ### NetBeans ###
 /nbproject/private/

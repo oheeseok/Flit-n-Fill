@@ -4,10 +4,10 @@ import "../../styles/fridge/FridgeRegister.css";
 import { useFridge } from "../../context/FridgeContext";
 import axios from "axios";
 const apiUrl = import.meta.env.VITE_API_URL;
-// import FridgeSearchBar from "../../components/fridge/FridgeSearchBar.tsx";
+import FridgeSearchBar from "../../components/fridge/FridgeSearchBar.tsx";
 
 const FridgeRegister = () => {
-  const { addFridgeItem } = useFridge();
+  const { addFridgeItem, requestAddIngredient } = useFridge();
   const [selectedMainCategory, setSelectedMainCategory] = useState<string>("");
   const [selectedSubCategory, setSelectedSubCategory] = useState<string>("");
   const [selectedDetailCategory, setSelectedDetailCategory] =
@@ -23,6 +23,8 @@ const FridgeRegister = () => {
   const [remarks, setRemarks] = useState<string>("");
   const [adminRequest, setAdminRequest] = useState<string>("");
   const [foodListId, setFoodListId] = useState<string>("");
+  const [requestContext, setRequestContext] = useState<string>("");
+  const [requestPopupOpen, setRequestPopupOpen] = useState(false);
   // const [categories, setCategories] = useState([]);
   const [categories, setCategories] = useState<Record<string, GroupedCategory>>(
     {}
@@ -45,7 +47,7 @@ const FridgeRegister = () => {
   interface SubCategory {
     foodListIcon: number;
     foodListId: number;
-    소분류: Record<string, { foodListIcon: number; foodListId: number }>;
+    소분류: Record<string, { foodListIcon: number; foodListId: number } | null>;
   }
 
   interface GroupedCategory {
@@ -177,10 +179,6 @@ const FridgeRegister = () => {
     const validateInput = (): boolean => {
       const errorMessages = [
         {
-          condition: quantity === "" || quantity === 0,
-          message: "수량을 입력해주세요.",
-        },
-        {
           condition:
             ingredientType !== "COOKED" &&
             (!selectedMainCategory || !selectedSubCategory),
@@ -193,6 +191,10 @@ const FridgeRegister = () => {
         {
           condition: ingredientType === "COOKED" && !name,
           message: "음식의 이름을 입력해주세요.",
+        },
+        {
+          condition: quantity === "" || quantity === 0,
+          message: "수량을 입력해주세요.",
         },
         {
           condition: new Date(expirationDate) <= new Date(),
@@ -243,6 +245,9 @@ const FridgeRegister = () => {
       icon: "success",
       title: "등록 완료",
       text: "냉장고에 항목이 추가되었습니다.",
+    }).then(() => {
+      // Swal 확인 버튼 클릭 후 실행
+      window.location.href = "/fridge";
     });
 
     // 폼 초기화
@@ -283,21 +288,48 @@ const FridgeRegister = () => {
     setFoodListId("");
   };
 
-  // onSearch 함수 정의
-  // const handleSearch = (
-  //   mainCategory: string,
-  //   subCategory?: string,
-  //   detailCategory?: string
-  // ) => {
-  //   console.log(mainCategory, subCategory, detailCategory);
-  //   setSelectedMainCategory(mainCategory || "");
-  //   setSelectedSubCategory(subCategory || "");
-  //   setSelectedDetailCategory(detailCategory || "");
+  const handleRequestRegister = (): void => {
+    if (!requestContext) {
+      alert("요청할 재료 이름을 입력해주세요.");
+      return;
+    }
 
-  //   console.log("selectedMain:", selectedMainCategory);
-  //   console.log("selectedSub:", selectedSubCategory);
-  //   console.log("selectedDetail:", selectedDetailCategory);
-  // };
+    try {
+      // string 그대로 전달
+      requestAddIngredient(requestContext); 
+  
+      Swal.fire({
+        icon: "success",
+        title: "등록 완료",
+        text: "재료 등록 요청에 성공하였습니다.",
+      });
+      setRequestContext(""); // 입력 필드 초기화
+      setRequestPopupOpen(false); // 팝업 닫기
+    } catch (error) {
+      console.error("재료 등록 요청 실패:", error);
+      Swal.fire({
+        icon: "error",
+        title: "요청 에러",
+        text: "재료 등록 요청에 하였습니다.",
+      });
+    }
+  }
+
+  // onSearch 함수 정의
+  const handleSearch = (
+    mainCategory: string,
+    subCategory?: string,
+    detailCategory?: string
+  ) => {
+    console.log(mainCategory, subCategory, detailCategory);
+    setSelectedMainCategory(mainCategory || "");
+    setSelectedSubCategory(subCategory || "");
+    setSelectedDetailCategory(detailCategory || "");
+
+    console.log("selectedMain:", selectedMainCategory);
+    console.log("selectedSub:", selectedSubCategory);
+    console.log("selectedDetail:", selectedDetailCategory);
+  };
 
   const handleMainCategoryChangee = (
     e: React.ChangeEvent<HTMLSelectElement>
@@ -385,13 +417,13 @@ const FridgeRegister = () => {
         </div>
 
         {/* 서치바 */}
-        {/* <div className="fridge-register-searchbar">
+        <div className="fridge-register-searchbar">
           <FridgeSearchBar
             onSearch={handleSearch}
             categories={categories}
             disabled={ingredientType === "COOKED"}
           ></FridgeSearchBar>
-        </div> */}
+        </div>
 
         {/* 아이콘 표시 */}
         {icon && (
@@ -587,7 +619,7 @@ const FridgeRegister = () => {
             ></textarea>
           </div>
 
-          <div className="fridge-register-form-group">
+          {/* <div className="fridge-register-form-group">
             <label>관리자 요청</label>
             <input
               type="text"
@@ -595,11 +627,26 @@ const FridgeRegister = () => {
               onChange={(e) => setAdminRequest(e.target.value)}
               placeholder="관리자 요청 사항 입력"
             />
-          </div>
+          </div> */}
         </div>
 
         {/* 버튼 */}
         <div className="fridge-register-buttons">
+        <button className="fridge-register-cancel-button" onClick={() => setRequestPopupOpen(true)}>
+            {/* <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="none"
+            >
+              <path
+                d="M6 14.7867L10 10.7867L14 14.7867L14.7867 14L10.7867 10L14.7867 6L14 5.21333L10 9.21333L6 5.21333L5.21333 6L9.21333 10L5.21333 14L6 14.7867ZM10.0033 20C8.62111 20 7.32111 19.7378 6.10333 19.2133C4.8863 18.6881 3.82741 17.9756 2.92667 17.0756C2.02593 16.1756 1.31296 15.1178 0.787778 13.9022C0.262593 12.6867 0 11.387 0 10.0033C0 8.61963 0.262593 7.31963 0.787778 6.10333C1.31222 4.8863 2.0237 3.82741 2.92222 2.92667C3.82074 2.02593 4.87889 1.31296 6.09667 0.787778C7.31445 0.262593 8.61444 0 9.99667 0C11.3789 0 12.6789 0.262593 13.8967 0.787778C15.1137 1.31222 16.1726 2.02407 17.0733 2.92333C17.9741 3.82259 18.687 4.88074 19.2122 6.09778C19.7374 7.31481 20 8.61444 20 9.99667C20 11.3789 19.7378 12.6789 19.2133 13.8967C18.6889 15.1144 17.9763 16.1733 17.0756 17.0733C16.1748 17.9733 15.117 18.6863 13.9022 19.2122C12.6874 19.7381 11.3878 20.0007 10.0033 20ZM10 18.8889C12.4815 18.8889 14.5833 18.0278 16.3056 16.3056C18.0278 14.5833 18.8889 12.4815 18.8889 10C18.8889 7.51852 18.0278 5.41667 16.3056 3.69444C14.5833 1.97222 12.4815 1.11111 10 1.11111C7.51852 1.11111 5.41667 1.97222 3.69444 3.69444C1.97222 5.41667 1.11111 7.51852 1.11111 10C1.11111 12.4815 1.97222 14.5833 3.69444 16.3056C5.41667 18.0278 7.51852 18.8889 10 18.8889Z"
+                fill="black"
+              />
+            </svg> */}
+            재료 등록요청
+          </button>
           <button className="fridge-register-button" onClick={handleRegister}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -632,6 +679,23 @@ const FridgeRegister = () => {
           </button>
         </div>
       </div>
+       {/* 수정 팝업 */}
+       {requestPopupOpen && (
+        <div className="edit-popup">
+          <h3>재료 등록 요청하기</h3>
+          <div>
+            <label>요청하실 재료를 입력해주세요.</label>
+            <textarea
+              value={requestContext}
+              onChange={(e) => setRequestContext(e.target.value)}
+            ></textarea>
+          </div>
+          <button className="edit" onClick={handleRequestRegister}>
+            저장
+          </button>
+          <button onClick={() => setRequestPopupOpen(false)}>취소</button>
+        </div>
+      )}
     </div>
   );
 };
