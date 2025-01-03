@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import "../styles/common/SignUp.css";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const SignUp = () => {
   // 상태 관리
@@ -16,7 +17,7 @@ const SignUp = () => {
   const handleSignUp = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/user/register",
+        `${apiUrl}/api/user/register`,
         {
           userName: name,
           userEmail: email,

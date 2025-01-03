@@ -1,8 +1,9 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AdminContext } from "../../context/AdminProvider"; // AdminContext 가져오기
 import "../../styles/admin/AdminPage.css"; // AdminPage.css 파일을 임포트
 import axios from "axios"; // axios 임포트
+const apiUrl = import.meta.env.VITE_API_URL;
 
 interface RequestDetailDto {
     requestId: string;
@@ -30,7 +31,7 @@ const AdminPage = () => {
     // 요청 목록 가져오기
     const fetchRequestList = async () => {
         try {
-            const response = await axios.get("http://localhost:8080/api/admin/requests", {
+            const response = await axios.get(`${apiUrl}/api/admin/requests`, {
                 withCredentials: true, // 쿠키와 같은 인증 정보를 자동으로 보내도록 설정
             });
 
@@ -66,7 +67,7 @@ const AdminPage = () => {
     // 요청 상세 정보 가져오기
     const fetchRequestDetail = async (requestId: string) => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/admin/requests/${requestId}`, {
+            await axios.get(`${apiUrl}/api/admin/requests/${requestId}`, {
                 withCredentials: true, // 쿠키와 같은 인증 정보를 자동으로 보내도록 설정
             });
             // 상세 정보 불러오기 후 상태 업데이트
@@ -87,7 +88,7 @@ const AdminPage = () => {
         const data: AdminResponseDto = { responseStatus, responseMessage };
 
         try {
-            await axios.patch(`http://localhost:8080/api/admin/requests/${requestId}`, data, {
+            await axios.patch(`${apiUrl}/api/admin/requests/${requestId}`, data, {
                 withCredentials: true, // 쿠키와 같은 인증 정보를 자동으로 보내도록 설정
             }); // 요청 상태 업데이트
             fetchRequestList(); // 상태 업데이트 후 요청 목록 다시 가져오기

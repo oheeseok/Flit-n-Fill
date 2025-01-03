@@ -1,11 +1,10 @@
 import React, { useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import "../styles/common/NotificationPopup.css";
 import { useNotification } from "../context/NotificationContext";
-import { NotificationViewDto } from "../interfaces/NotificationInterfaces";
 import { fromEnumToDescription } from "../components/enum";
 import Swal from "sweetalert2";
 import axios, { AxiosError } from "axios";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 interface NotificationPopupProps {
   setShowNotification: React.Dispatch<React.SetStateAction<boolean>>;
@@ -69,7 +68,7 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({
       });
 
       const response = await axios.patch(
-        `http://localhost:8080/api/notifications/${notificationId}`,
+        `${apiUrl}/api/notifications/${notificationId}`,
         state,
         {
           withCredentials: true,

@@ -3,6 +3,7 @@ import Swal from "sweetalert2";
 import "../../styles/fridge/FridgeRegister.css";
 import { useFridge } from "../../context/FridgeContext";
 import axios from "axios";
+const apiUrl = import.meta.env.VITE_API_URL;
 // import FridgeSearchBar from "../../components/fridge/FridgeSearchBar.tsx";
 
 const FridgeRegister = () => {
@@ -56,7 +57,7 @@ const FridgeRegister = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/api/foodlist", {
+        const response = await axios.get(`${apiUrl}/api/foodlist`, {
           withCredentials: true,
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,

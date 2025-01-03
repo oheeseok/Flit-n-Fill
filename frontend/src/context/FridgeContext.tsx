@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
-import { FoodCategory, FoodStorage } from "../components/enum";
+import Swal from "sweetalert2";
 
 // 백엔드에서 받은 FoodDetailDto 타입의 데이터
 interface FoodDetailDto {
@@ -102,13 +102,14 @@ interface FridgeContextType {
   bucketItems: FridgeItem[];
   addFridgeItem: (item: FridgeItem) => void;
   removeFridgeItem: (id: number) => void;
-  updateFridgeItem: (id: number, updatedItem: Partial<FridgeItem>) => void;
+  updateFridgeItem: (updatedItem: Partial<FridgeItem>) => Promise<void>;
   filterByStorageMethod: (
     method: "REFRIGERATED" | "FROZEN" | "ROOM_TEMPERATURE"
   ) => FridgeItem[];
   addToBucket: (item: FridgeItem) => void;
   removeFromBucket: (id: number) => void;
   fetchFridgeItems: () => Promise<void>; // 비동기 함수로 수정
+  requestAddIngredient: (requestFood: string) => Promise<void>;
 }
 
 // 기본 Context 값 설정
@@ -117,11 +118,12 @@ const FridgeContext = createContext<FridgeContextType>({
   bucketItems: [],
   addFridgeItem: () => {},
   removeFridgeItem: () => {},
-  updateFridgeItem: () => {},
+  updateFridgeItem: async () => {},
   filterByStorageMethod: () => [],
   addToBucket: () => {},
   removeFromBucket: () => {},
   fetchFridgeItems: async () => {}, // 비어 있는 비동기 함수로 설정
+  requestAddIngredient: async () => {},
 });
 
 // Provider 컴포넌트
@@ -156,11 +158,25 @@ export const FridgeProvider = ({ children }: { children: React.ReactNode }) => {
 
   // 버킷에 아이템 추가
   const addToBucket = (item: FridgeItem) => {
-    setBucketItems((prevItems) =>
-      prevItems.find((prevItem) => prevItem.id === item.id)
-        ? prevItems
-        : [...prevItems, item]
-    );
+    if (item.foodListId === null) {
+      console.warn("Cooked items cannot be added to the bucket.");
+      Swal.fire({
+        icon: "warning",
+        title: "추가 불가",
+        text: "요리는 버킷에 추가할 수 없습니다.",
+      });
+      return;
+    }
+    // 이미 버킷에 존재하는 아이템인지 확인
+    setBucketItems((prevItems) => {
+      // 아이템이 이미 버킷에 있으면 삭제
+      if (prevItems.find((prevItem) => prevItem.id === item.id)) {
+        return prevItems.filter((prevItem) => prevItem.id !== item.id);
+      } else {
+        // 없으면 추가
+        return [...prevItems, item];
+      }
+    });
   };
 
   // 버킷에서 아이템 삭제
@@ -206,9 +222,9 @@ export const FridgeProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  // 냉장고 아이템 업데이트
-  const updateFridgeItem = async (id: number, updatedItem: FridgeItem) => {
+  const updateFridgeItem = async (updatedItem: Partial<FridgeItem>) => {
     const convertedItem = {
+      foodId: updatedItem.id,
       foodCount: updatedItem.quantity,
       foodStorage: updatedItem.storageMethod,
       foodUnit: updatedItem.unit,
@@ -218,9 +234,8 @@ export const FridgeProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     try {
-      console.log("Updated item", convertedItem);
       await axios.put(
-        `http://localhost:8080/api/my-fridge/${id}`,
+        `http://localhost:8080/api/my-fridge/${convertedItem.foodId}`,
         convertedItem,
         {
           withCredentials: true,
@@ -233,6 +248,32 @@ export const FridgeProvider = ({ children }: { children: React.ReactNode }) => {
       await fetchFridgeItems();
     } catch (error) {
       console.error("Error updating fridge item", error);
+    }
+  };
+
+  // 재료 등록 요청하기
+  const requestAddIngredient = async (requestFood: string) => {
+    try {
+      const response = await axios.post(
+        `http://localhost:8080/api/my-fridge/request`,
+        requestFood,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "text/plain",
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
+          },
+        }
+      );
+      console.log("재료 등록 요청 성공:", response.data);
+      return response.data; // 성공적으로 처리된 데이터를 반환
+    } catch (error: any) {
+      console.error(
+        "재료 등록 요청 중 오류 발생:",
+        error.response?.data || error.message
+      );
+      throw error; // 호출한 쪽에서 에러를 처리할 수 있도록 던짐
     }
   };
 
@@ -260,6 +301,7 @@ export const FridgeProvider = ({ children }: { children: React.ReactNode }) => {
         addToBucket,
         removeFromBucket,
         fetchFridgeItems,
+        requestAddIngredient,
       }}
     >
       {children}

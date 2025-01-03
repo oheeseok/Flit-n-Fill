@@ -1,11 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
-
 import {
   NotificationViewDto,
   NotificationContextType,
 } from "../interfaces/NotificationInterfaces";
-
 const apiUrl = import.meta.env.VITE_API_URL;
 
 // Context 기본 값
@@ -50,7 +48,7 @@ export const NotificationProvider = ({
   const markAllAsRead = async () => {
     try {
       const response = await axios.patch(
-        "http://localhost:8080/api/notifications/read",
+        `${apiUrl}/api/notifications/read`,
         {},
         {
           withCredentials: true,
@@ -73,7 +71,7 @@ export const NotificationProvider = ({
   const markAsRead = async (notificationId: number) => {
     try {
       const response = await axios.patch(
-        `http://localhost:8080/api/notifications/${notificationId}/read`,
+        `${apiUrl}/api/notifications/${notificationId}/read`,
         {},
         {
           withCredentials: true,
@@ -96,7 +94,7 @@ export const NotificationProvider = ({
   const deleteOneNotification = async (notificationId: number) => {
     try {
       const response = await axios.delete(
-        `http://localhost:8080/api/notifications/${notificationId}`,
+        `${apiUrl}/api/notifications/${notificationId}`,
         {
           withCredentials: true,
           headers: {
@@ -117,7 +115,7 @@ export const NotificationProvider = ({
   const deleteAllNotifications = async () => {
     try {
       const response = await axios.delete(
-        `http://localhost:8080/api/notifications`,
+        `${apiUrl}/api/notifications`,
         {
           withCredentials: true,
           headers: {

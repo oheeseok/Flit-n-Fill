@@ -26,15 +26,13 @@ import "./App.css";
 import AdminPage from "./pages/admin/AdminPage"; // AdminPage 컴포넌트 임포트
 import { AdminProvider } from "./context/AdminProvider"; // 새로 만든 AdminProvider 가져오기
 import AdminLayout from "./components/AdminLayout"; // AdminLayout (관리자 전용 레이아웃)
-// import PushNotification from "./components/PushNotification.tsx";
-import SseTest from "./pages/SseTest.tsx";
+// import SseTest from "./pages/SseTest.tsx";
 
 function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
       <GlobalProvider>
-        {/* <PushNotification /> */}
         <Routes>
           <Route
             path="/"
@@ -213,14 +211,14 @@ function App() {
               </Layout>
             }
           />
-          <Route
+          {/* <Route
             path="/sse"
             element={
               <Layout>
                 <SseTest />
               </Layout>
             }
-          />
+          /> */}
           <Route
             path="/signin"
             element={
