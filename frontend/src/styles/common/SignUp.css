@@ -192,3 +192,38 @@
   top: 0;
   right: 0;
 }
+
+/* Add these styles to your SignUp.css file */
+.select-container {
+  display: flex;
+  flex-direction: row; /* Arrange the select boxes horizontally */
+  justify-content: space-between; /* Ensure space between them */
+  align-items: center; /* Align them vertically in the center */
+  gap: 20px; /* Space between select elements */
+}
+
+.select-container select {
+  font-size: 18px;
+  padding: 8px 12px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 45%; /* Adjust width for a balanced layout */
+  max-width: 300px;
+  box-sizing: border-box;
+  background-color: #f8f8f8;
+  transition: border-color 0.3s;
+}
+
+.select-container select:focus {
+  border-color: #71c9fc; /* Blue border on focus */
+  outline: none;
+}
+
+.select-container option {
+  font-size: 18px;
+}
+
+/* Optional: Add some spacing between the title and the select boxes */
+.signup-text-address {
+  margin-bottom: 20px;
+}

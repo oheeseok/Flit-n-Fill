@@ -107,11 +107,6 @@ const SignIn: React.FC = () => {
             onChange={handleChangePassword}
           />
 
-          <label>
-            <input type="checkbox" />
-            Remember your id
-          </label>
-
           <button onClick={handleLogin}>Log In</button>
 
           <div>---------or---------</div>
