@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useUser } from "../context/UserContext";
 import Swal from "sweetalert2"; // SweetAlert2 사용
 import "../styles/main/MyPage.css";
 import ProfileImageUploader from "../components/main/ProfileUploader"; // ProfileUploader 컴포넌트 사용
 import { useNavigate } from "react-router-dom"; // useNavigate 추가
+import { area } from "../data/area";
 
 const MyPage: React.FC = () => {
   // 상태 관리
@@ -11,11 +12,37 @@ const MyPage: React.FC = () => {
     useUser();
   const [nickname, setNickname] = useState("");
   const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
   const [password, setPassword] = useState(""); // 비밀번호 상태 추가
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null); // 파일 상태 추가
+
+  const [selectedArea, setSelectedArea] = useState<string>("");
+  const [selectedSubArea, setSelectedSubArea] = useState<string>("");
+  const [selectWidth, setSelectWidth] = useState<number>(400); // 초기값 설정
+
+  const areaSelectRef = useRef<HTMLSelectElement>(null);
+
   const navigate = useNavigate(); // useNavigate 훅을 사용
+
+  // 선택된 지역에 따라 하위 지역 목록을 가져옴
+  const subAreas =
+    area.find((area) => area.name === selectedArea)?.subArea || [];
+
+  // 이벤트 핸들러
+  const handleAreaChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedArea(e.target.value);
+    setSelectedSubArea(""); // 새로운 지역 선택 시 하위 지역 초기화
+  };
+
+  const handleSubAreaChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedSubArea(e.target.value);
+  };
+
+  useEffect(() => {
+    if (areaSelectRef.current) {
+      setSelectWidth(areaSelectRef.current.offsetWidth); // 첫 번째 select의 너비를 계산
+    }
+  }, [selectedArea]);
 
   // 컴포넌트가 마운트될 때 사용자 데이터 초기화
   useEffect(() => {
@@ -32,7 +59,8 @@ const MyPage: React.FC = () => {
     if (user) {
       setNickname(user.userNickname || "");
       setPhone(user.userPhone || "");
-      setAddress(user.userAddress || "");
+      setSelectedArea(user.userAddress.split(" ")[0] || "지역");
+      setSelectedSubArea(user.userAddress.split(" ")[1] || "시, 군, 구구");
       setProfileImage(user.userProfile || null);
     }
   }, [user]);
@@ -41,11 +69,12 @@ const MyPage: React.FC = () => {
   const handleEditProfile = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const fullAddress = `${selectedArea} ${selectedSubArea}`;
     const userUpdateDto = {
       userNickname: nickname,
       userPassword: password,
       userPhone: phone,
-      userAddress: address,
+      userAddress: fullAddress,
     };
 
     try {
@@ -118,7 +147,7 @@ const MyPage: React.FC = () => {
         <img src="/assets/mypage-left.png" alt="Illustration" />
       </div>
       <div className="mypage-right">
-        <h2>Edit profile</h2>
+        <h2>회원 정보 수정</h2>
         <div className="mypage-profile-picture">
           <ProfileImageUploader
             onChangeImage={handleImageChange}
@@ -148,13 +177,36 @@ const MyPage: React.FC = () => {
           </div>
           <div className="mypage-form-group">
             <label htmlFor="address">Address</label>
-            <input
-              id="address"
-              type="text"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              placeholder="Edit your address"
-            />
+            <div className="select-container">
+              <select
+                ref={areaSelectRef}
+                value={selectedArea}
+                onChange={handleAreaChange}
+                style={{ width: `${selectWidth}px` }} // 고정된 너비 적용
+              >
+                <option value="">지역</option>
+                {area.map((area) => (
+                  <option key={area.name} value={area.name}>
+                    {area.name}
+                  </option>
+                ))}
+              </select>
+
+              {selectedArea && (
+                <select
+                  value={selectedSubArea}
+                  onChange={handleSubAreaChange}
+                  style={{ width: `${selectWidth}px` }}
+                >
+                  <option value="">시, 군, 구</option>
+                  {subAreas.map((subArea) => (
+                    <option key={subArea} value={subArea}>
+                      {subArea}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
           </div>
           <div className="mypage-form-group">
             <label htmlFor="password">Password</label>
@@ -172,12 +224,12 @@ const MyPage: React.FC = () => {
               className="mypage-delete-btn"
               onClick={handleDeleteID}
             >
-              Delete ID
+              회원 탈퇴
             </button>
           </div>
           <div className="mypage-submit">
             <button type="submit" className="mypage-edit-btn">
-              Edit profile
+              회원 정보 수정
             </button>
           </div>
         </form>
