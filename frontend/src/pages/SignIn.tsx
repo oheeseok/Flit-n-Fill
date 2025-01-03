@@ -9,6 +9,8 @@ interface UserLoginResponse {
   blacked: boolean;
   blacklistExpiryDate: Date;
 }
+const apiUrl = import.meta.env.VITE_API_URL;
+console.log(apiUrl); // http://localhost:8080
 
 const SignIn: React.FC = () => {
   // 상태 관리
@@ -20,7 +22,7 @@ const SignIn: React.FC = () => {
     try {
       // API 요청을 보냄 (localhost:8080)
       const response = await axios.post<UserLoginResponse>(
-        "http://localhost:8080/api/user/login",
+          `${apiUrl}/api/user/login`,
         {
           userEmail: email,
           userPassword: password,

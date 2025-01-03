@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import "../styles/common/NotificationPopup.css";
 import { useNotification } from "../context/NotificationContext";
-import { NotificationViewDto } from "../interfaces/NotificationInterfaces";
+// import { NotificationViewDto } from "../interfaces/NotificationInterfaces";
 import { fromEnumToDescription } from "../components/enum";
 
 interface NotificationPopupProps {
