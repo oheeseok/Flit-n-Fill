@@ -55,7 +55,7 @@ const SignIn: React.FC = () => {
       console.log("Current User Email:", currentUserEmail);
       if (currentUserEmail) {
         console.log("Calling startSSE");
-        startSSE(`http://localhost:8080/api/subscribe/${currentUserEmail}`);
+        startSSE(`${apiUrl}/api/subscribe/${currentUserEmail}`);
       }
 
       // 로그인 후 대시보드로 리디렉션
@@ -118,7 +118,7 @@ const SignIn: React.FC = () => {
           <button
             onClick={() =>
               (window.location.href =
-                "http://localhost:8080/oauth2/authorization/google")
+                `${apiUrl}/oauth2/authorization/google`)
             }
           >
             구글 로그인
@@ -126,7 +126,7 @@ const SignIn: React.FC = () => {
           <button
             onClick={() =>
               (window.location.href =
-                "http://localhost:8080/oauth2/authorization/kakao")
+                `${apiUrl}/oauth2/authorization/kakao`)
             }
           >
             카카오 로그인

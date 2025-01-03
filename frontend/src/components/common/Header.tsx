@@ -5,6 +5,7 @@ import Icon from "../../assets/icon.png";
 import "../../styles/common/Header.css";
 import NotificationPopup from "../../pages/NotificationPopup";
 import { useSSEContext } from "../../context/SSEContext";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const Header = () => {
   const { stopSSE } = useSSEContext();
@@ -51,6 +52,11 @@ const Header = () => {
       cancelButtonText: "취소",
     }).then((result) => {
       if (result.isConfirmed) {
+        const userEmail = localStorage.getItem("userEmail");
+        if (userEmail) {
+          const userUrl = `${apiUrl}/api/subscribe/${userEmail}`;
+          stopSSE(userUrl); // SSE 연결 종료
+        }
         localStorage.clear();
         setIsLoggedIn(false);
         Swal.fire("로그아웃 완료", "로그아웃 되었습니다.", "success");
