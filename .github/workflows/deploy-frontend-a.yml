@@ -30,15 +30,24 @@ jobs:
       # 4. 의존성 설치 및 빌드
       - name: Install dependencies and build
         run: |
-          cd Flit-n-Fill/frontend  # cicdtest4/ 디렉토리 안에 있는 frontend로 이동
+          cd Flit-n-Fill/frontend  # Flit-n-Fill/ 디렉토리 안에 있는 frontend로 이동
           npm install  # 의존성 설치
           npm run build  # 빌드 실행
+
 
 #      # 5. Docker 이미지 빌드
 #      - name: Build Docker Image
 #        run: |
 #          cd frontend  # 정확한 경로로 이동
 #          docker build -t ckdgkim/frontendproject:front-1 .  # Docker 이미지 빌드
+
+
+
+#      # 6. Docker Hub에 푸시
+#      - name: Push Docker Image to Docker Hub
+#        run: |
+#          echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+#          docker push ckdgkim/frontendproject:front-1  # Docker Hub에 푸시
 
 
       # 5. Docker 이미지 태그 생성
@@ -58,11 +67,6 @@ jobs:
           docker push ckdgkim/frontendproject:front-${{ env.TAG }}
 
 
-      # 6. Docker Hub에 푸시
-      - name: Push Docker Image to Docker Hub
-        run: |
-          echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
-          docker push ckdgkim/frontendproject:front-1  # Docker Hub에 푸시
 
       # 8. SSH 키 설정
       - name: Set up SSH
