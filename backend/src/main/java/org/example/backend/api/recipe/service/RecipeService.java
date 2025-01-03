@@ -465,6 +465,19 @@ public class RecipeService {
         .collect(Collectors.toList());
   }
 
+  public List<RecipeSimpleDto> searchRecipesByFoods(Long userId, List<String> foods) {
+    List<String> bookmarkedRecipeIds = bookmarkedRecipeRepository.findRecipeIdsByUserId(userId);
+    List<Recipe> recipes = recipeRepository.findRecipesByFoods(userId, foods);
+    return recipes.stream()
+        .map(recipe -> {
+          User user = recipe.getUserId() != null ? userRepository.findById(recipe.getUserId()).orElse(null) : null;
+          RecipeSimpleDto recipeSimpleDto = RecipeSimpleDto.of(recipe, user);
+          recipeSimpleDto.setRecipeIsBookmarked(bookmarkedRecipeIds.contains(recipeSimpleDto.getRecipeId()));
+          return recipeSimpleDto;
+        })
+        .collect(Collectors.toList());
+  }
+
   public static class Pair<K, V> {
     private final K first;
     private final V second;
