@@ -22,14 +22,6 @@ const Community = () => {
   //   setSearchParams(updatedParams);
   // };
 
-  //
-  // const handleFilterChange = (filter: string) => {
-  //   const updatedParams = {
-  //     ...Object.fromEntries(searchParams.entries()),
-  //     tradeType: filter,
-  //   };
-  //   setSearchParams(updatedParams); // tradeType 업데이트
-  // };
   // const handleFilterChange = (newFilter: string) => {
   //   const updatedParams = {
   //     ...Object.fromEntries(searchParams.entries()),

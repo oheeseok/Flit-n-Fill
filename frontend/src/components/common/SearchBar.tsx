@@ -8,6 +8,7 @@ interface SearchBarProps {
   query: string; // 현재 검색어
   // tradeType: string; // 현재 tradeType 필터
   onQueryChange: (newQuery: string) => void; // 검색어 변경 핸들러
+  // onSearch: () => void; // 검색 실행 핸들러
   // onTradeTypeChange: (newTradeType: string) => void; // 필터 변경 핸들러
 }
 
@@ -15,7 +16,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ query, onQueryChange }) => {
   // const { setSearchQuery } = useRecipe(); // Context에서 setSearchQuery만 사용
   // const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams()
-
+  console.log(searchParams)
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     onQueryChange(event.target.value); // 검색어 상태 업데이트
   };
@@ -52,13 +53,13 @@ const SearchBar: React.FC<SearchBarProps> = ({ query, onQueryChange }) => {
     }
     // navigate(`/community/list?query=${query}`); // 검색 결과 페이지로 이동 
     // onSearch()
-    // setSearchParams({ searchQuery: query }); // URL query string 업데이트
+    setSearchParams({ searchQuery: query }); // URL query string 업데이트
     // 기존 query string 유지하면서 searchQuery와 tradeType 업데이트
     // const updatedParams = {
     //   ...Object.fromEntries(searchParams.entries()),
     //   searchQuery: query,
     // };
-    setSearchParams({ searchQuery: query }); // URL query string 업데이트
+    // onSearch(); // URL query string 업데이트
   };
 
 
