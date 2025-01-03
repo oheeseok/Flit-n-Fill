@@ -4,15 +4,16 @@ import Swal from "sweetalert2";
 import Icon from "../../assets/icon.png";
 import "../../styles/common/Header.css";
 import NotificationPopup from "../../pages/NotificationPopup";
+import { useSSEContext } from "../../context/SSEContext";
 
 const Header = () => {
+  const { stopSSE } = useSSEContext();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [showNotification, setShowNotification] = useState<boolean>(false);
   const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
 
   const navigate = useNavigate();
-
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -52,6 +53,7 @@ const Header = () => {
         localStorage.removeItem("accessToken");
         setIsLoggedIn(false);
         Swal.fire("로그아웃 완료", "로그아웃 되었습니다.", "success");
+        stopSSE(); // SSE 연결 종료
         navigate("/");
       }
     });
@@ -59,7 +61,7 @@ const Header = () => {
 
   const handleMenuClick = () => {
     toggleUserMenu();
-  }
+  };
 
   return (
     <div className="header">
@@ -84,9 +86,9 @@ const Header = () => {
               <img src="/assets/notification-icon.png" alt="notification" />
             </a>
             {/* 알림 팝업 */}
-              {showNotification && (
-                  <NotificationPopup setShowNotification={setShowNotification} />
-              )}
+            {showNotification && (
+              <NotificationPopup setShowNotification={setShowNotification} />
+            )}
 
             {/* 사용자 메뉴 버튼 */}
             <a href="#" className="header-user" onClick={toggleUserMenu}>
@@ -97,16 +99,24 @@ const Header = () => {
               <div className="header-user-menu">
                 <ul>
                   <li>
-                    <Link to="/mypage" onClick={handleMenuClick}>회원 정보 수정</Link>
+                    <Link to="/mypage" onClick={handleMenuClick}>
+                      회원 정보 수정
+                    </Link>
                   </li>
                   <li>
-                    <Link to="#" onClick={handleMenuClick}>내 게시글 보기</Link>
+                    <Link to="#" onClick={handleMenuClick}>
+                      내 게시글 보기
+                    </Link>
                   </li>
                   <li>
-                    <Link to="#" onClick={handleMenuClick}>내 거래글 보기</Link>
+                    <Link to="#" onClick={handleMenuClick}>
+                      내 거래글 보기
+                    </Link>
                   </li>
                   <li>
-                    <Link to="#" onClick={handleMenuClick}>내 레시피 보기</Link>
+                    <Link to="#" onClick={handleMenuClick}>
+                      내 레시피 보기
+                    </Link>
                   </li>
                   <li>
                     <a href="#" onClick={handleLogout}>
