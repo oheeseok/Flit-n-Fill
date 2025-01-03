@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Swal from "sweetalert2";
 import axios from "axios";
 import CommunityImageUploader from "../../components/community/CommunityImageUploader";
@@ -28,9 +28,15 @@ interface FoodListViewDto {
   foodListIcon: number;
 }
 
+interface  LocationState {
+  bucketItemId: number;
+}
+
 const CommunityRegister = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
+  const location = useLocation();
+  const { bucketItemId } = location.state as LocationState;
 
   // 상태 관리
   const [uploadedImage1, setUploadedImage1] = useState<File | null>(null);
@@ -39,11 +45,12 @@ const CommunityRegister = () => {
   const [meetingPlace, setMeetingPlace] = useState<string>("");
   const [meetingTime, setMeetingTime] = useState<string>("");
   const [category, setCategory] = useState<string>("EXCHANGE");
-  const [writerFoodId, setWriterFoodId] = useState<number>(0);
+  const [writerFoodId, setWriterFoodId] = useState<number>(bucketItemId || 0);
   const [proposerFoodListId, setProposerFoodListId] = useState<number>(0);
   const [fridgeItems, setFridgeItems] = useState<FoodDetailDto[]>([])
   const [foodList, setFoodList] = useState<FoodListViewDto[]>([])
 
+  console.log(writerFoodId);
   // 이미지 업로드 핸들러
   const handleImage1Change = (image: File) => setUploadedImage1(image);
 

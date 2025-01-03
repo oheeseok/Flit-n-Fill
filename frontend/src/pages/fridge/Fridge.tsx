@@ -286,7 +286,7 @@ const Fridge: React.FC = () => {
         </div>
         <div className="button-container">
           <ToRecipeButton />
-          <ToCommunityButton />
+          { bucketItems.length == 1 && <ToCommunityButton bucketItemId={bucketItems[0].id} />}
         </div>
       </div>
 

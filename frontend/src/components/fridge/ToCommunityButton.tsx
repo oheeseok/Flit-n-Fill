@@ -1,10 +1,16 @@
 import { Link } from "react-router-dom";
 import "../../styles/fridge/ToCommunityButton.css";
 
-const ToCommunityButton = () => {
+interface ToCommunityButtonProps {
+  bucketItemId : number;
+}
+
+const ToCommunityButton = ({ bucketItemId } : ToCommunityButtonProps) => {
   return (
     <div>
-      <Link className="to-coummunity-register" to="/community">
+      <Link className="to-coummunity-register" 
+      to=  {"/community/register"}
+      state = {{ bucketItemId }} >
         <button className="to-coummunity-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
