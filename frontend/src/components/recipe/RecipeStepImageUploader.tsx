@@ -28,6 +28,9 @@ const StepImage = styled.img`
   margin-right: 20px;
 `;
 
+const RECIPE_STEP_DEFAULT_IMG_URL =
+  "https://flitnfill.s3.ap-northeast-2.amazonaws.com/default-img/recipe-step-default-img.png";
+
 interface RecipeStepImageUploaderProps {
   stepIndex: number;
   uploadedImage: string | null; // 미리보기 이미지 URL
@@ -48,9 +51,10 @@ function RecipeStepImageUploader({
       setPreview(previewURL); // 미리보기 URL 업데이트
       onImageChange(stepIndex, file); // 파일 객체 전달
     } else {
-      // 파일이 없을 경우 null을 처리
-      setPreview(null); // 미리보기 이미지도 null로 처리
-      onImageChange(stepIndex, null); // null을 전달
+      // 파일이 없을 경우
+      const emptyFile = new File([], ""); // 빈 파일 생성
+      setPreview(RECIPE_STEP_DEFAULT_IMG_URL); // RECIPE_STEP_DEFAULT_IMG_URL 로 설정
+      onImageChange(stepIndex, emptyFile); // emptyFile 전달
     }
   };
 
