@@ -15,6 +15,9 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -45,7 +48,13 @@ public class TokenManagementService {
         addCookie(response, "userEmail", user.getUserEmail());
         addCookie(response, "accessToken", accessToken);
 
-        return new UserLoginResponse(accessToken, refreshToken, user.getUserEmail());
+        boolean isBlacked = false;
+        LocalDateTime blacklistUser = isBlacklistUser(user.getUserEmail());
+        if (blacklistUser != null) {
+            isBlacked = true;
+        }
+
+        return new UserLoginResponse(accessToken, refreshToken, user.getUserEmail(), user.getUserProfile(), isBlacked, blacklistUser);
     }
 
     // 쿠키 추가
@@ -134,5 +143,16 @@ public class TokenManagementService {
         }
         clearCookie(response, "accessToken");
         clearCookie(response, "userEmail");
+    }
+
+    // 블랙유저 체크
+    public LocalDateTime isBlacklistUser(String userEmail) {
+        ValueOperations<String, Long> ops = redisTemplate.opsForValue();
+        Long expirationTime = ops.get("BlackUser:" + userEmail);
+
+        if (expirationTime != null) {
+            return LocalDateTime.ofInstant(Instant.ofEpochMilli(expirationTime), ZoneId.systemDefault());
+        };
+        return null;
     }
 }

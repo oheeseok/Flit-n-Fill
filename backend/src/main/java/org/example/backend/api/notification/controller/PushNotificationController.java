@@ -16,8 +16,8 @@ public class PushNotificationController {
   private final PushNotificationService pushNotificationService;
 
   // SSE 연결을 시작하는 엔드포인트
-  @GetMapping(value = "/{userId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-  public SseEmitter subscribe(@PathVariable("userId") Long userId) {
-    return pushNotificationService.subscribe(userId);
+  @GetMapping(value = "/{userEmail}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+  public SseEmitter subscribe(@PathVariable("userEmail") String userEmail) {
+    return pushNotificationService.subscribe(userEmail);
   }
 }

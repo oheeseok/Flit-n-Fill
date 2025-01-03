@@ -6,6 +6,7 @@ import { useChatRoom } from "../../context/ChatRoomContext";
 import { useUser } from "../../context/UserContext"; // userId 조회 용도
 import { OtherUserDto } from "../../interfaces/TradeRoomInterfaces";
 import "../../styles/community/ChatRoomAfter.css";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const ChatRoomAfter: React.FC = () => {
   const FEEDBACK_GREAT = "GREAT";
@@ -70,11 +71,13 @@ const ChatRoomAfter: React.FC = () => {
     try {
       console.log(`handleFeedback => ${feedbackState}`);
       const response = await axios.post(
-        `http://localhost:8080/api/trade/${tradeRoomId}/kindness`,
+        `${apiUrl}/api/trade/${tradeRoomId}/kindness`,
         feedbackState,
         {
           headers: {
             "Content-Type": "text/plain", // 헤더 설정
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
           },
           withCredentials: true, // 쿠키와 인증 정보를 포함하여 요청 보냄
         }

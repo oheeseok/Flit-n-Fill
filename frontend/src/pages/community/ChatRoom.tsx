@@ -13,6 +13,7 @@ import {
 import { format } from "date-fns";
 import { fromEnumToDescription } from "../../components/enum";
 import "../../styles/community/ChatRoom.css";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const ChatRoom: React.FC = () => {
   const TRADE_COMPLETE = "COMPLETED";
@@ -99,11 +100,13 @@ const ChatRoom: React.FC = () => {
     try {
       // HTTP POST 요청으로 서버에 메시지 전송
       const response = await axios.post(
-        `http://localhost:8080/api/trade/${tradeRoomId}`,
+        `${apiUrl}/api/trade/${tradeRoomId}`,
         encodedMessage,
         {
           headers: {
             "Content-Type": "text/plain", // 헤더 설정
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
           },
           withCredentials: true, // 쿠키와 인증 정보를 포함하여 요청 보냄
         }
@@ -135,11 +138,13 @@ const ChatRoom: React.FC = () => {
     try {
       console.log(`handleTrade => ${tradeState}`);
       const response = await axios.patch(
-        `http://localhost:8080/api/trade/${tradeRoomId}`,
+        `${apiUrl}/api/trade/${tradeRoomId}`,
         tradeState,
         {
           headers: {
             "Content-Type": "text/plain", // 헤더 설정
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
           },
           withCredentials: true, // 쿠키와 인증 정보를 포함하여 요청 보냄
         }
@@ -193,11 +198,13 @@ const ChatRoom: React.FC = () => {
     try {
       console.log(`reportUser()`);
       const response = await axios.post(
-        `http://localhost:8080/api/user/report`,
+        `${apiUrl}/api/user/report`,
         reportMessageObj,
         {
           headers: {
             "Content-Type": "application/json", // 헤더 설정
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
           },
           withCredentials: true, // 쿠키와 인증 정보를 포함하여 요청 보냄
         }

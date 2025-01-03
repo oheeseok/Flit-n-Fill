@@ -1,9 +1,9 @@
 package org.example.backend.security;
 
 import lombok.RequiredArgsConstructor;
-import org.example.backend.api.user.repository.UserRepository;
 import org.example.backend.api.user.service.TokenManagementService;
-import org.example.backend.api.user.service.UserService;
+import org.example.backend.security.service.CustomOAuth2UserService;
+import org.example.backend.security.service.CustomUserDetailsService;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,7 +46,8 @@ public class SpringConfig {
         // 인증 요청 페이지 설정
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/user/register", "/api/user/login", "/oauth2/**", "/api/subscribe/**", "/api/admin/login", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/user/register", "/api/user/login", "/oauth2/**", "/api/subscribe/**", "/api/auth/**",
+                                "/api/admin/login", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().permitAll())
@@ -81,6 +82,7 @@ public class SpringConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedOrigin("http://localhost:5173"); // React 개발 서버 주소
+        configuration.addAllowedOrigin("http://3.39.21.24"); // React 개발 서버 주소
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
         configuration.setAllowCredentials(true);

@@ -47,6 +47,17 @@ public class NotificationController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @PatchMapping("/{notificationId}/read")
+    public ResponseEntity<Void> readOneNotification(HttpServletRequest request,  @PathVariable("notificationId") Long notificationId) {   // 알림 전체 읽음 처리
+        Long userId = (Long) request.getAttribute("userId");
+        if (userId == null) {
+            throw new UserIdNullException("User ID is null");
+        }
+
+        notificationService.readOneNotification(userId, notificationId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
     @DeleteMapping()
     public ResponseEntity<Void> deleteAllNotifications(HttpServletRequest request) {    // 알림 전체 삭제
         Long userId = (Long) request.getAttribute("userId");

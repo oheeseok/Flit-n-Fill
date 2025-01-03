@@ -118,4 +118,11 @@ public class GlobalExceptionHandler {
             .status(HttpStatus.CONFLICT)
             .body(ex.getMessage());
     }
+
+    @ExceptionHandler(TaskStatusNotPendingException.class)
+    public ResponseEntity<String> handleTaskStatusNotPendingException(TaskStatusNotPendingException ex) {
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(ex.getMessage());
+    }
 }

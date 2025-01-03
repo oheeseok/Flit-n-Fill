@@ -5,17 +5,26 @@ import { FridgeProvider } from "./FridgeContext";
 import { CommunityProvider } from "./CommunityContext";
 import { UserProvider } from "./UserContext";
 import { ChatRoomProvider } from "./ChatRoomContext";
+import { NotificationProvider } from "./NotificationContext";
+import { SSEProvider } from "./SSEContext";
+import { ToastProvider } from "./ToastContext";
 
 export const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <UserProvider>
-      <RecipeProvider>
-        <FridgeProvider>
-          <CommunityProvider>
-            <ChatRoomProvider>{children}</ChatRoomProvider>
-          </CommunityProvider>
-        </FridgeProvider>
-      </RecipeProvider>
+      <NotificationProvider>
+        <ToastProvider>
+          <SSEProvider>
+            <RecipeProvider>
+              <FridgeProvider>
+                <CommunityProvider>
+                  <ChatRoomProvider>{children}</ChatRoomProvider>
+                </CommunityProvider>
+              </FridgeProvider>
+            </RecipeProvider>
+          </SSEProvider>
+        </ToastProvider>
+      </NotificationProvider>
     </UserProvider>
   );
 };

@@ -1,15 +1,12 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-} from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import {
   TradeRoomSimpleDto,
   TradeRoomDetailDto,
   TraderoomContextType,
 } from "../interfaces/TradeRoomInterfaces";
+
+const apiUrl = import.meta.env.VITE_API_URL;
 
 // Context 기본 값
 const ChatRoomContext = createContext<TraderoomContextType>({
@@ -29,8 +26,12 @@ export const ChatRoomProvider = ({
 
   const getTradeRoomList = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/trade", {
+      const response = await axios.get(`${apiUrl}/api/trade`, {
         withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          userEmail: localStorage.getItem("userEmail"),
+        },
       });
       if (response.status !== 200) {
         throw new Error("Failed to fetch traderoom list");
@@ -48,9 +49,13 @@ export const ChatRoomProvider = ({
   ): Promise<TradeRoomDetailDto | null> => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/trade/${tradeRoomId}`,
+        `${apiUrl}/api/trade/${tradeRoomId}`,
         {
           withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
+          },
         }
       );
       if (response.status !== 200) {
