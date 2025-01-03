@@ -9,6 +9,7 @@ import org.example.backend.enums.FoodStorage;
 import org.example.backend.enums.FoodUnit;
 
 import java.time.LocalDate;
+import java.util.Locale;
 
 @Getter
 @Setter
@@ -44,7 +45,7 @@ public class FoodDetailDto {
                 food.isFoodIsThaw(),
                 food.getFoodDescription(),
                 foodListIcon,
-                food.getFoodList().getFoodListId()
+                food.getFoodList() != null ? food.getFoodList().getFoodListId() : null
         );
         return dto;
     }

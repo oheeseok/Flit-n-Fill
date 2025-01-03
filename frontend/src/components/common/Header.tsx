@@ -3,16 +3,17 @@ import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import Icon from "../../assets/icon.png";
 import "../../styles/common/Header.css";
-// import NotificationPopup from "../../pages/NotificationPopup";
+import NotificationPopup from "../../pages/NotificationPopup";
+import { useSSEContext } from "../../context/SSEContext";
 
 const Header = () => {
+  const { stopSSE } = useSSEContext();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [showNotification, setShowNotification] = useState<boolean>(false);
   const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
 
   const navigate = useNavigate();
-
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -29,6 +30,7 @@ const Header = () => {
       setProfileImage("/assets/user-icon.png"); // 기본 아이콘
     }
   }, []);
+
   const toggleNotification = () => {
     setShowNotification((prev) => !prev);
   };
@@ -49,9 +51,10 @@ const Header = () => {
       cancelButtonText: "취소",
     }).then((result) => {
       if (result.isConfirmed) {
-        localStorage.removeItem("accessToken");
+        localStorage.clear();
         setIsLoggedIn(false);
         Swal.fire("로그아웃 완료", "로그아웃 되었습니다.", "success");
+        stopSSE(); // SSE 연결 종료
         navigate("/");
       }
     });
@@ -59,7 +62,7 @@ const Header = () => {
 
   const handleMenuClick = () => {
     toggleUserMenu();
-  }
+  };
 
   return (
     <div className="header">
@@ -72,7 +75,8 @@ const Header = () => {
         <Link to="/recipe">recipe</Link>
         <Link to="/community">community</Link>
         <Link to="/cart">cart</Link>
-
+        <Link to="/adminpage">adminpage</Link>{" "}
+        {/* adminpage로 이동하는 링크 추가 */}
         {/* 로그인 상태에 따라 메뉴 다르게 표시 */}
         {isLoggedIn ? (
           <>
@@ -84,9 +88,9 @@ const Header = () => {
               <img src="/assets/notification-icon.png" alt="notification" />
             </a>
             {/* 알림 팝업 */}
-              {showNotification && (
-                  <NotificationPopup setShowNotification={setShowNotification} />
-              )}
+            {showNotification && (
+              <NotificationPopup setShowNotification={setShowNotification} />
+            )}
 
             {/* 사용자 메뉴 버튼 */}
             <a href="#" className="header-user" onClick={toggleUserMenu}>
@@ -97,16 +101,24 @@ const Header = () => {
               <div className="header-user-menu">
                 <ul>
                   <li>
-                    <Link to="/mypage" onClick={handleMenuClick}>회원 정보 수정</Link>
+                    <Link to="/mypage" onClick={handleMenuClick}>
+                      회원 정보 수정
+                    </Link>
                   </li>
                   <li>
-                    <Link to="#" onClick={handleMenuClick}>내 게시글 보기</Link>
+                    <Link to="#" onClick={handleMenuClick}>
+                      내 게시글 보기
+                    </Link>
                   </li>
                   <li>
-                    <Link to="#" onClick={handleMenuClick}>내 거래글 보기</Link>
+                    <Link to="#" onClick={handleMenuClick}>
+                      내 거래글 보기
+                    </Link>
                   </li>
                   <li>
-                    <Link to="#" onClick={handleMenuClick}>내 레시피 보기</Link>
+                    <Link to="#" onClick={handleMenuClick}>
+                      내 레시피 보기
+                    </Link>
                   </li>
                   <li>
                     <a href="#" onClick={handleLogout}>

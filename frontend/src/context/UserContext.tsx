@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import axios from "axios"; // DB와 통신할 때 사용할 라이브러리
+const apiUrl = import.meta.env.VITE_API_URL;
 
 // 사용자 타입 정의
 interface User {
@@ -41,16 +42,13 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     }
 
     try {
-      const response = await axios.get<User>(
-        "http://localhost:8080/api/user/info",
-        {
-          withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-            userEmail: localStorage.getItem("userEmail"),
-          },
-        }
-      );
+      const response = await axios.get<User>(`${apiUrl}/api/user/info`, {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          userEmail: localStorage.getItem("userEmail"),
+        },
+      });
 
       setUser(response.data); // 사용자 데이터 설정
       console.log("User data loaded:", response.data);
@@ -70,7 +68,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     try {
       console.log("Updating user info:", updatedUser); // 전송 데이터 로그
       const response = await axios.put(
-        "http://localhost:8080/api/user/info",
+        `${apiUrl}/api/user/info`,
         updatedUser,
         {
           // headers: { Authorization: `Bearer ${accessToken}` },

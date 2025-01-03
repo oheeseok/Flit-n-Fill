@@ -1,4 +1,4 @@
-package org.example.backend.security;
+package org.example.backend.security.model;
 
 import jakarta.security.auth.message.AuthException;
 import lombok.Builder;

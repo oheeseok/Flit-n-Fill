@@ -19,7 +19,7 @@ import org.example.backend.exceptions.LoginFailedException;
 import org.example.backend.exceptions.PasswordMismatchException;
 import org.example.backend.exceptions.UserNotFoundException;
 import org.example.backend.security.JwtTokenProvider;
-import org.example.backend.security.PrincipalDetails;
+import org.example.backend.security.model.PrincipalDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

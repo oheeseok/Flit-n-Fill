@@ -1,6 +1,7 @@
 import "../styles/Cart.css";
 import { useState, useEffect } from "react";
 import axios from "axios";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const Cart = () => {
   const [inputText, setInputText] = useState<string>("");
@@ -9,7 +10,7 @@ const Cart = () => {
   // 서버에서 장바구니 데이터 조회하는 함수
   const getMyCart = async () => {
     try {
-      const response = await axios.get("/api/my-fridge/shoppingcart", {
+      const response = await axios.get(`${apiUrl}/api/my-fridge/shoppingcart`, {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
@@ -54,7 +55,7 @@ const Cart = () => {
     console.log("memo: ", memo);
     try {
       const response = await axios.post(
-        "/api/my-fridge/shoppingcart", // 백엔드 API 경로
+        `${apiUrl}/api/my-fridge/shoppingcart`, // 백엔드 API 경로
         lines, // 리스트를 전송
         {
           withCredentials: true,

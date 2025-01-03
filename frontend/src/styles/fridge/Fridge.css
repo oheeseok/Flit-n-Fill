@@ -63,6 +63,7 @@
   flex-wrap: wrap; /* 넘칠 경우 새 줄로 이동 */
   justify-content: flex-start; /* 왼쪽 정렬 */
   align-items: flex-start;
+  align-content: flex-start;
   gap: 14px; /* 아이템 간격 추가 */
   width: 660px;
   height: 520px;
@@ -102,7 +103,7 @@
   flex-shrink: 0;
   border-radius: 0px 0px 60px 60px;
   background: var(--light-green, #d4efc7);
-  position: relative;
+  /* position: relative; */
   font-family: Ubuntu;
   font-size: 22px;
 }
@@ -110,11 +111,11 @@
 .freeze-side {
   display: flex;
   flex-direction: column;
-  justify-content: start;
+  justify-content: center;
   align-items: center;
   width: 760px;
   height: 560px;
-  flex-shrink: 0;
+  /* flex-shrink: 0; */
   border-radius: 58px;
   font-size: 18px;
   background: rgba(63, 126, 112, 0.3);
@@ -125,13 +126,14 @@
   font-size: 18px;
   width: 660px;
   height: 520px;
-  flex-shrink: 0;
+  /* flex-shrink: 0; */
   border-radius: 0px 0px 56px 56px;
   background: rgba(63, 126, 112, 0.6);
   display: flex;
   flex-wrap: wrap; /* 넘칠 경우 새 줄로 이동 */
   justify-content: flex-start; /* 왼쪽 정렬 */
   align-items: flex-start;
+  align-content: flex-start;
   gap: 14px; /* 아이템 간격 추가 */
 }
 .freeze-door {
@@ -143,7 +145,7 @@
     rgba(63, 126, 112, 0.6) 0%,
     rgba(212, 239, 199, 0.6) 40%
   );
-  position: absolute;
+  /* position: absolute; */
   right: 60px;
   bottom: 0;
 }
@@ -191,6 +193,7 @@
   flex-wrap: wrap; /* 넘칠 경우 새 줄로 이동 */
   justify-content: flex-start; /* 왼쪽 정렬 */
   align-items: flex-start;
+  align-content: flex-start;
   gap: 14px; /* 아이템 간격 추가 */
 }
 .out-area1 {
@@ -223,10 +226,10 @@
 /* cart 부분 */
 .bucket-container {
   margin: 80px 20px 80px 20px;
-  width: 1100px;
+  width: 1300px;
   height: 600px;
   background: #fffbd6;
-  border-radius: 200px;
+  border-radius: 180px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -234,7 +237,7 @@
 }
 
 .bucket-side {
-  width: 1000px;
+  width: 1200px;
   height: 520px;
   background: #faf3b8;
   border-radius: 180px;
@@ -249,7 +252,7 @@
 .bucket-area {
   font-family: Ubuntu;
   font-size: 22px;
-  width: 900px;
+  width: 1100px;
   height: 440px;
   background: #ebe298;
   border-radius: 160px;
@@ -273,12 +276,12 @@
 }
 
 .fridge-item-icon {
-  width: 62px;
+  width: 80px;
 }
 .fridge-item-name {
   color: #000;
   font-family: Ubuntu;
-  font-size: 12px;
+  font-size: 15px;
   font-style: normal;
   font-weight: 700;
   line-height: 20px; /* 166.667% */
@@ -305,9 +308,29 @@
   display: flex;
 }
 
+.fridge-item.selected {
+  position: relative; /* 선택된 테두리를 정확히 조정하기 위해 필요 */
+  border: none; /* 기본 테두리 제거 */
+}
+
+.fridge-item.selected::before {
+  content: ""; /* 가상 요소로 테두리 생성 */
+  position: absolute;
+  top: 20%; /* 테두리를 안쪽으로 줄임 */
+  /* left: 10%; */
+  width: 90%; /* 원 크기를 아이템보다 작게 설정 */
+  height: 60%; /* 원 크기를 아이템보다 작게 설정 */
+  /* border: 2px solid #ecef29; 선택된 아이템 테두리 */
+  border-radius: 90%; /* 동그라미 모양 */
+  box-shadow: 
+      0 0 20px 10px rgba(193, 255, 234, 0.7), /* 부드럽고 확장된 바깥쪽 그림자 */
+      inset 0 0 30px rgba(188, 255, 234, 0.6); /* 부드럽고 자연스러운 안쪽 그림자 */
+  pointer-events: none; /* 클릭 이벤트가 가상 요소에 전달되지 않도록 설정 */
+}
+
 /* 말풍선 에딧딧 */
 .edit-popup {
-  position: absolute;
+  position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -451,7 +474,7 @@
   .fridgebody {
     flex-direction: column;
   }
-
+  
   .fridge-container {
     width: 100%;
     margin: 20px auto;
