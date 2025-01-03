@@ -70,8 +70,6 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.QWE_PEM }}" > ~/.ssh/qwe.pem
           chmod 600 ~/.ssh/qwe.pem
-
-      # 3. EC2 접속하기
       - name: Deploy to EC2
         run: |
           echo "Step 1: Connecting to EC2 instance (${{ vars.PUB_IP_A }})"
