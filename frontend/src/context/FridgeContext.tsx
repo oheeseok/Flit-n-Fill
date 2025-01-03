@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 // 백엔드에서 받은 FoodDetailDto 타입의 데이터
 interface FoodDetailDto {
@@ -134,7 +135,7 @@ export const FridgeProvider = ({ children }: { children: React.ReactNode }) => {
   // axios로 서버에서 데이터를 가져오기
   const fetchFridgeItems = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/my-fridge", {
+      const response = await axios.get(`${apiUrl}/api/my-fridge`, {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -189,7 +190,7 @@ export const FridgeProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const dto = convertToFoodDetailDto(item);
       const response = await axios.post(
-        "http://localhost:8080/api/my-fridge",
+        `${apiUrl}/api/my-fridge`,
         dto,
         {
           withCredentials: true,
@@ -208,7 +209,7 @@ export const FridgeProvider = ({ children }: { children: React.ReactNode }) => {
   // 냉장고에서 아이템 삭제
   const removeFridgeItem = async (id: number) => {
     try {
-      await axios.delete(`http://localhost:8080/api/my-fridge/${id}`, {
+      await axios.delete(`${apiUrl}/api/my-fridge/${id}`, {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -235,7 +236,7 @@ export const FridgeProvider = ({ children }: { children: React.ReactNode }) => {
 
     try {
       await axios.put(
-        `http://localhost:8080/api/my-fridge/${convertedItem.foodId}`,
+        `${apiUrl}/api/my-fridge/${convertedItem.foodId}`,
         convertedItem,
         {
           withCredentials: true,
@@ -255,7 +256,7 @@ export const FridgeProvider = ({ children }: { children: React.ReactNode }) => {
   const requestAddIngredient = async (requestFood: string) => {
     try {
       const response = await axios.post(
-        `http://localhost:8080/api/my-fridge/request`,
+        `${apiUrl}/api/my-fridge/request`,
         requestFood,
         {
           withCredentials: true,

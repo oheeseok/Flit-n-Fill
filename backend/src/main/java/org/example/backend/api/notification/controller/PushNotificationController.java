@@ -3,10 +3,8 @@ package org.example.backend.api.notification.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.backend.api.notification.service.PushNotificationService;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
@@ -20,4 +18,12 @@ public class PushNotificationController {
   public SseEmitter subscribe(@PathVariable("userEmail") String userEmail) {
     return pushNotificationService.subscribe(userEmail);
   }
+
+  // 구독 취소 엔드포인트 (Unsubscribe)
+  @DeleteMapping("/{userEmail}")
+  public ResponseEntity<Void> unsubscribe(@PathVariable("userEmail") String userEmail) {
+    pushNotificationService.unsubscribe(userEmail);
+    return ResponseEntity.noContent().build(); // 204 No Content 응답 반환
+  }
+
 }
