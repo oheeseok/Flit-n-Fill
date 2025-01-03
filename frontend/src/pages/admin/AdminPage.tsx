@@ -21,6 +21,8 @@ interface AdminResponseDto {
     responseMessage: string;
 }
 
+const apiUrl = import.meta.env.VITE_API_URL;
+
 const AdminPage = () => {
     const { isAdmin, accessToken } = useContext(AdminContext)!; // 관리자인지 확인
     const navigate = useNavigate();
@@ -32,7 +34,7 @@ const AdminPage = () => {
     // 요청 목록 가져오기
     const fetchRequestList = async () => {
         try {
-            const response = await axios.get("http://54.180.201.220:8080/api/admin/requests", {
+            const response = await axios.get(`${apiUrl}/api/admin/requests`, {
             // const response = await axios.get("http://localhost:8080/api/admin/requests", {
                 withCredentials: true,
                 headers: {
@@ -74,7 +76,7 @@ const AdminPage = () => {
     const fetchRequestDetail = async (requestId: string) => {
         try {
             // const response = await axios.get(`http://localhost:8080/api/admin/requests/${requestId}`, {
-            const response = await axios.get(`http://54.180.201.220:8080/api/admin/requests/${requestId}`, {
+            const response = await axios.get(`${apiUrl}/api/admin/requests/${requestId}`, {
                 withCredentials: true,
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
@@ -100,8 +102,8 @@ const AdminPage = () => {
         const data: AdminResponseDto = { responseStatus, responseMessage };
 
         try {
-            // await axios.patch(`http://localhost:8080/api/admin/requests/${requestId}`, data, {
-            await axios.patch(`http://54.180.201.220:8080/api/admin/requests/${requestId}`, data, {
+            await axios.patch(`http://localhost:8080/api/admin/requests/${requestId}`, data, {
+            // await axios.patch(`${apiUrl}/api/admin/requests/${requestId}`, data, {
                 withCredentials: true,
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
