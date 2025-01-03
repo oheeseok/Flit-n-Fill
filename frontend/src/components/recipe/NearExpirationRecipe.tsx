@@ -1,47 +1,71 @@
-import React, { useState } from "react";
-import steak from "../../assets/images/steak.jpg";
-import pizza from "../../assets/images/pizza.png";
-import pasta from "../../assets/images/pasta.png";
-import eggdrop from "../../assets/images/eggdrop.jpg";
-import eggcake from "../../assets/images/eggcake.jpg";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import "../../styles/recipe/NearExpirationRecipe.css";
 
-interface RecipeImages {
-  id: number;
-  name: string;
-  img: string;
-}
+const apiUrl = import.meta.env.VITE_API_URL;
 
-const todayrecipeimages: RecipeImages[] = [
-  { id: 0, name: "RecipeCarousel01", img: steak },
-  { id: 1, name: "RecipeCarousel02", img: pizza },
-  { id: 2, name: "RecipeCarousel03", img: pasta },
-  { id: 3, name: "RecipeCarousel04", img: eggdrop },
-  { id: 4, name: "RecipeCarousel05", img: eggcake },
-];
+const fetchNearExpiryRecipes = async () => {
+  try {
+    const response = await axios.get(`${apiUrl}/api/recipes/near-expiry`, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        userEmail: localStorage.getItem("userEmail"),
+      },
+    });
 
-// 캐러셀 컴포넌트
+    return response.data.slice(0, 8); // 최대 8개의 레시피만 반환
+  } catch (error) {
+    return [];
+  }
+};
+
 const NearExpirationRecipe: React.FC = () => {
+  const [recipes, setRecipes] = useState<any[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchRecipes = async () => {
+      const data = await fetchNearExpiryRecipes();
+      setRecipes(data); // 최대 8개로 제한된 데이터 설정
+    };
+
+    fetchRecipes();
+  }, []);
+
+  // 자동 슬라이드 설정
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % recipes.length);
+    }, 4500); // 4초마다 다음 슬라이드
+
+    // 컴포넌트 언마운트 시 clearInterval 호출
+    return () => clearInterval(interval);
+  }, [recipes.length]);
 
   const nextSlide = () => {
-    setCurrentIndex(
-      (prevIndex) =>
-        (prevIndex + 1 + todayrecipeimages.length) % todayrecipeimages.length
-    );
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % recipes.length);
   };
 
   const prevSlide = () => {
     setCurrentIndex(
-      (prevIndex) =>
-        (prevIndex - 1 + todayrecipeimages.length) % todayrecipeimages.length
+      (prevIndex) => (prevIndex - 1 + recipes.length) % recipes.length
     );
   };
 
-  const prevIndex =
-    (currentIndex - 1 + todayrecipeimages.length) % todayrecipeimages.length;
-  const nextIndex =
-    (currentIndex + 1 + todayrecipeimages.length) % todayrecipeimages.length;
+  const handleRecipeClick = (recipeId: string) => {
+    navigate(`/recipe/detail/${recipeId}`);
+  };
+
+  if (recipes.length === 0) {
+    return <div>유통기한 임박 재료가 없습니다.</div>;
+  }
+
+  const prevIndex = (currentIndex - 1 + recipes.length) % recipes.length;
+  const nextIndex = (currentIndex + 1) % recipes.length;
+  const next2Index = (currentIndex + 2) % recipes.length;
 
   return (
     <div className="near-expiration-container">
@@ -49,29 +73,43 @@ const NearExpirationRecipe: React.FC = () => {
 
       <div className="near-expiration-images">
         <img
-          src={todayrecipeimages[prevIndex].img}
-          alt={todayrecipeimages[prevIndex].name}
+          src={recipes[prevIndex]?.recipeMainPhoto}
+          alt={recipes[prevIndex]?.recipeTitle}
+          onClick={() => handleRecipeClick(recipes[prevIndex]?.recipeId)}
+          style={{ cursor: "pointer" }}
         />
         <img
-          src={todayrecipeimages[currentIndex].img}
-          alt={todayrecipeimages[currentIndex].name}
+          src={recipes[currentIndex]?.recipeMainPhoto}
+          alt={recipes[currentIndex]?.recipeTitle}
+          onClick={() => handleRecipeClick(recipes[currentIndex]?.recipeId)}
+          style={{ cursor: "pointer" }}
         />
         <img
-          src={todayrecipeimages[nextIndex].img}
-          alt={todayrecipeimages[nextIndex].name}
+          src={recipes[nextIndex]?.recipeMainPhoto}
+          alt={recipes[nextIndex]?.recipeTitle}
+          onClick={() => handleRecipeClick(recipes[nextIndex]?.recipeId)}
+          style={{ cursor: "pointer" }}
         />
         <img
-          src={todayrecipeimages[prevIndex].img}
-          alt={todayrecipeimages[prevIndex].name}
+          src={recipes[next2Index]?.recipeMainPhoto}
+          alt={recipes[next2Index]?.recipeTitle}
+          onClick={() => handleRecipeClick(recipes[next2Index]?.recipeId)}
+          style={{ cursor: "pointer" }}
         />
       </div>
 
       <div className="near-expiration-buttons">
-        <button onClick={prevSlide} className="btn">
-          이전
+        <button
+          className="near-expiration-buttons-carousel"
+          onClick={prevSlide}
+        >
+          &#10094;
         </button>
-        <button onClick={nextSlide} className="btn">
-          다음
+        <button
+          className="near-expiration-buttons-carousel"
+          onClick={nextSlide}
+        >
+          &#10095;
         </button>
       </div>
     </div>

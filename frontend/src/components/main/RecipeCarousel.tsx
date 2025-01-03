@@ -85,7 +85,7 @@ const RecipeCarousel: React.FC = () => {
 
   return (
     <div className="carousel-container">
-      <div className="carousel-title">Today's Recipes</div>
+      <div className="carousel-title">Random Recipes</div>
 
       <div className="carousel-images">
         <div style={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
