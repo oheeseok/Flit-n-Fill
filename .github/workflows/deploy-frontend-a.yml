@@ -78,9 +78,9 @@ jobs:
       # 9. EC2에 배포
       - name: Deploy to EC2
         run: |
-          echo "Step 1: Connecting to EC2 instance (${{ secrets.PUB_IP_A }})"
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.ssh/qwe.pem ec2-user@"${{ secrets.PUB_IP_A }}" << EOF
-            echo "Connected to EC2 (${{ secrets.PUB_IP_A }})"
+          echo "Step 1: Connecting to EC2 instance (${{ vars.PUB_IP_A }})"
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.ssh/qwe.pem ec2-user@"${{ vars.PUB_IP_A }}" << EOF
+            echo "Connected to EC2 (${{ vars.PUB_IP_A }})"
             # EC2에서 실행할 명령을 여기에 추가
 
             # Docker 이미지 가져오기
