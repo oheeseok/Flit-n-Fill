@@ -29,7 +29,7 @@ jobs:
           mkdir -p Flit-n-Fill/backend/src/main/resources  # 올바른 경로로 생성
           echo "${{ secrets.APPLICATION_YML }}" | base64 --decode > Flit-n-Fill/backend/src/main/resources/application.yml
           echo "DB_HOST=${{ secrets.DB_HOST }}"  # 환경 변수 확인
-          find src
+          find Flit-n-Fill  # 디렉토리 확인
 
 
       # 3. Gradle 실행 권한 부여
