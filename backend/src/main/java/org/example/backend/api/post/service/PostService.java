@@ -85,21 +85,21 @@ public class PostService {
     if (! writerFood.isPresent()) {
       throw new NoSuchElementException("Food does not exist with ID: " + postRegisterDto.getWriterFoodId());
     }
+    post.setWriterFood(writerFood.get());
 
-    Optional<FoodList> foodList = foodListRepository.findById(postRegisterDto.getProposerFoodListId());
-    if (! foodList.isPresent()) {
-      throw new NoSuchElementException("FoodList does not exist with ID: " + postRegisterDto.getProposerFoodListId());
+    if (postRegisterDto.getTradeType().equals(TradeType.EXCHANGE)) {  // 교환일 경우에만 foodList 검증
+      Optional<FoodList> foodList = foodListRepository.findById(postRegisterDto.getProposerFoodListId());
+      if (! foodList.isPresent()) {
+        throw new NoSuchElementException("FoodList does not exist with ID: " + postRegisterDto.getProposerFoodListId());
+      }
+      post.setProposerFoodList(foodList.get());
     }
 
-    String writerFoodName = writerFood.get().getFoodListName();
-    String proposerFoodName = foodList.get().getFoodListType() == null ?
-        foodList.get().getFoodListProduct() :
-        foodList.get().getFoodListType();
-
-    log.info("[PostService.addPost] writerFoodName: {}, proposerFoodName: {}", writerFoodName, proposerFoodName);
-
-    post.setWriterFood(writerFood.get());
-    post.setProposerFoodList(foodList.get());
+//    String writerFoodName = writerFood.get().getFoodListName();
+//    String proposerFoodName = foodList.get().getFoodListType() == null ?
+//        foodList.get().getFoodListProduct() :
+//        foodList.get().getFoodListType();
+//    log.info("[PostService.addPost] writerFoodName: {}, proposerFoodName: {}", writerFoodName, proposerFoodName);
 
     Post savedPost = postRepository.save(post);
     return PostDetailDto.of(savedPost, savedPost.getUser());
@@ -275,7 +275,7 @@ public class PostService {
 
     // email 전송
     log.info("1. send email");
-//    emailService.sendTradeRequestEmail(writer.getUserId(), proposerId, postId);
+    emailService.sendTradeRequestEmail(writer.getUserId(), proposerId, postId);
     log.info("1. send email --- done");
 
     // push 알림 전송
@@ -286,7 +286,7 @@ public class PostService {
         proposer.getUserNickname(),
         post.getTradeType().getDescription());
     log.info("message: {}", message);
-    pushNotificationService.sendPushNotification(writer.getUserId(), message);
+    pushNotificationService.sendPushNotification(writer.getUserEmail(), message);
     log.info("2. send push --- done");
 
     // notification 테이블에 데이터 저장
@@ -295,7 +295,7 @@ public class PostService {
     notificationService.saveTradeRequestNotification(
         writer,
         notificationType,
-        post.getTradeType().getDescription() + " 요청이 왔습니다!",
+        proposer.getUserNickname() + "님이 " + post.getTradeType().getDescription() + "을 요청합니다.",
         tradeRequest.getTradeRequestId(),
         null);
     log.info("3. save data to db --- done");
@@ -346,7 +346,7 @@ public class PostService {
             post.getTradeType().getDescription()
         );
         log.info("message: {}", message);
-        pushNotificationService.sendPushNotification(writer.getUserId(), message);
+        pushNotificationService.sendPushNotification(writer.getUserEmail(), message);
         log.info("2. send push --- done");
       } else {
         log.info("> 요청 취소가 불가능합니다. tradeTaskStatus = {}", tradeTaskStatus.getDescription());

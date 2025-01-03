@@ -23,4 +23,7 @@ export interface NotificationContextType {
   setNotifications: React.Dispatch<React.SetStateAction<NotificationViewDto[]>>;
   getNotificationList: () => Promise<void>;
   markAllAsRead: () => Promise<void>;
+  deleteOneNotification: (notificationId: number) => Promise<void>;
+  markAsRead: (notificationId: number) => Promise<void>;
+  deleteAllNotifications: () => Promise<void>;
 }

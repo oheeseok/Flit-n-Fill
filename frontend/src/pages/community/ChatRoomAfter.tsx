@@ -6,6 +6,7 @@ import { useChatRoom } from "../../context/ChatRoomContext";
 import { useUser } from "../../context/UserContext"; // userId 조회 용도
 import { OtherUserDto } from "../../interfaces/TradeRoomInterfaces";
 import "../../styles/community/ChatRoomAfter.css";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const ChatRoomAfter: React.FC = () => {
   const FEEDBACK_GREAT = "GREAT";
@@ -70,7 +71,7 @@ const ChatRoomAfter: React.FC = () => {
     try {
       console.log(`handleFeedback => ${feedbackState}`);
       const response = await axios.post(
-        `http://localhost:8080/api/trade/${tradeRoomId}/kindness`,
+        `${apiUrl}/api/trade/${tradeRoomId}/kindness`,
         feedbackState,
         {
           headers: {

@@ -1,6 +1,5 @@
-package org.example.backend.security;
+package org.example.backend.security.model;
 
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.example.backend.api.user.model.entity.User;
 import org.springframework.security.core.GrantedAuthority;

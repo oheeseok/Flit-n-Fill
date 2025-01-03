@@ -1,6 +1,7 @@
 import "../styles/Cart.css";
 import { useState, useEffect } from "react";
 import axios from "axios";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const Cart = () => {
   const [inputText, setInputText] = useState<string>("");
@@ -9,7 +10,8 @@ const Cart = () => {
   // 서버에서 장바구니 데이터 조회하는 함수
   const getMyCart = async () => {
     try {
-      const response = await axios.get("/api/my-fridge/shoppingcart", {
+      const response = await axios.get(`${apiUrl}/api/my-fridge/shoppingcart`, {
+        withCredentials: true,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -27,24 +29,6 @@ const Cart = () => {
   useEffect(() => {
     getMyCart();
   }, []);
-
-  // 엔터키로 텍스트를 태그로 추가하는 함수
-  // const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-  //   if (e.key === "Enter" && inputText.trim() !== "") {
-  //     const newTag = inputText.trim();
-  //     setInputText(""); // 입력 후 텍스트 초기화
-
-  //     // 입력된 텍스트를 태그 형식으로 변환
-  //     const tagElement = document.createElement("span");
-  //     tagElement.className = "tag"; // 태그 스타일 적용
-  //     tagElement.textContent = newTag;
-
-  //     // e.preventDefault(); // 엔터키가 줄 바꿈을 하지 않도록 방지
-
-  //     const contentEditable = e.target as HTMLDivElement;
-  //     contentEditable.appendChild(tagElement); // contentEditable 안에 태그 추가
-  //   }
-  // };
 
   // 텍스트 입력 처리 함수
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -71,9 +55,10 @@ const Cart = () => {
     console.log("memo: ", memo);
     try {
       const response = await axios.post(
-        "/api/my-fridge/shoppingcart", // 백엔드 API 경로
+        `${apiUrl}/api/my-fridge/shoppingcart`, // 백엔드 API 경로
         lines, // 리스트를 전송
         {
+          withCredentials: true,
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -117,16 +102,16 @@ const Cart = () => {
               className="cart-input"
               value={inputText}
               placeholder="사야할 재료를 입력해주세요."
-              onChange={handleInputChange}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange(e)}
             />
-            <button className="add-button" onClick={handleAddLine}>
-              추가
-            </button>
           </div>
-        </div>
+        <button className="add-button" onClick={handleAddLine}>
+          추가
+        </button>
         <button className="save-cart-button" onClick={handleSave}>
           저장하기
         </button>
+        </div>
       </div>
     </div>
   );

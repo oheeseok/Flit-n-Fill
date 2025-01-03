@@ -1,46 +1,62 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { useCommunity } from "../../context/CommunityContext";
+import axios from "axios";
 import "../../styles/community/CommunityEdit.css";
 import CommunityImageEdit from "../../components/community/CommunityImageEdit";
 
 const CommunityEdit = () => {
-  const { communityData, setCommunityData } = useCommunity();
+  const apiUrl = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
+  const { postId } = useParams<{ postId: string }>()  // URL에서 postId 가져오기
 
-  // 상태 관리
-  const [postTitle, setPostTitle] = useState(communityData?.postTitle || "");
-  const [postContent, setPostContent] = useState(
-    communityData?.postContent || ""
-  );
-  const [meetingPlace, setMeetingPlace] = useState(
-    communityData?.meetingPlace || ""
-  );
-  const [meetingTime, setMeetingTime] = useState(
-    communityData?.meetingTime || ""
-  );
-  const [postPhoto1, setPostPhoto1] = useState<string | null>(
-    communityData?.postPhoto1 || null
-  );
-  const [
-    postPhoto2,
-    // setPostPhoto2
-  ] = useState<string | null>(communityData?.postPhoto2 || null);
-  const [tradeType, setTradeType] = useState(
-    communityData?.tradeType || "EXCHANGE"
-  );
-  const [writerFoodId, setWriterFoodId] = useState(
-    communityData?.writerFoodId || 0
-  );
-  const [proposerFoodListId, setProposerFoodListId] = useState(
-    communityData?.proposerFoodListId || 0
-  );
+  const [postTitle, setPostTitle] = useState("");
+  const [postContent, setPostContent] = useState("");
+  const [meetingPlace, setMeetingPlace] = useState("");
+  const [meetingTime, setMeetingTime] = useState("");
+  const [postPhoto1, setPostPhoto1] = useState<File | null>(null);
+  const [writerFoodId, setWriterFoodId] = useState(0);
+  const [proposerFoodListId, setProposerFoodListId] = useState(0);
 
-  const handlePhoto1Change = (image: string) => setPostPhoto1(image);
-  // const handlePhoto2Change = (image: string) => setPostPhoto2(image);
+  // 기존 데이터 가져오기
+  useEffect(() => {
+    const fetchPostData = async () => {
+      try {
+        const response = await axios.get(`${apiUrl}/api/posts/${postId}`, {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
+          },
+        });
+        const post = response.data;
 
-  const handleUpdate = () => {
+        // 상태 업데이트
+        setPostTitle(post.postTitle);
+        setPostContent(post.postContent);
+        setMeetingPlace(post.meetingPlace);
+        setMeetingTime(post.meetingTime);
+        setPostPhoto1(post.postPhoto1); 
+        setWriterFoodId(post.writerFoodId);
+        setProposerFoodListId(post.proposerFoodListId);
+      } catch (error) {
+        console.error("게시글 가져오기 실패:", error);
+        Swal.fire("오류", "게시글 데이터를 가져오는 데 실패했습니다.", "error").then(
+          () => {
+            navigate("/community");
+          }
+        );
+      }
+    };
+
+    if (postId) {
+      fetchPostData();
+    }
+  }, [postId, navigate]);
+
+  const handlePhoto1Change = (image: File) => setPostPhoto1(image);
+
+  const handleUpdate = async () => {
     if (
       !postTitle.trim() ||
       !postContent.trim() ||
@@ -56,28 +72,56 @@ const CommunityEdit = () => {
       return;
     }
 
-    // 업데이트된 데이터 생성
-    const updatedData = {
-      postTitle,
-      postContent,
-      meetingPlace,
-      meetingTime,
-      postPhoto1,
-      postPhoto2,
-      tradeType,
-      writerFoodId,
-      proposerFoodListId,
-    };
+    try {
+      const formData = new FormData();
 
-    setCommunityData(updatedData); // Context 데이터 업데이트
+      // JSON 데이터 생성
+      const postUpdateDto = {
+        postTitle,
+        postContent,
+        meetingPlace,
+        meetingTime,
+        writerFoodId,
+        proposerFoodListId,
+      };
+      formData.append("postUpdateDto", JSON.stringify(postUpdateDto));
 
-    Swal.fire({
-      icon: "success",
-      title: "수정 완료",
-      text: "게시물이 수정되었습니다!",
-    }).then(() => {
-      navigate("/community/detail"); // 수정 후 상세 페이지로 이동
-    });
+      // 이미지 추가
+      if (postPhoto1) {
+        formData.append("postMainPhoto", postPhoto1);
+      }
+
+      // 서버 요청
+      const response = await axios.put(
+        `${apiUrl}/api/posts/${postId}`,
+        formData,
+        {
+          headers: { 
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
+          },
+          withCredentials: true,
+        }
+      );
+
+      if (response.status === 200) {
+        Swal.fire({
+          icon: "success",
+          title: "수정 완료",
+          text: "게시물이 수정되었습니다!",
+        }).then(() => {
+          navigate(`/community/detail/${postId}`); // 수정 후 상세 페이지로 이동
+        });
+      }
+    } catch (error) {
+      console.error("게시글 수정 실패:", error);
+      Swal.fire({
+        icon: "error",
+        title: "수정 실패",
+        text: "게시물 수정 중 오류가 발생했습니다.",
+      });
+    }
   };
 
   const handleCancel = () => {
@@ -87,35 +131,12 @@ const CommunityEdit = () => {
       text: "수정이 취소되었습니다.",
       confirmButtonText: "확인",
     }).then(() => {
-      navigate("/community/detail");
+      navigate(`/community/detail/${postId}`);
     });
   };
 
   return (
     <div className="community-edit-body">
-      {/* 교환/나눔 선택 */}
-      <div className="community-edit-category">
-        <label>
-          <input
-            type="radio"
-            name="category"
-            value="EXCHANGE"
-            checked={tradeType === "EXCHANGE"}
-            onChange={(e) => setTradeType(e.target.value)}
-          />
-          교환
-        </label>
-        <label>
-          <input
-            type="radio"
-            name="category"
-            value="SHARE"
-            checked={tradeType === "SHARE"}
-            onChange={(e) => setTradeType(e.target.value)}
-          />
-          나눔
-        </label>
-      </div>
       {/* 제목 입력 */}
       <input
         type="text"

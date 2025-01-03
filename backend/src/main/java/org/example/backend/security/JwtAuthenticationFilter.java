@@ -3,30 +3,21 @@ package org.example.backend.security;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.backend.api.user.model.entity.User;
-import org.example.backend.api.user.repository.UserRepository;
 import org.example.backend.api.user.service.TokenManagementService;
-import org.example.backend.api.user.service.UserService;
-import org.example.backend.exceptions.UserNotFoundException;
-import org.springframework.context.annotation.Lazy;
+import org.example.backend.security.service.CustomUserDetailsService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.security.Principal;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor

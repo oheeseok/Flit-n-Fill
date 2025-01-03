@@ -11,10 +11,57 @@
   z-index: 1000;
 }
 
+.notification-list {
+  max-height: 400px; /* 최대 높이 설정 */
+  overflow-y: auto; /* 내용이 넘칠 경우 스크롤 활성화 */
+  padding: 10px;
+}
+
+/* 스크롤바 커스터마이즈 */
+.notification-list::-webkit-scrollbar {
+  width: 8px; /* 스크롤바 너비 */
+}
+
+.notification-list::-webkit-scrollbar-thumb {
+  background-color: #888; /* 스크롤바 색상 */
+  border-radius: 4px; /* 스크롤바 둥글게 */
+}
+
+.notification-list::-webkit-scrollbar-thumb:hover {
+  background-color: #555; /* 호버 시 색상 */
+}
+
 .notification-item {
-  margin-bottom: 12px;
-  padding: 8px;
-  border-bottom: 1px solid #ddd;
+  margin: 5px 0;
+  border-radius: 5px;
+  position: relative; /* 상대 위치 지정 */
+  padding: 10px;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.mark-as-read-button {
+  position: absolute;
+  bottom: 10px; /* 아이템 하단에 위치 */
+  left: 10px; /* 좌측에 위치 */
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.mark-as-read-button:hover {
+  background-color: #0056b3;
+}
+
+.notification-item.unread {
+  background-color: #f0f8ff; /* 옅은 파란색 */
+}
+
+.notification-item.read {
+  background-color: #f9f9f9; /* 옅은 회색 */
 }
 
 .notification-item:last-child {

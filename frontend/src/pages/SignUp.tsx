@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import "../styles/common/SignUp.css";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const SignUp = () => {
   // 상태 관리
@@ -15,17 +16,14 @@ const SignUp = () => {
   // Sign Up 요청 처리 함수
   const handleSignUp = async () => {
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/user/register",
-        {
-          userName: name,
-          userEmail: email,
-          userPassword: password,
-          userNickname: nickname, // Nickname 포함
-          userPhone: phone, // Phone 포함
-          userAddress: address, // Address 포함
-        }
-      );
+      const response = await axios.post(`${apiUrl}/api/user/register`, {
+        userName: name,
+        userEmail: email,
+        userPassword: password,
+        userNickname: nickname, // Nickname 포함
+        userPhone: phone, // Phone 포함
+        userAddress: address, // Address 포함
+      });
       console.log("회원가입 성공:", response.data); // response 사용
       // 성공 시 처리
       Swal.fire({
@@ -169,8 +167,7 @@ const SignUp = () => {
             <button
               className="signup-button-google"
               onClick={() =>
-                (window.location.href =
-                  "http://localhost:8080/oauth2/authorization/google")
+                (window.location.href = `${apiUrl}/oauth2/authorization/google`)
               }
             >
               구글로그인
@@ -180,8 +177,7 @@ const SignUp = () => {
             <button
               className="signup-button-kakao"
               onClick={() =>
-                (window.location.href =
-                  "http://localhost:8080/oauth2/authorization/kakao")
+                (window.location.href = `${apiUrl}/oauth2/authorization/kakao`)
               }
             >
               카카오로그인

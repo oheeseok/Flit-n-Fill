@@ -31,6 +31,9 @@ public class PostDetailDto {
     private String userProfile;
     private String address;
     private Progress progress;
+    private String userEmail;
+    private String writerFoodName;
+    private String proposerFoodName;
 
     public static PostDetailDto of(Post post, User user) {
         PostDetailDto dto = new PostDetailDto();
@@ -44,16 +47,24 @@ public class PostDetailDto {
         dto.setPostPhoto2(post.getPostPhoto2());
         dto.setTradeType(post.getTradeType());
         dto.setWriterFoodId(post.getWriterFood().getFoodId());
-        dto.setProposerFoodListId(post.getProposerFoodList().getFoodListId());
+        dto.setProposerFoodListId(post.getProposerFoodList() != null ? post.getProposerFoodList().getFoodListId() : null);
+        dto.setWriterFoodName(post.getWriterFood() != null ? post.getWriterFood().getFoodListName() : null);
+        dto.setProposerFoodName(post.getProposerFoodList() != null
+                ? (post.getProposerFoodList().getFoodListType() != null
+                        ? post.getProposerFoodList().getFoodListType()
+                        : post.getProposerFoodList().getFoodListProduct())
+                : null);
         dto.setAddress(post.getAddress());
         dto.setProgress(post.getProgress());
 
         if (user != null) {
             dto.setUserNickname(user.getUserNickname());
             dto.setUserProfile(user.getUserProfile());
+            dto.setUserEmail(user.getUserEmail());
         } else {
             dto.setUserNickname(null);
             dto.setUserProfile(null);
+            dto.setUserEmail(null);
         }
         return dto;
     }

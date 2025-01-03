@@ -6,11 +6,32 @@ interface CommunityData {
   meetingPlace: string;
   meetingTime: string;
   postPhoto1: string | null;
-  postPhoto2: string | null;
   tradeType: string;
   writerFoodId: number;
   proposerFoodListId: number;
 }
+
+// interface PostSimpleDto {
+//   postId: number;
+//   postTitle: string;
+//   postPhoto1: string;
+//   tradeType: "SHARING" | "EXCHANGE";
+//   postCreatedDate: Date;
+//   userNickname: string;
+//   userProfile: string;
+//   address: string;
+//   progress: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "CANCELED";
+// }
+
+// interface PostRegisterDto {
+//   postTitle: string;
+//   postContent: string;
+//   meetingPlace: string;
+//   meetingTime: string;
+//   tradeType: "SHARING" | "EXCHANGE";
+//   writerFoodId: number;
+//   proposerFoodListId: number;
+// };
 
 interface CommunityContextProps {
   communityData: CommunityData | null;

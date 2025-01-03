@@ -13,7 +13,7 @@ import org.example.backend.api.user.service.UserService;
 import org.example.backend.exceptions.LoginFailedException;
 import org.example.backend.exceptions.UserIdNullException;
 import org.example.backend.exceptions.UserNotFoundException;
-import org.example.backend.security.PrincipalDetails;
+import org.example.backend.security.model.PrincipalDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -48,6 +48,7 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserLoginDto userLoginDto, HttpServletResponse response) {
         try {
+            log.info("login email: {}", userLoginDto.getUserEmail());
             UserLoginResponse login = userService.login(userLoginDto, response);
 
 //            return ResponseEntity.status(HttpStatus.OK).body("로그인에 성공하였습니다.");
@@ -133,10 +134,26 @@ public class UserController {
     }
 
     @DeleteMapping("/info")
-    public ResponseEntity<?> deleteUser(Authentication authentication, @RequestBody UserLoginDto loginDto) {
-        loginDto.setUserEmail(authentication.getName());
+    public ResponseEntity<?> deleteUser(Authentication authentication, @RequestBody UserLoginDto loginDto,
+                                        HttpServletRequest request, HttpServletResponse response) {
+        // 로그인 dto에서 로그인 email 받아오기) {
+        String userEmail = authentication.getName();
+        loginDto.setUserEmail(userEmail);
+
+        Cookie[] cookies = request.getCookies();
+        String token = null;
+
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("accessToken".equals(cookie.getName())) {
+                    token = cookie.getValue();
+                    break;
+                }
+            }
+        }
 
         try {
+            userService.logout(token, userEmail, response);
             userService.deleteUserByUserEmail(loginDto);
             return ResponseEntity.status(HttpStatus.OK).body("회원 탈퇴 처리되었습니다.");
         } catch (UserNotFoundException e) {
@@ -145,7 +162,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원 탈퇴 중 오류가 발생했습니다.");
         }
     }
-
     @PostMapping("/report")
     public ResponseEntity<?> reportUser(HttpServletRequest request, @RequestBody UserReportDto userReportDto) {
         Long userId = (Long) request.getAttribute("userId");

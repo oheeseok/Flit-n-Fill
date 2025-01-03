@@ -26,8 +26,8 @@ const MyProfileImg = styled.img`
 `;
 
 interface CommunityImageEditProps {
-  onChangeImage: (image: string) => void;
-  uploadedImage: string | null;
+  onChangeImage: (image: File) => void;
+  uploadedImage: File | null;
 }
 
 function CommunityImageEdit({
@@ -37,21 +37,21 @@ function CommunityImageEdit({
   const onChangeFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (reader.result) {
-          onChangeImage(reader.result as string);
-        }
-      };
-      reader.readAsDataURL(file);
+      onChangeImage(file)
     }
   };
 
   return (
     <Container>
       <MyProfileImg
-        src={uploadedImage || sample}
-        alt="레시피 이미지"
+        src={ 
+          typeof uploadedImage === "string"
+            ? uploadedImage // URL
+            : uploadedImage
+            ? URL.createObjectURL(uploadedImage) // File
+            : sample // 기본 이미지
+         }
+        alt="게시글 이미지"
         onClick={() => document.getElementById("file-input")?.click()}
       />
       <HiddenInput

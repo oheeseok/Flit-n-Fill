@@ -6,6 +6,7 @@ build/
 !**/src/test/**/build/
 application.yaml
 node_modules
+.env
 
 ### STS ###
 .apt_generated
@@ -27,6 +28,8 @@ bin/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+local.env
+.env
 
 ### NetBeans ###
 /nbproject/private/
