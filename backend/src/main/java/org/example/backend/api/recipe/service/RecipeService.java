@@ -357,7 +357,7 @@ public class RecipeService {
     LocalDate startDate = today.minusDays(2);
     LocalDate endDate = today.plusDays(3);
     // 소비기한이 임박한 food 조회
-    List<Food> foodByExpDateRange = myfridgeRepository.findFoodByExpDateRange(startDate, endDate);
+    List<Food> foodByExpDateRange = myfridgeRepository.findByUser_UserIdAndFoodExpDateBetween(userId, startDate, endDate);
 
     // 동일한 이름의 food가 존재하면, 소비기한이 가장 짧은 것만 남기고 중복 제거
     Map<String, Food> filteredFoodMap = new HashMap<>();

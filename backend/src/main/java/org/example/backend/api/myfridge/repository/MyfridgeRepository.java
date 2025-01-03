@@ -16,4 +16,5 @@ public interface MyfridgeRepository extends JpaRepository<Food, Long> {
   @Query("SELECT f FROM Food f WHERE f.foodExpDate BETWEEN :startDate AND :endDate")
   List<Food> findFoodByExpDateRange(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
   List<Food> findByUserAndFoodList_FoodListId(User user, Long foodListId);
+  List<Food> findByUser_UserIdAndFoodExpDateBetween(Long userId, LocalDate startDate, LocalDate endDate);
 }
