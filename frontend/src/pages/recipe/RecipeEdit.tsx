@@ -132,6 +132,14 @@ const RecipeEdit = () => {
               description: method.description,
               photo: method.photo,
             };
+          } else if (method.photo === null) {
+            // 스텝 이미지가 null인 경우 기본 이미지 URL로 설정
+            return {
+              seq: method.seq,
+              description: method.description,
+              photo:
+                "https://flitnfill.s3.ap-northeast-2.amazonaws.com/default-img/recipe-step-default-img.png",
+            };
           }
           // 이미지가 없으면 기본 이미지 URL로 설정
           return {

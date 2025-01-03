@@ -19,60 +19,30 @@ const RecipeList = () => {
     setIsLoading(true);
     try {
       const params = {
-        page: 1,
-        size: PAGE_SIZE,
-        search: searchQuery.trim() || "",
+        search: searchQuery.trim() || "", // 검색어 적용
       };
-      if (searchQuery.trim()) params.search = searchQuery; // 검색어 반영
 
       const response = await fetchRecipes(params);
-      console.log("Fetched response:", response); // 응답 확인
-      let filtered = response?.content || []; // response.content가 undefined일 수 있음
+      console.log("Fetched response:", response);
 
-      // 검색어에 따른 필터링
-      if (searchQuery.trim()) {
-        filtered = filtered.filter(
-          (recipe) =>
-            recipe.recipeTitle
-              .toLowerCase()
-              .includes(searchQuery.toLowerCase()) ||
-            recipe.recipeFoodDetails
-              .toLowerCase()
-              .includes(searchQuery.toLowerCase())
-        );
-      }
-
-      // 북마크 필터 적용
-      if (showBookmarksOnly) {
-        filtered = filtered.filter((recipe) => recipe.recipeIsBookmarked);
-      }
-
-      if (searchQuery.trim() !== "") {
-        filtered = filtered.filter(
-          (recipe) =>
-            recipe.recipeTitle
-              .toLowerCase()
-              .includes(searchQuery.toLowerCase()) ||
-            recipe.recipeFoodDetails
-              .toLowerCase()
-              .includes(searchQuery.toLowerCase())
-        );
-      }
-
-      console.log("Filtered recipes:", filtered); // 필터된 레시피 확인
-      setDisplayedRecipes(filtered);
-      setCurrentPage(1);
-      setHasMore(filtered.length === PAGE_SIZE);
+      // 검색 결과를 필터링 없이 적용
+      setDisplayedRecipes(response?.content || response || []);
     } catch (error) {
       console.error("Failed to fetch filtered recipes:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [fetchRecipes, searchQuery, showBookmarksOnly]);
+  }, [fetchRecipes, searchQuery]);
 
   useEffect(() => {
-    fetchFilteredRecipes();
-  }, [fetchFilteredRecipes]);
+    if (showBookmarksOnly) {
+      setDisplayedRecipes((prev) =>
+        prev.filter((recipe) => recipe.recipeIsBookmarked)
+      );
+    } else {
+      fetchFilteredRecipes();
+    }
+  }, [showBookmarksOnly, fetchFilteredRecipes]);
 
   // 무한 스크롤 데이터 로드
   const loadMoreRecipes = useCallback(async () => {

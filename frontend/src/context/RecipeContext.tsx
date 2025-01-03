@@ -180,10 +180,8 @@ export const RecipeProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const response = await fetchRecipes({
         search: searchQuery.trim() || "", // 검색어가 없으면 빈 문자열로 처리
-        page: 1,
-        size: 18,
       });
-      setRecipes(response.content);
+      setRecipes(response.content || response); // API 응답 구조에 따라 수정 필요
     } catch (error) {
       console.error("Failed to search recipes:", error);
     }

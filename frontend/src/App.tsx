@@ -17,7 +17,7 @@ import ChatRoomList from "./pages/community/ChatRoomList";
 import ChatRoom from "./pages/community/ChatRoom";
 import ChatRoomAfter from "./pages/community/ChatRoomAfter";
 import RecipeRegister from "./pages/recipe/RecipeRegister";
-import RecipeList from "./pages/recipe/RecipeList";
+import RecipeList from "./pages/recipe/RecipeList.js";
 import RecipeDetail from "./pages/recipe/RecipeDetail";
 import RecipeEdit from "./pages/recipe/RecipeEdit";
 // import NotificationPopup from "./pages/NotificationPopup.tsx";

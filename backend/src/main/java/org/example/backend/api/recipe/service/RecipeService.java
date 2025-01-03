@@ -77,8 +77,10 @@ public class RecipeService {
    * @return recipeTitle이나 recipeFoodDetails에 keyword가 포함된 레시피
    */
   public List<RecipeSimpleDto> searchRecipes(Long userId, String keyword) {
+    log.info("Executing search for keyword: {}", keyword);
     List<String> bookmarkedRecipeIds = bookmarkedRecipeRepository.findRecipeIdsByUserId(userId);
     List<Recipe> recipes = recipeRepository.findByRecipeTitleContainingIgnoreCaseOrRecipeFoodDetailsContainingIgnoreCase(keyword, keyword, Sort.by(Sort.Direction.DESC, "recipeCreatedDate"));
+    log.info("Number of recipes found: {}", recipes.size()); // 검색된 레시피 수 로그
     return recipes.stream()
         .map(recipe -> {
           User user = recipe.getUserId() != null ? userRepository.findById(recipe.getUserId()).orElse(null) : null;

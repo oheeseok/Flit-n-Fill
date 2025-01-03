@@ -29,7 +29,7 @@ public class RecipeController {
                                                 @RequestParam(value = "src", required = false) String src,
                                                 @RequestParam(value = "page", defaultValue = "0") int page,  // 기본 값 0
                                                 @RequestParam(value = "size", defaultValue = "18") int size) {
-
+        log.info("Received search query: {}", keyword); // 검색어 로그
         Long userId = (Long) request.getAttribute("userId");
         if (userId == null) {
             throw new UserIdNullException("userId not found");
