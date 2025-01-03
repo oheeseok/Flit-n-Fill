@@ -44,7 +44,7 @@
 /* 제목 */
 .community-title {
   width: 100%;
-  margin-top: 230px;
+  margin-top: 20px;
   color: var(--light-black, #3c3c3c);
   font-family: Ubuntu, sans-serif;
   font-size: 60px;
@@ -78,7 +78,7 @@
   display: flex;
   justify-content: center;
   margin-top: 40px;
-  margin-bottom: 280px;
+  margin-bottom: 40px;
   width: 100%;
   gap: 20px;
 }

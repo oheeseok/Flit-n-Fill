@@ -81,8 +81,12 @@ const CommunityRegister = () => {
             userEmail: localStorage.getItem("userEmail"),
           },
         });
+        const uniqueItems = Array.from(
+          new Map(response.data.map((item) => [item.foodListName, item])).values()
+        );
+
         console.log("fridge items: ", response.data)
-        setFridgeItems(response.data);
+        setFridgeItems(uniqueItems);
       } catch (error) {
         console.error("작성자의 재료를 가져오는 데 실패했습니다:", error);
         Swal.fire("오류", "작성자의 재료를 가져오는 데 실패했습니다.", "error");

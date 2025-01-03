@@ -30,29 +30,17 @@ const CommunityList: React.FC<CommunityListProps> = ({ filter }) => {
   const [loading, setLoading] = useState<boolean>(true); // 로딩 상태 관리
   const [error, setError] = useState<string | null>(null); // 에러 메시지 관리
 
-  const [searchParams] = useSearchParams() //===
-  const searchQuery = searchParams.get("searchQuery") || ""  //===
-  console.log("search-query keyword: ", searchQuery)  //===
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get("searchQuery") || "";
 
-  // const filteredPosts =
-  //   filter === "ALL"
-  //     ? posts
-  //     : posts.filter((post) => post.tradeType === filter);
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
         setLoading(true);
-        // const params: Record<string, string> = {};
-        // if (filter !== "ALL") {
-        //   params["trade-type"] = filter; // 필터 추가
-        // }
-        // if (query.trim()) {
-        //   params["search-query"] = query; // 검색어 추가
-        // }
 
         const response = await axios.get("/api/posts", {
-          params: { "search-query": searchQuery },  //
+          params: { "search-query": searchQuery },
           withCredentials: true,
           headers: { 
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -73,34 +61,31 @@ const CommunityList: React.FC<CommunityListProps> = ({ filter }) => {
   }, [searchQuery]);
 
   // 필터 및 검색 적용
-  const filteredPosts = posts.filter((post) => {
+  const tradeTypeFilteredPosts = posts.filter((post) => {
     return filter === "ALL" || post.tradeType === filter;
   });
 
-
-  // useEffect(() => {
-  //   // 필터링과 검색 적용
-  //   const filteredPosts = posts.filter((post) => {
-  //     if (filter !== "ALL" && post.tradeType !== filter) return false;
-  //     if (query.trim() && (post.postTitle.includes(query) || post.postContent.includes(query))) return false;
-  //     return true;
-  //   });
-
-  //   setPosts(filteredPosts);
-  // }, [filter, query]);
+  const queryFilteredPosts = tradeTypeFilteredPosts.filter((post) => {
+    return (
+      searchQuery ||
+      post.postTitle.includes(searchQuery) ||
+      post.postContent.includes(searchQuery)
+    );
+  });
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
 
-
   return (
     <div className="community-list-body">
-      <div className="community-list-header">
-        <h1>지역 이름 넣을까 목록이라고 쓸까</h1>
-      </div>
-      {/* <button onClick={() => setSearchParams({searchQuery: `${query}`})}>Query String 바꾸기</button> */}
+      {/* <div className="community-list-header">
+        <h1>게시글 목록
+        {filter !== "ALL" && `- ${filter === "SHARING" ? "나눔" : "교환"}`}
+        {searchQuery && ` (검색어: "${searchQuery}")`}
+        </h1>
+      </div> */}
       <div className="recipelistbody">
-        {filteredPosts.map((post) => (
+        {queryFilteredPosts.map((post) => (
           <div className="recipe-list-container" key={post.postId}>
             <div className="recipe-list-box-name-title">
               [{post.tradeType === "EXCHANGE" ? "교환" : "나눔"}]
