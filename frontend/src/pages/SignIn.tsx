@@ -1,6 +1,8 @@
 import React, { useState, ChangeEvent } from "react";
 import axios from "axios";
-import "../styles/common/SignIn.css"; // 스타일 파일 경로는 프로젝트에 맞게 설정하세요.
+import "../styles/common/SignIn.css";
+import { useSSEContext } from "../context/SSEContext";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 interface UserLoginResponse {
   accessToken: string;
@@ -9,6 +11,7 @@ interface UserLoginResponse {
 }
 
 const SignIn: React.FC = () => {
+  const { startSSE } = useSSEContext();
   // 상태 관리
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -18,13 +21,13 @@ const SignIn: React.FC = () => {
     try {
       // API 요청을 보냄 (localhost:8080)
       const response = await axios.post<UserLoginResponse>(
-        "http://localhost:8080/api/user/login",
+        `${apiUrl}/api/user/login`,
         {
           userEmail: email,
           userPassword: password,
         },
         {
-          withCredentials: true, // CORS 에러를 ��하기 위해 credentials: 'include'로 설정
+          withCredentials: true, // CORS 에러를 해결하기 위해 credentials: 'include'로 설정
         }
       );
 
@@ -35,6 +38,13 @@ const SignIn: React.FC = () => {
 
       console.log(response);
       alert("로그인 성공"); // 로그인 성공 메시지
+
+      const currentUserEmail = localStorage.getItem("userEmail");
+      console.log("Current User Email:", currentUserEmail);
+      if (currentUserEmail) {
+        console.log("Calling startSSE");
+        startSSE(`http://localhost:8080/api/subscribe/${currentUserEmail}`);
+      }
 
       // 로그인 후 대시보드로 리디렉션
       window.location.href = "/"; // 홈 페이지로 리디렉션
