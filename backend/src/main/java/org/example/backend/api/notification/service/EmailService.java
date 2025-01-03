@@ -52,11 +52,10 @@ public class EmailService {
     @Value("${server.port}")
     private String port;
 
-    @Async
     public void sendEmail(String to, String subject, String content) {  // 이메일 전송
         try {
             MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            MimeMessageHelper helper = new MimeMessageHelper(message, false, "UTF-8");
 
             helper.setTo(to);    // 이메일 받을 주소
             helper.setSubject(subject);
