@@ -102,6 +102,14 @@ public class NotificationService {
     return notificationsList;
   }
 
+  public void readOneNotification(Long userId, Long notificationId) {
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
+    Notification notification = notificationRepository.findByNotificationId(notificationId);
+    notification.setNotificationIsRead(true);
+    notificationRepository.save(notification);
+  }
+
   public void readAllNotifications(Long userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));

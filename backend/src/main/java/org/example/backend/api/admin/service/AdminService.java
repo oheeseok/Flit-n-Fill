@@ -109,7 +109,7 @@ public class AdminService {
         }
 
         emailService.sendEmail(user.getUserEmail(), subject, content.toString());
-        pushNotificationService.sendPushNotification(user.getUserId(), message);
+        pushNotificationService.sendPushNotification(user.getUserEmail(), message);
 
         notificationService.saveRequestNotification(
                 user,
@@ -146,7 +146,7 @@ public class AdminService {
         }
 
         emailService.sendEmail(user.getUserEmail(), subject, content.toString());
-        pushNotificationService.sendPushNotification(user.getUserId(), message);
+        pushNotificationService.sendPushNotification(user.getUserEmail(), message);
 
         notificationService.saveRequestNotification(
                 user,

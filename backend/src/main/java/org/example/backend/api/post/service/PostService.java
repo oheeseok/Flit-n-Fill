@@ -286,7 +286,7 @@ public class PostService {
         proposer.getUserNickname(),
         post.getTradeType().getDescription());
     log.info("message: {}", message);
-    pushNotificationService.sendPushNotification(writer.getUserId(), message);
+    pushNotificationService.sendPushNotification(writer.getUserEmail(), message);
     log.info("2. send push --- done");
 
     // notification 테이블에 데이터 저장
@@ -295,7 +295,7 @@ public class PostService {
     notificationService.saveTradeRequestNotification(
         writer,
         notificationType,
-        post.getTradeType().getDescription() + " 요청이 왔습니다!",
+        proposer.getUserNickname() + "님이 " + post.getTradeType().getDescription() + "을 요청합니다.",
         tradeRequest.getTradeRequestId(),
         null);
     log.info("3. save data to db --- done");
@@ -346,7 +346,7 @@ public class PostService {
             post.getTradeType().getDescription()
         );
         log.info("message: {}", message);
-        pushNotificationService.sendPushNotification(writer.getUserId(), message);
+        pushNotificationService.sendPushNotification(writer.getUserEmail(), message);
         log.info("2. send push --- done");
       } else {
         log.info("> 요청 취소가 불가능합니다. tradeTaskStatus = {}", tradeTaskStatus.getDescription());

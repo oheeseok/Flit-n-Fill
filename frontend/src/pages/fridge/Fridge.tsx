@@ -136,7 +136,7 @@ const Fridge: React.FC = () => {
     const [selectedItemIds, setSelectedItemIds] = useState<number[]>([]); // 다중 선택 상태 관리
 
     const handleItemClick = (id: number, foodListId: number | undefined) => {
-      if(foodListId === null) {
+      if (foodListId === null) {
         return;
       }
       setSelectedItemIds((prev) =>
@@ -171,7 +171,7 @@ const Fridge: React.FC = () => {
               src="/assets/edit.png"
               alt="수정"
               className="fridge-item-edit-icon"
-              onClick={(e) =>{
+              onClick={(e) => {
                 e.stopPropagation();
                 handleEditClick(item.id);
               }}

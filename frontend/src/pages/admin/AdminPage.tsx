@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AdminContext } from "../../context/AdminProvider"; // AdminContext 가져오기
 import "../../styles/admin/AdminPage.css"; // AdminPage.css 파일을 임포트
 import axios from "axios"; // axios 임포트
+const apiUrl = import.meta.env.VITE_API_URL;
 
 interface RequestDetailDto {
     requestId: string;

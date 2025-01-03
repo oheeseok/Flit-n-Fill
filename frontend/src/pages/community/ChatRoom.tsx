@@ -13,6 +13,7 @@ import {
 import { format } from "date-fns";
 import { fromEnumToDescription } from "../../components/enum";
 import "../../styles/community/ChatRoom.css";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const ChatRoom: React.FC = () => {
   const TRADE_COMPLETE = "COMPLETED";
@@ -99,7 +100,7 @@ const ChatRoom: React.FC = () => {
     try {
       // HTTP POST 요청으로 서버에 메시지 전송
       const response = await axios.post(
-        `http://localhost:8080/api/trade/${tradeRoomId}`,
+        `${apiUrl}/api/trade/${tradeRoomId}`,
         encodedMessage,
         {
           headers: {
@@ -137,7 +138,7 @@ const ChatRoom: React.FC = () => {
     try {
       console.log(`handleTrade => ${tradeState}`);
       const response = await axios.patch(
-        `http://localhost:8080/api/trade/${tradeRoomId}`,
+        `${apiUrl}/api/trade/${tradeRoomId}`,
         tradeState,
         {
           headers: {
@@ -197,7 +198,7 @@ const ChatRoom: React.FC = () => {
     try {
       console.log(`reportUser()`);
       const response = await axios.post(
-        `http://localhost:8080/api/user/report`,
+        `${apiUrl}/api/user/report`,
         reportMessageObj,
         {
           headers: {

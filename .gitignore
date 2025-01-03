@@ -6,6 +6,7 @@ build/
 !**/src/test/**/build/
 application.yaml
 node_modules
+.env
 
 ### STS ###
 .apt_generated
