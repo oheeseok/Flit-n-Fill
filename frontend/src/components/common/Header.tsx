@@ -31,6 +31,7 @@ const Header = () => {
       setProfileImage("/assets/user-icon.png"); // 기본 아이콘
     }
   }, []);
+
   const toggleNotification = () => {
     setShowNotification((prev) => !prev);
   };
@@ -59,6 +60,7 @@ const Header = () => {
         localStorage.clear();
         setIsLoggedIn(false);
         Swal.fire("로그아웃 완료", "로그아웃 되었습니다.", "success");
+        stopSSE(); // SSE 연결 종료
         navigate("/");
       }
     });
@@ -79,7 +81,8 @@ const Header = () => {
         <Link to="/recipe">recipe</Link>
         <Link to="/community">community</Link>
         <Link to="/cart">cart</Link>
-
+        <Link to="/adminpage">adminpage</Link>{" "}
+        {/* adminpage로 이동하는 링크 추가 */}
         {/* 로그인 상태에 따라 메뉴 다르게 표시 */}
         {isLoggedIn ? (
           <>
