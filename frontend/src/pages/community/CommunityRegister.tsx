@@ -89,8 +89,10 @@ const CommunityRegister = () => {
             userEmail: localStorage.getItem("userEmail"),
           },
         });
+        const filteredItems = response.data.filter((item) => item.foodListId !== null)
+
         const uniqueItems = Array.from(
-          new Map(response.data.map((item) => [item.foodListName, item])).values()
+          new Map(filteredItems.map((item) => [item.foodListName, item])).values()
         );
 
         console.log("fridge items: ", response.data)
