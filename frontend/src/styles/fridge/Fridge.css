@@ -429,6 +429,16 @@
   height: 28px; /* 원하는 높이 */
 }
 
+.bucket-item-edit-icon {
+  width: 28px; /* 원하는 너비 */
+  height: 28px; /* 원하는 높이 */
+}
+
+.bucket-item-delete-icon {
+  width: 28px; /* 원하는 너비 */
+  height: 28px; /* 원하는 높이 */
+}
+
 /* 미디어 쿼리 */
 @media (max-width: 1024px) {
   .fridge-container {
