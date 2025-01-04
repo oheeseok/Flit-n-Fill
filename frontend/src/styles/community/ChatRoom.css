@@ -10,46 +10,228 @@
 
 .chatroom-header {
   padding: 16px;
-  background-color: #ffffff;
+  background-color: white;
   border-bottom: 1px solid #e0e0e0;
   display: flex;
   flex-direction: column;
+  border: 1px solid #e0e0e0;
 }
 
 .chatroom-header h2 {
   font-size: 20px;
   font-weight: bold;
   margin-bottom: 8px;
+  text-align: center; /* 중앙 정렬 */
+  cursor: pointer;
+  transition: color text-decoration 0.3s ease; /* 밑줄 효과를 위한 트랜지션 */
+}
+
+.chatroom-header .post-title:hover {
+  text-decoration: underline; /* 마우스 호버 시 밑줄 추가 */
+  color: #5ca8a2; /* 마우스 호버 시 텍스트 색상 변경 */
 }
 
 .chatroom-header-info {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   font-size: 14px;
   color: #888;
+  align-items: center;
+  gap: 8px; /* 요소 간 간격 추가 */
+  position: relative;
+}
+
+.chatroom-header-info .user-info {
+  display: flex;
+  align-items: center; /* 프로필 이미지와 텍스트 세로로 정렬 */
+  gap: 10px; /* 이미지와 텍스트 간 간격 */
+}
+
+/* 닉네임 및 글 작성 시각 */
+.chatroom-header-info .user-info .nickname-time {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* 왼쪽 정렬 */
+  font-size: 14px;
+}
+
+.chatroom-header-info .user-info .nickname-time .nickname {
+  font-weight: bold;
+  color: #333;
+}
+
+.chatroom-header-info .user-info .nickname-time .post-time {
+  color: #888;
+  font-size: 12px;
+}
+
+/* 버튼들 오른쪽 정렬 */
+.chatroom-header-info .button-group {
+  display: flex;
+  gap: 4px; /* 버튼 간 간격 */
+  align-items: center;
+  justify-content: auto; /* 오른쪽 정렬 */
+}
+
+/* 버튼들 간격을 더 좁게 하고 오른쪽 정렬 */
+.chatroom-header-info .button-group button {
+  margin-right: 5px; /* 버튼 간의 간격 좁히기 */
+  width: auto; /* 버튼 너비를 자동으로 조정 */
+  position: relative;
+}
+
+.progress-text {
+  font-weight: bold; /* 원하는 스타일 */
+  font-size: 1em; /* 폰트 크기 */
+  margin-right: 10px; /* 원하는 띄어쓰기 값 */
+  padding: 5px 10px; /* 텍스트와 배경 간의 여유 공간 */
+  border-radius: 12px; /* 배경에 둥근 모서리 추가 */
+}
+
+.progress-inprogress {
+  background-color: #4caf50; /* 진행중에 대한 색 (예: 초록색) */
+  color: white;
+}
+
+.progress-completed {
+  background-color: #2196f3; /* 완료에 대한 색 (예: 파란색) */
+  color: white;
+}
+
+.progress-canceled {
+  background-color: #f44336; /* 취소에 대한 색 (예: 빨간색) */
+  color: white;
+}
+
+.progress-pending {
+  background-color: #ff9800; /* 대기에 대한 색 (예: 주황색) */
+  color: black;
 }
 
 .chatroom-messages {
   padding: 16px;
-  background-color: #f9f9f9;
+  background-color: #f2f2f2;
   max-height: 400px;
+  max-width: 100%;
   overflow-y: auto;
+  overflow-x: hidden; /* 가로 스크롤을 숨김 */
+  border-bottom: 5px solid #e0e0e0;
 }
 
 .chatroom-message {
+  display: flex;
+  flex-direction: row;
   margin-bottom: 16px;
   padding: 10px;
   border-radius: 8px;
 }
 
+.chatroom-message-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  width: auto; /* 메시지 내용에 맞게 동적으로 크기 조정 */
+  margin: 0; /* 여백 없애기 */
+  padding: 0; /* 패딩 없애기 */
+}
+
+.chatroom-user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 10px;
+  position: relative; /* 부모 요소에 상대적인 위치 추가 */
+}
+
+.chatroom-profile-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-bottom: 5px;
+}
+
+/* 프로필 위젯 */
+.profile-info-widget {
+  position: absolute;
+  top: -60px; /* 프로필 이미지 위에 위치 */
+  left: 0;
+  background-color: #ffffff;
+  padding: 8px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  z-index: 10;
+  width: 120px; /* 위젯 너비 */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px); /* 위젯이 살짝 위로 올라간 상태로 시작 */
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+}
+
+/* 열릴 때 */
+.profile-info-widget.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0); /* 위젯이 부드럽게 내려오는 효과 */
+}
+
+.profile-info-widget p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.profile-info-widget p:first-child {
+  font-weight: bold;
+}
+
 .my-message {
   background-color: #e6f7ff;
   text-align: right;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 밑부분에 그림자 */
+  margin-left: auto; /* 오른쪽 정렬 */
+  width: auto; /* 메시지 길이에 맞게 너비를 자동으로 설정 */
+  max-width: 50%;
+  display: flex; /* flexbox 추가 */
+  flex-direction: row; /* 메시지와 프로필을 나란히 배치 */
+  justify-content: flex-end; /* 메시지는 왼쪽, 프로필 이미지는 오른쪽 배치 */
+  align-items: flex-start; /* 프로필 이미지와 닉네임을 위로 정렬 */
+  word-wrap: break-word; /* 긴 단어를 자동으로 줄바꿈 처리 */
+  white-space: pre-wrap; /* 줄바꿈 유지, 내용이 길면 자동으로 줄바꿈 */
+  padding: 8px;
+}
+
+.my-message .chatroom-message-container {
+  display: flex;
+  flex-direction: row-reverse; /* 프로필 이미지가 오른쪽에 오도록 수정 */
+  justify-content: flex-start; /* 왼쪽으로 정렬 */
+}
+
+.my-message .chatroom-message-content {
+  background-color: #e6f7ff; /* 내 메시지는 배경색이 다르게 */
+  align-self: flex-end;
+  padding-right: 10px;
 }
 
 .other-message {
-  background-color: #ffffff;
+  background-color: #fffee0;
   text-align: left;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 밑부분에 그림자 */
+  margin-right: auto; /* 왼쪽 정렬 */
+  width: auto; /* 메시지 길이에 맞게 너비를 자동으로 설정 */
+  max-width: 50%;
+  flex-direction: row; /* 상대 메시지는 프로필 이미지와 닉네임을 왼쪽에 배치 */
+  word-wrap: break-word; /* 긴 단어를 자동으로 줄바꿈 처리 */
+  white-space: pre-wrap; /* 줄바꿈 유지, 내용이 길면 자동으로 줄바꿈 */
+}
+
+.other-message .chatroom-message-container {
+  align-self: flex-start;
+}
+
+.other-message .chatroom-message-content {
+  align-self: flex-start;
 }
 
 .chatroom-message-author {
@@ -58,26 +240,39 @@
   margin-bottom: 4px;
 }
 
+.chatroom-message-content-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
 .chatroom-message-content {
-  font-size: 16px;
+  font-size: 18px;
+  word-wrap: break-word; /* 긴 단어를 자동으로 줄바꿈 처리 */
+  white-space: pre-wrap; /* 줄바꿈 유지, 내용이 길면 자동으로 줄바꿈 */
 }
 
 .chatroom-message-time {
   font-size: 12px;
   color: #888;
   margin-top: 4px;
+  align-self: flex-end;
+  padding-right: 12px;
 }
 
 .chatroom-footer {
   display: flex;
-  flex-direction: column;
+  /* flex-direction: column; */
   padding: 16px;
   background-color: #ffffff;
   border-top: 1px solid #e0e0e0;
+  align-items: center; /* 세로 방향 중앙 정렬 */
+  gap: 10px; /* 입력창과 버튼 간의 간격 */
 }
 
 .chatroom-input {
-  width: 100%;
+  flex: 1; /* 텍스트 영역이 가능한 공간을 모두 차지하게 함 */
+  width: calc(100% - 100px); /* 버튼 크기와 비례하여 조정 */
   height: 60px;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
@@ -85,20 +280,29 @@
   font-size: 16px;
   resize: none;
   margin-bottom: 8px;
+  outline: 1px solid #85b573;
+  background-color: #f8f8f8;
+}
+
+.chatroom-input:focus {
+  border-color: #85b573;
+  outline: groove #85b573;
 }
 
 .chatroom-send-button {
   align-self: flex-end;
-  padding: 8px 16px;
-  background-color: #d4efc7;
-  color: #000;
+  padding: 8px 12px;
+  border: 2px solid transparent; /* 기본적으로 테두리는 투명 */
+  outline: none; /* 버튼에 기본적으로 적용되는 outline을 제거 */
   font-size: 14px;
   font-weight: bold;
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  min-width: 80px; /* 버튼의 최소 너비 설정 */
+  box-sizing: border-box; /* 테두리가 버튼 크기에 영향을 주지 않도록 설정 */
 }
 
 .chatroom-send-button:hover {
-  background-color: #85b573;
+  outline: 2px solid #929292;
 }
