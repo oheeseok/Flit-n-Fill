@@ -168,12 +168,20 @@ public class UserService {
         }
         user.setUserPhone(updateDto.getUserPhone() != null ? updateDto.getUserPhone() : user.getUserPassword());
         user.setUserAddress(updateDto.getUserAddress() != null ? updateDto.getUserAddress() : user.getUserAddress());
-        if (userProfile != null && !userProfile.equals(PROFILE_DEFAULT_IMG_URL)) {
-            String newProfile = s3Service.uploadFile(userProfile, "users/profile");
-            user.setUserProfile(newProfile);
-        } else {  // 프로필 삭제 시 기본 프로필로 변경
-//            s3Service.deleteFile(user.getUserProfile());
-            user.setUserProfile(PROFILE_DEFAULT_IMG_URL);
+
+        String oldMainProfile = user.getUserProfile();
+        MultipartFile newProfile = userProfile;
+        String backupProfile = "";
+
+        if (oldMainProfile != null && !oldMainProfile.isEmpty() && !oldMainProfile.equals(PROFILE_DEFAULT_IMG_URL)) {
+            backupProfile = oldMainProfile;
+        }
+
+        if (newProfile != null && !newProfile.isEmpty()) {
+            String newProfileUrl = s3Service.uploadFile(newProfile, "users/profile");
+            user.setUserProfile(newProfileUrl);
+        } else {
+            user.setUserProfile(backupProfile);
         }
 
         User updatedUser = userRepository.save(user);
