@@ -116,13 +116,14 @@
   flex-shrink: 0;
 }
 
-.signup-text-phone-input {
+.signup-text-input {
   display: flex;
   max-width: 600px;
   width: 100%;
-  font-size: 18px;
+  font-size: 16px;
   border-radius: 5px;
   margin-bottom: 10px;
+  padding: 5px;
 }
 .signup-text-address {
   display: flex;
@@ -193,21 +194,28 @@
   right: 0;
 }
 
+.signup-container-address {
+  display: flex;
+  align-items: center; /* Align Address and select boxes vertically */
+  gap: 20px; /* Add spacing between Address and select boxes */
+}
+
 /* Add these styles to your SignUp.css file */
 .select-container {
-  display: flex;
+  display: inline-flex;
   flex-direction: row; /* Arrange the select boxes horizontally */
-  justify-content: space-between; /* Ensure space between them */
+  /* justify-content: flex-start; Ensure space between them */
   align-items: center; /* Align them vertically in the center */
   gap: 20px; /* Space between select elements */
 }
 
 .select-container select {
+  flex:1;
   font-size: 18px;
   padding: 8px 12px;
   border-radius: 5px;
   border: 1px solid #ccc;
-  width: 45%; /* Adjust width for a balanced layout */
+  /* width: 45%; Adjust width for a balanced layout */
   max-width: 300px;
   box-sizing: border-box;
   background-color: #f8f8f8;
@@ -226,4 +234,12 @@
 /* Optional: Add some spacing between the title and the select boxes */
 .signup-text-address {
   margin-bottom: 20px;
+}
+
+.error-message {
+  color: red;
+  font-family: Ubuntu;
+  width: 100%;
+  text-align: left;
+  margin-top: -10px;
 }

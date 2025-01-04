@@ -129,3 +129,8 @@
 .signup-text-address {
   margin-bottom: 20px;
 }
+
+.mypage-error-message {
+  color: red;
+  text-align: left;
+}
