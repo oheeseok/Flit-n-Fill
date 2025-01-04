@@ -130,22 +130,34 @@ const Header = () => {
               <div className="header-user-menu" ref={menuRef}>
                 <ul>
                   <li>
-                    <Link to="/mypage" onClick={handleMenuClick}>
+                    <Link to="/mypage" onClick={() => {
+                      handleMenuClick(); 
+                      setShowUserMenu((prev) => !prev)
+                      }}>
                       회원 정보 수정
                     </Link>
                   </li>
                   <li>
-                    <Link to="#" onClick={handleMenuClick}>
+                    <Link to="/myposts" onClick={() => {
+                      handleMenuClick(); 
+                      setShowUserMenu((prev) => !prev)
+                      }}>
                       내 게시글 목록
                     </Link>
                   </li>
                   <li>
-                    <Link to="/chatroomlist" onClick={handleMenuClick}>
+                    <Link to="/chatroomlist" onClick={() => {
+                      handleMenuClick(); 
+                      setShowUserMenu((prev) => !prev)
+                      }}>
                       내 거래방 목록
                     </Link>
                   </li>
                   <li>
-                    <Link to="/myrecipes" onClick={handleMenuClick}>
+                    <Link to="/myrecipes" onClick={() => {
+                      handleMenuClick(); 
+                      setShowUserMenu((prev) => !prev)
+                      }}>
                       내 레시피 목록
                     </Link>
                   </li>
