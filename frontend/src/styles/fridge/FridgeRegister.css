@@ -158,3 +158,8 @@
   font-weight: 700;
   line-height: 20px; /* 125% */
 }
+
+textarea {
+  resize: none;
+  height: 100px;
+}

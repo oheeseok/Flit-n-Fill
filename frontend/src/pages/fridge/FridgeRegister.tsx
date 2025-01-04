@@ -694,7 +694,7 @@ const FridgeRegister = () => {
             ></textarea>
           </div>
           <button className="edit" onClick={handleRequestRegister}>
-            저장
+            요청
           </button>
           <button onClick={() => setRequestPopupOpen(false)}>취소</button>
         </div>
