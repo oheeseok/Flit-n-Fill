@@ -19,7 +19,9 @@ export const SSEProvider = ({ children }: { children: React.ReactNode }) => {
       return;
     }
 
-    let es: EventSource | null = new EventSource(url);
+    let es: EventSource | null = new EventSource(url, {
+      withCredentials: true,
+    });
 
     // 연결이 성공적으로 이루어졌을 때
     es.onopen = () => {
