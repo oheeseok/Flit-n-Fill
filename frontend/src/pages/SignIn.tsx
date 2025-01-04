@@ -20,7 +20,9 @@ const SignIn: React.FC = () => {
   const [password, setPassword] = useState<string>("");
 
   // URL에서 토큰을 가져오기 위한 상태
-  const [tokenFromRedirect, setTokenFromRedirect] = useState<string | null>(null);
+  const [tokenFromRedirect, setTokenFromRedirect] = useState<string | null>(
+    null
+  );
 
   // 리디렉션 URL에서 토큰을 가져오는 useEffect
   useEffect(() => {
@@ -37,9 +39,10 @@ const SignIn: React.FC = () => {
     if (tokenFromRedirect) {
       // 토큰으로 로그인 처리 (백엔드에서 토큰을 받아서 검증)
       axios
-      .post<UserLoginResponse>(`${apiUrl}/api/user/login/social`, 
-        tokenFromRedirect // 'socialToken'을 'data'로 전달
-      )
+        .post<UserLoginResponse>(
+          `${apiUrl}/api/user/login/social`,
+          tokenFromRedirect // 'socialToken'을 'data'로 전달
+        )
         .then((response) => {
           localStorage.setItem("accessToken", response.data.accessToken);
           localStorage.setItem("userEmail", response.data.userEmail);
@@ -56,7 +59,6 @@ const SignIn: React.FC = () => {
         });
     }
   }, [tokenFromRedirect]);
-
 
   // 로그인 처리 함수
   const handleLogin = async () => {
@@ -134,7 +136,7 @@ const SignIn: React.FC = () => {
           <input
             type="text"
             className="signin-input"
-            placeholder="Enter your email"
+            placeholder="이메일 주소를 입력해주세요."
             value={email}
             onChange={handleChangeEmail}
           />
@@ -143,30 +145,39 @@ const SignIn: React.FC = () => {
           <input
             type="password"
             className="signin-input"
-            placeholder="Enter your password"
+            placeholder="비밀번호를 입력해주세요."
             value={password}
             onChange={handleChangePassword}
           />
 
-          <button onClick={handleLogin}>Log In</button>
+          <button className="signin-button-login" onClick={handleLogin}>
+            Log In
+          </button>
 
-          <div>---------or---------</div>
-          <button
-            onClick={() =>
-              (window.location.href =
-                `${apiUrl}/oauth2/authorization/google`)
-            }
-          >
-            구글 로그인
-          </button>
-          <button
-            onClick={() =>
-              (window.location.href =
-                `${apiUrl}/oauth2/authorization/kakao`)
-            }
-          >
-            카카오 로그인
-          </button>
+          <div className="signup-button-or">or</div>
+          <div className="signin-button-container2">
+            <button className="signin-button-google"
+              onClick={() =>
+                (window.location.href = `${apiUrl}/oauth2/authorization/google`)
+              }
+            >
+              <img
+                src="src/assets/google_login.png"
+                alt="Google 로그인"
+              />
+            </button>
+
+            <button className="signin-button-kakao"
+              onClick={() =>
+                (window.location.href = `${apiUrl}/oauth2/authorization/kakao`)
+              }
+            >
+              <img
+                src="src/assets/kakao_login.png"
+                alt="Kakao 로그인"
+              />
+            </button>
+          </div>
 
           <div>
             Don't have an account? <a href="/signUp">Sign Up</a>

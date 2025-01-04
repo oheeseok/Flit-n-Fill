@@ -10,6 +10,7 @@ const SignUp = () => {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>(""); // 추가된 상태: confirmPassword
   const [nickname, setNickname] = useState<string>(""); // 추가된 상태: Nickname
   const [phone, setPhone] = useState<string>(""); // 추가된 상태: Phone
 
@@ -17,11 +18,78 @@ const SignUp = () => {
   const [selectedSubArea, setSelectedSubArea] = useState<string>("");
   const [selectWidth, setSelectWidth] = useState<number>(200); // 초기값 설정
 
+  const [emailError, setEmailError] = useState<string>("");
+  const [passwordError, setPasswordError] = useState<string>("");
+  const [phoneError, setPhoneError] = useState<string>("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState<string>("");
+  const [formValid, setFormValid] = useState<boolean>(false);
+
   const areaSelectRef = useRef<HTMLSelectElement>(null);
 
   // 선택된 지역에 따라 하위 지역 목록을 가져옴
   const subAreas =
     area.find((area) => area.name === selectedArea)?.subArea || [];
+
+  // 이메일 유효성 검사
+  const validateEmail = (email: string) => {
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return regex.test(email);
+  };
+
+  // 비밀번호 유효성 검사
+  const validatePassword = (password: string) => {
+    const minLength = 8; // 비밀번호 최소 길이
+    const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/;
+    return password.length >= minLength && regex.test(password);
+  };
+
+  // 비밀번호 확인 검사
+  const validateConfirmPassword = (
+    password: string,
+    confirmPassword: string
+  ) => {
+    return password === confirmPassword;
+  };
+
+  // 전화번호 유효성 검사
+  const validatePhone = (phone: string) => {
+    const regex = /^\d{3}-\d{4}-\d{4}$/;
+    return regex.test(phone);
+  }
+
+  // 실시간 유효성 검사
+  useEffect(() => {
+    setEmailError(
+      email === "" ? "" :
+      validateEmail(email) ? "" : "이메일 형식이 올바르지 않습니다."
+    );
+    setPasswordError(
+      password === "" ? "" :
+      validatePassword(password)
+        ? ""
+        : "비밀번호는 최소 8자 이상, 영문과 숫자를 포함해야 합니다."
+    );
+    setConfirmPasswordError(
+      confirmPassword === "" ? "" :
+      validateConfirmPassword(password, confirmPassword)
+        ? ""
+        : "비밀번호가 일치하지 않습니다."
+    );
+    setPhoneError(
+      phone === "" ? "" :
+      validatePhone(phone)
+      ? ""
+      : "전화번호는 000-0000-0000 형식으로 입력해주세요."
+    )
+
+    // 폼이 모두 유효한지 체크
+    setFormValid(
+      validateEmail(email) &&
+        validatePassword(password) &&
+        validateConfirmPassword(password, confirmPassword) &&
+        validatePhone(phone)
+    );
+  }, [email, password, confirmPassword, phone]);
 
   // 이벤트 핸들러
   const handleAreaChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -41,6 +109,37 @@ const SignUp = () => {
 
   // Sign Up 요청 처리 함수
   const handleSignUp = async () => {
+    if(!formValid) {
+      Swal.fire({
+        title: "회원가입 실패",
+        text: "입력하신 정보가 올바르지 않습니다.",
+        icon: "error",
+        confirmButtonColor: "#d33",
+        confirmButtonText: "확인",
+      });
+      return; 
+    }
+
+    // 입력 값이 빈칸일 경우 가입 불가
+  if (
+    !name ||
+    !email ||
+    !password ||
+    !confirmPassword ||
+    !nickname ||
+    !phone ||
+    !selectedArea ||
+    !selectedSubArea
+  ) {
+    Swal.fire({
+      title: "회원가입 실패",
+      text: "모든 필드에 값을 입력해주세요.",
+      icon: "error",
+      confirmButtonColor: "#d33",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
     try {
       const fullAddress = `${selectedArea} ${selectedSubArea}`;
       const response = await axios.post(`${apiUrl}/api/user/register`, {
@@ -100,6 +199,13 @@ const SignUp = () => {
     setPassword(e.target.value);
   };
 
+  // Confirm Password 입력 값 변경 처리
+  const handleChangeConfirmPassword = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setConfirmPassword(e.target.value);
+  };
+
   // Nickname 입력 값 변경 처리
   const handleChangeNickname = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNickname(e.target.value);
@@ -120,8 +226,8 @@ const SignUp = () => {
           <div className="signup-text-name">Name</div>
           <input
             type="text"
-            className="signup-text-name-input"
-            placeholder="Enter your name"
+            className="signup-text-input"
+            placeholder="이름을 입력해주세요."
             value={name}
             onChange={handleChangeName}
           />
@@ -130,28 +236,45 @@ const SignUp = () => {
           <div className="signup-text-email">Email address</div>
           <input
             type="text"
-            className="signup-text-email-input"
-            placeholder="Enter your email"
+            className="signup-text-input"
+            placeholder="사용하실 이메일 주소를 입력해주세요."
             value={email}
             onChange={handleChangeEmail}
           />
+          {emailError && <div className="error-message">{emailError}</div>}
 
           {/* Password 입력 */}
           <div className="signup-text-password">Password</div>
           <input
             type="password"
-            className="signup-text-password-input"
-            placeholder="Enter your password"
+            className="signup-text-input"
+            placeholder="사용하실 비밀번호를 입력해주세요."
             value={password}
             onChange={handleChangePassword}
           />
+          {passwordError && (
+            <div className="error-message">{passwordError}</div>
+          )}
+
+          {/* Confirm Password 입력 */}
+          <div className="signup-text-password">Confirm Password</div>
+          <input
+            type="password"
+            className="signup-text-input"
+            placeholder="비밀번호를 다시 입력해주세요."
+            value={confirmPassword}
+            onChange={handleChangeConfirmPassword}
+          />
+          {confirmPasswordError && (
+            <div className="error-message">{confirmPasswordError}</div>
+          )}
 
           {/* Nickname 입력 */}
           <div className="signup-text-nickname">Nickname</div>
           <input
             type="text"
-            className="signup-text-nickname-input"
-            placeholder="Enter your nickname"
+            className="signup-text-input"
+            placeholder="사용하실 닉네임을 입력해주세요."
             value={nickname}
             onChange={handleChangeNickname}
           />
@@ -160,13 +283,17 @@ const SignUp = () => {
           <div className="signup-text-phone">Phone</div>
           <input
             type="text"
-            className="signup-text-phone-input"
-            placeholder="Enter your phone number"
+            className="signup-text-input"
+            placeholder="휴대전화 번호를 입력해주세요."
             value={phone}
             onChange={handleChangePhone}
           />
+          {phoneError && (
+            <div className="error-message">{phoneError}</div>
+          )}
 
           {/* Address 입력 */}
+          <div className="signup-container-address">
           <div className="signup-text-address">Address</div>
           <div className="select-container">
             <select
@@ -198,6 +325,7 @@ const SignUp = () => {
               </select>
             )}
           </div>
+          </div>
           {/* Sign Up 버튼 */}
           <div className="signup-button-container">
             <button className="signup-button-login" onClick={handleSignUp}>
@@ -206,25 +334,23 @@ const SignUp = () => {
           </div>
           <div className="signup-button-or">or</div>
 
-          <div className="signup-button-container2">
-            {/* 구글 로그인 버튼 */}
+          <div className="signin-button-container2">
             <button
-              className="signup-button-google"
+              className="signin-button-google"
               onClick={() =>
                 (window.location.href = `${apiUrl}/oauth2/authorization/google`)
               }
             >
-              구글로그인
+              <img src="src/assets/google_login.png" alt="Google 로그인" />
             </button>
 
-            {/* 카카오 로그인 버튼 */}
             <button
-              className="signup-button-kakao"
+              className="signin-button-kakao"
               onClick={() =>
                 (window.location.href = `${apiUrl}/oauth2/authorization/kakao`)
               }
             >
-              카카오로그인
+              <img src="src/assets/kakao_login.png" alt="Kakao 로그인" />
             </button>
           </div>
           {/* 이미 계정이 있는 경우 로그인 링크 */}
