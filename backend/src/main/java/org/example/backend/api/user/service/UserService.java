@@ -17,6 +17,7 @@ import org.example.backend.enums.RequestType;
 import org.example.backend.enums.TaskStatus;
 import org.example.backend.exceptions.LoginFailedException;
 import org.example.backend.exceptions.PasswordMismatchException;
+import org.example.backend.exceptions.UnauthorizedException;
 import org.example.backend.exceptions.UserNotFoundException;
 import org.example.backend.security.JwtTokenProvider;
 import org.example.backend.security.model.PrincipalDetails;
@@ -95,6 +96,17 @@ public class UserService {
        return tokenManagementService.handleSuccessfulLogin(user, response);
     }
 
+    public UserLoginResponse socialLogin(String socialToken, HttpServletResponse response) {
+        if (!jwtTokenProvider.isTokenExpired(socialToken)) {
+            String userEmail = jwtTokenProvider.getUserEmailFromToken(socialToken);
+            User user = userRepository.findByUserEmail(userEmail)
+                    .orElseThrow();
+            return tokenManagementService.handleSuccessfulLogin(user, response);
+        } else {
+            throw new UnauthorizedException("로그인 세션이 만료되었습니다.");
+        }
+    }
+
     public void logout(String token, String userEmail, HttpServletResponse response) {
         if (userEmail == null) {
             throw new IllegalArgumentException("이메일이 존재하지 않습니다.");
@@ -115,7 +127,7 @@ public class UserService {
         } catch (Exception e) {
             log.info(e + "이미 만료된 토큰입니다.");
         }
-//        log.info("만료기한 : {}", tokenExpiration);
+
         tokenManagementService.addBlacklistToken(token, tokenExpiration, response);
     }
 

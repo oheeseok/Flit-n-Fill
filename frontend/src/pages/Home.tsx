@@ -8,6 +8,8 @@ import MainButton2 from "../components/main/MainButton2";
 import RecipeCarousel from "../components/main/RecipeCarousel";
 
 const Home = () => {
+
+  
   useEffect(() => {
     const controller = new ScrollMagic.Controller();
 

@@ -60,6 +60,21 @@ public class UserController {
         }
     }
 
+    @PostMapping("/login/social")
+    public ResponseEntity<?> logout(@RequestBody String socialToken, HttpServletResponse response) {
+        // 토큰 검증 로직
+        try {
+            log.info("social token: " + socialToken);
+
+            UserLoginResponse login = userService.socialLogin(socialToken, response);
+            return ResponseEntity.status(HttpStatus.OK).body(login);
+        } catch (LoginFailedException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("로그인 처리 중 오류가 발생했습니다.");
+        }
+    }
+
     @GetMapping("/info")
     public ResponseEntity<?> getUserInfo(Authentication authentication) {
         String userEmail = authentication.getName();
@@ -107,25 +122,19 @@ public class UserController {
     }
 
     @GetMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-        // 쿠키에서 토큰 가져오기
-        Cookie[] cookies = request.getCookies();
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+        String authorization = request.getHeader("Authorization");
         String token = null;
-
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("accessToken".equals(cookie.getName())) {
-                    token = cookie.getValue();
-                    break;
-                }
-            }
+        if (authorization != null && authorization.startsWith("Bearer ")) {
+            // "Bearer " 다음에 오는 토큰을 추출
+            token = authorization.substring(7); // "Bearer "는 7글자
         }
-
-        String userEmail = authentication.getName();
+        String userEmail = request.getHeader("userEmail");
 
         try {
             // 로그아웃 처리
             userService.logout(token, userEmail, response);
+
             return ResponseEntity.ok("로그아웃되었습니다.");
         } catch (Exception e) {
             // 잘못된 토큰이나 사용자 정보가 없는 경우

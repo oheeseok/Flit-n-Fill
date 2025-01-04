@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent } from "react";
+import React, { useState, ChangeEvent, useEffect } from "react";
 import axios from "axios";
 import "../styles/common/SignIn.css";
 import { useSSEContext } from "../context/SSEContext";
@@ -18,6 +18,44 @@ const SignIn: React.FC = () => {
   // 상태 관리
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+
+  // URL에서 토큰을 가져오기 위한 상태
+  const [tokenFromRedirect, setTokenFromRedirect] = useState<string | null>(null);
+
+  // 리디렉션 URL에서 토큰을 가져오는 useEffect
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("socialtoken");
+    if (token) {
+      setTokenFromRedirect(token); // 토큰 상태 업데이트
+      console.log(tokenFromRedirect);
+    }
+  }, []);
+
+  // social 로그인 처리 함수
+  useEffect(() => {
+    if (tokenFromRedirect) {
+      // 토큰으로 로그인 처리 (백엔드에서 토큰을 받아서 검증)
+      axios
+      .post<UserLoginResponse>(`${apiUrl}/api/user/login/social`, 
+        tokenFromRedirect // 'socialToken'을 'data'로 전달
+      )
+        .then((response) => {
+          localStorage.setItem("accessToken", response.data.accessToken);
+          localStorage.setItem("userEmail", response.data.userEmail);
+          localStorage.setItem("userProfile", response.data.userProfile);
+          localStorage.setItem("role", response.data.role);
+
+          alert("소셜 로그인 성공");
+          // 이후 대시보드로 리디렉션
+          window.location.href = "/";
+        })
+        .catch((error) => {
+          alert("소셜 로그인 실패");
+        });
+    }
+  }, [tokenFromRedirect]);
+
 
   // 로그인 처리 함수
   const handleLogin = async () => {

@@ -3,8 +3,10 @@ package org.example.backend.security;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.backend.api.user.model.dto.UserLoginResponse;
 import org.example.backend.api.user.model.entity.User;
 import org.example.backend.api.user.repository.UserRepository;
 import org.example.backend.api.user.service.TokenManagementService;
@@ -31,8 +33,10 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         User user = userRepository.findByUserEmail(userEmail)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        tokenManagementService.handleSuccessfulLogin(user, response);
+        UserLoginResponse userLoginResponse = tokenManagementService.handleSuccessfulLogin(user, response);
+
+        String accessToken = userLoginResponse.getAccessToken();
         // 메인 페이지로 리디렉션
-        response.sendRedirect("/api/recipes");
+        response.sendRedirect("http://localhost:5173/signin?socialtoken="+accessToken);
     }
 }
