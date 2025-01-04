@@ -8,8 +8,13 @@ import { area } from "../data/area";
 
 const MyPage: React.FC = () => {
   // 상태 관리
-  const { user, fetchUserData, updateUserInfoWithFile, deleteUserAccount, setUser } =
-    useUser();
+  const {
+    user,
+    fetchUserData,
+    updateUserInfoWithFile,
+    deleteUserAccount,
+    setUser,
+  } = useUser();
   const [nickname, setNickname] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -80,18 +85,25 @@ const MyPage: React.FC = () => {
         : "전화번호는 000-0000-0000 형식으로 입력해주세요."
     );
 
-    console.log("passwordcheck:",validatePassword(password) || password === "");
-    console.log("passwordconfirmcheck:",(validateConfirmPassword(password, confirmPassword) ||
-    (password === null &&
-      confirmPassword === null)));
-    console.log("phonecheck:",validatePhone(phone) || phone === user?.userPhone);
+    console.log(
+      "passwordcheck:",
+      validatePassword(password) || password === ""
+    );
+    console.log(
+      "passwordconfirmcheck:",
+      validateConfirmPassword(password, confirmPassword) ||
+        (password === null && confirmPassword === null)
+    );
+    console.log(
+      "phonecheck:",
+      validatePhone(phone) || phone === user?.userPhone
+    );
 
     // 폼이 모두 유효한지 체크
     setFormValid(
       (validatePassword(password) || password === "") &&
         (validateConfirmPassword(password, confirmPassword) ||
-          (password === "" &&
-            confirmPassword === "")) &&
+          (password === "" && confirmPassword === "")) &&
         (validatePhone(phone) || phone === user?.userPhone)
     );
     console.log("formvaild:", formValid);
@@ -129,7 +141,7 @@ const MyPage: React.FC = () => {
       setEmail(user.userEmail);
       setNickname(user.userNickname || "");
       setPhone(user.userPhone || "");
-  
+
       // user.userAddress가 유효한 경우에만 split 호출
       if (user.userAddress) {
         const addressParts = user.userAddress.split(" ");
@@ -140,7 +152,7 @@ const MyPage: React.FC = () => {
         setSelectedArea("지역");
         setSelectedSubArea("시, 군, 구");
       }
-  
+
       setProfileImage(user.userProfile || null);
     }
   }, [user]);
@@ -155,7 +167,7 @@ const MyPage: React.FC = () => {
       userPhone: phone,
       userAddress: fullAddress,
       userPassword: password, // password가 비어있지 않을 때만 추가
-      userProfile: profileImage
+      userProfile: profileImage || "",
     };
 
     if (!formValid) {
@@ -175,7 +187,6 @@ const MyPage: React.FC = () => {
         selectedFile
       );
 
-      
       Swal.fire({
         icon: "success",
         title: "프로필 업데이트 완료",

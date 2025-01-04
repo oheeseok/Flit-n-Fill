@@ -5,7 +5,6 @@ import Swal from "sweetalert2";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
-
 // 사용자 타입 정의
 interface User {
   userId: number;
@@ -82,17 +81,13 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
 
     try {
       console.log("Updating user info:", updatedUser);
-      const response = await axios.put(
-        `${apiUrl}/api/user/info`,
-        updatedUser,
-        {
-          withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-            userEmail: localStorage.getItem("userEmail"),
-          },
-        }
-      );
+      const response = await axios.put(`${apiUrl}/api/user/info`, updatedUser, {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          userEmail: localStorage.getItem("userEmail"),
+        },
+      });
 
       if (response.status === 200) {
         console.log("User info updated successfully:", response.data);
