@@ -112,6 +112,7 @@
 .fridge-register-radio-group {
   display: flex;
   gap: 10px;
+  justify-content: center;
 }
 
 .fridge-register-radio-group label {

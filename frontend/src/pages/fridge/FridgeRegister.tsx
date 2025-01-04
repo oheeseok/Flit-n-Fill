@@ -174,6 +174,14 @@ const FridgeRegister = () => {
     ingredientType,
   ]);
 
+  useEffect(() => {
+    // 오늘 날짜를 구하고 YYYY-MM-DD 형식으로 변환
+    const today = new Date();
+    const formattedDate = today.toISOString().split("T")[0]; // YYYY-MM-DD 형식
+    setExpirationDate(formattedDate); // 기본값으로 설정
+    setManufactureDate(formattedDate);
+  }, []);
+
   const handleRegister = (): void => {
     // 유효성 검사 함수
     const validateInput = (): boolean => {
