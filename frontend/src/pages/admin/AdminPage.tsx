@@ -90,7 +90,7 @@ const AdminPage = () => {
         prevRequests.map((request) =>
           request.requestId === requestId
             ? { ...request, isOpen: !request.isOpen } // 클릭 시 상세 정보 토글
-            : request
+            : { ...request, isOpen: false}
         )
       );
     } catch (error) {
@@ -168,7 +168,15 @@ const AdminPage = () => {
 
               {/* 요청 상세 정보 토글 */}
               {request.isOpen && (
-                <div className="request-detail">
+                <div
+                  className="request-detail"
+                  style={{
+                    backgroundColor: "#fff",
+                    borderRadius: "5px", // 둥근 모서리
+                    marginRight: "50px",
+                    width: "500px",
+                  }}
+                >
                   <p>
                     <strong>Request ID:</strong> {request.requestId}
                   </p>
@@ -179,7 +187,16 @@ const AdminPage = () => {
                     <strong>Request Type:</strong> {request.requestType}
                   </p>
                   <p>
-                    <strong>Request Content:</strong> {request.requestContent}
+                    <strong>Request Content:</strong>
+                    <span
+                      style={{
+                        display: "block", // 텍스트가 블록 요소로 처리되어 줄 바꿈을 할 수 있도록
+                        wordWrap: "break-word", // 긴 단어가 자동으로 줄 바꿈되도록
+                        whiteSpace: "normal", // 텍스트가 공백을 기준으로 줄 바꿈되도록
+                      }}
+                    >
+                      {request.requestContent}
+                    </span>
                   </p>
                   <p>
                     <strong>Reported User ID:</strong> {request.reportedUserId}
