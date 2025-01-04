@@ -31,6 +31,7 @@ interface UserContextType {
       userPassword: string;
       userPhone: string;
       userAddress: string;
+      userProfile: string;
     },
     userProfileFile: File | null
   ) => Promise<User>; // 반환 타입을 `Promise<User>`로 수정
@@ -114,6 +115,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
       userPassword: string;
       userPhone: string;
       userAddress: string;
+      userProfile: string;
     },
     userProfileFile: File | null
   ): Promise<User> => {

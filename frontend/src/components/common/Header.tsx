@@ -4,7 +4,6 @@ import Swal from "sweetalert2";
 import Icon from "../../assets/icon.png";
 import "../../styles/common/Header.css";
 import NotificationPopup from "../../pages/NotificationPopup";
-import axios from "axios";
 
 import { useSSEContext } from "../../context/SSEContext";
 const apiUrl = import.meta.env.VITE_API_URL;
@@ -34,18 +33,11 @@ const Header = () => {
         if (userEmail) {
           const userUrl = `${apiUrl}/api/subscribe/${userEmail}`;
           stopSSE(userUrl); // SSE 연결 종료
-
-          axios.get(`${apiUrl}/api/user/logout`, {
-            withCredentials: true,
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-              userEmail: localStorage.getItem("userEmail"),
-            },
-          })
         }
         localStorage.clear();
         setIsLoggedIn(false);
         Swal.fire("로그아웃 완료", "로그아웃 되었습니다.", "success");
+        stopSSE(); // SSE 연결 종료
         navigate("/");
       }
     });
