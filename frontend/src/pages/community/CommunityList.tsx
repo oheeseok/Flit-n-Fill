@@ -80,11 +80,13 @@ const CommunityList: React.FC<CommunityListProps> = ({ filter }) => {
             <div className="recipe-list-box-card">
               <div className="recipe-list-box-card-img-container">
                 {post.postPhoto1 ? (
+                  <Link to={`/community/detail/${post.postId}`}>
                   <img
                     className="recipe-list-box-card-img"
                     src={post.postPhoto1}
                     alt={post.postTitle}
                   />
+                  </Link>
                 ) : (
                   <p>이미지가 없습니다.</p>
                 )}

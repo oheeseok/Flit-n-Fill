@@ -75,11 +75,13 @@ const MyRecipes = () => {
             </div>
             <div className="recipe-list-box-card">
               <div className="recipe-list-box-card-img-container">
+                <Link to={`/recipe/detail/${recipe.recipeId}`}>
                 <img
                   className="recipe-list-box-card-img"
                   src={recipe.recipeMainPhoto || "/placeholder.jpg"}
                   alt={recipe.recipeTitle}
                 />
+                </Link>
               </div>
               <div className="recipe-list-box-card-profile-container">
                 <div
