@@ -108,7 +108,12 @@ public class AdminService {
             throw new RequestNotFoundException("요청이 없거나 아직 대기상태입니다.");
         }
 
-        emailService.sendEmail(user.getUserEmail(), subject, content.toString());
+        try {
+            emailService.sendEmail(user.getUserEmail(), subject, content.toString());
+        }
+        catch (Exception e) {
+            log.error("Error sending email");
+        }
         pushNotificationService.sendPushNotification(user.getUserEmail(), message);
 
         notificationService.saveRequestNotification(

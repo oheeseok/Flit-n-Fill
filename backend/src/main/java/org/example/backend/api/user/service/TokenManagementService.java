@@ -54,7 +54,7 @@ public class TokenManagementService {
             isBlacked = true;
         }
 
-        return new UserLoginResponse(accessToken, refreshToken, user.getUserEmail(), user.getUserProfile(), isBlacked, blacklistUser);
+        return new UserLoginResponse(accessToken, refreshToken, user.getUserEmail(), user.getUserProfile(), isBlacked, blacklistUser, user.getRole());
     }
 
     // 쿠키 추가
