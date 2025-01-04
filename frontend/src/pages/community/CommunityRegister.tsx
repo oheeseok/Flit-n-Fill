@@ -89,8 +89,10 @@ const CommunityRegister = () => {
             userEmail: localStorage.getItem("userEmail"),
           },
         });
+        const filteredItems = response.data.filter((item) => item.foodListId !== null)
+
         const uniqueItems = Array.from(
-          new Map(response.data.map((item) => [item.foodListName, item])).values()
+          new Map(filteredItems.map((item) => [item.foodListName, item])).values()
         );
 
         console.log("fridge items: ", response.data)
@@ -102,6 +104,18 @@ const CommunityRegister = () => {
     };
 
     fetchFridgeItems();
+  }, []);
+
+  // 현재 시각을 ISO 8601 형식으로 변환
+  useEffect(() => {
+    const now = new Date();
+    
+    // 한국 표준시(KST)로 변환
+    now.setHours(now.getHours() + 9);
+
+    // 현재 시각을 "YYYY-MM-DDTHH:MM" 형식으로 변환
+    const formattedNow = now.toISOString().slice(0, 16); // 날짜와 시간을 추출
+    setMeetingTime(formattedNow);
   }, []);
 
   const handleRegister = async () => {
@@ -223,6 +237,7 @@ const CommunityRegister = () => {
           uploadedImage={uploadedImage1}
         />
       </div>
+      거래 장소
       {/* 장소 입력 */}
       <input
         type="text"
@@ -232,6 +247,7 @@ const CommunityRegister = () => {
         placeholder="만남 장소를 입력하세요"
       />
       {/* 시간 입력 */}
+      거래 시간
       <input
         type="datetime-local"
         className="community-register-text"
@@ -253,9 +269,8 @@ const CommunityRegister = () => {
           </option>
         ))}
       </select>
-      { category !== "SHARING" && (
-        <div>
           원하는 재료
+      { category !== "SHARING" && (
           <select
             className="community-register-text"
             value={proposerFoodListId}
@@ -268,7 +283,6 @@ const CommunityRegister = () => {
               </option>
             ))}
           </select>
-        </div>
       )}
       
       {/* 내용 입력 */}

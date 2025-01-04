@@ -287,6 +287,8 @@ const FridgeRegister = () => {
     setName("");
     setQuantity("");
     setUnit("PIECE");
+    setExpirationDate("");
+    setManufactureDate("");
     setStorageMethod("REFRIGERATED");
     setRemarks("");
     setAdminRequest("");
@@ -349,8 +351,6 @@ const FridgeRegister = () => {
     setName("");
     setQuantity("");
     setUnit("PIECE");
-    setExpirationDate("");
-    setManufactureDate("");
     setStorageMethod("REFRIGERATED");
     setRemarks("");
     setAdminRequest("");
@@ -367,8 +367,6 @@ const FridgeRegister = () => {
     setName("");
     setQuantity("");
     setUnit("PIECE");
-    setExpirationDate("");
-    setManufactureDate("");
     setStorageMethod("REFRIGERATED");
     setRemarks("");
     setAdminRequest("");
@@ -386,8 +384,6 @@ const FridgeRegister = () => {
     setName("");
     setQuantity("");
     setUnit("PIECE");
-    setExpirationDate("");
-    setManufactureDate("");
     setStorageMethod("REFRIGERATED");
     setRemarks("");
     setAdminRequest("");
@@ -527,10 +523,10 @@ const FridgeRegister = () => {
               />
               <select value={unit} onChange={(e) => setUnit(e.target.value)}>
                 <option value="PIECE">개</option>
-                <option value="L">L</option>
                 <option value="G">g</option>
                 <option value="KG">Kg</option>
                 <option value="ML">mL</option>
+                <option value="L">L</option>
               </select>
             </div>
           </div>
