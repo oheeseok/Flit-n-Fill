@@ -55,11 +55,11 @@ public class EmailService {
     public void sendEmail(String to, String subject, String content) {  // 이메일 전송
         try {
             MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, false, "UTF-8");
+//            MimeMessageHelper helper = new MimeMessageHelper(message, false, "UTF-8");
 
-            helper.setTo(to);    // 이메일 받을 주소
-            helper.setSubject(subject);
-            helper.setText(content, true);
+            message.setRecipients(MimeMessage.RecipientType.TO, to);    // 이메일 받을 주소
+            message.setSubject(subject, "UTF-8");
+            message.setContent(content, "text/html; charset=utf-8");
             mailSender.send(message);
         } catch (Exception e) {
             throw new RuntimeException("이메일 전송 실패", e);
