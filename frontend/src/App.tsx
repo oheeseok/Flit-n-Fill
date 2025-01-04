@@ -20,6 +20,7 @@ import RecipeRegister from "./pages/recipe/RecipeRegister";
 import RecipeList from "./pages/recipe/RecipeList.js";
 import RecipeDetail from "./pages/recipe/RecipeDetail";
 import RecipeEdit from "./pages/recipe/RecipeEdit";
+import MyRecipes from "./pages/MyRecipes.tsx";
 import { GlobalProvider } from "./context/GlobalProvider";
 import Layout from "./components/Layout";
 import "./App.css";
@@ -62,6 +63,16 @@ function App() {
               <PrivateRoute allowedPages={["mypage"]}>
                 <Layout>
                   <MyPage />
+                </Layout>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/myrecipes"
+            element={
+              <PrivateRoute allowedPages={["myrecipes"]}>
+                <Layout>
+                  <MyRecipes />
                 </Layout>
               </PrivateRoute>
             }

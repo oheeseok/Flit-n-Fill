@@ -145,7 +145,7 @@ const Header = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link to="#" onClick={handleMenuClick}>
+                    <Link to="/myrecipes" onClick={handleMenuClick}>
                       내 레시피 목록
                     </Link>
                   </li>
