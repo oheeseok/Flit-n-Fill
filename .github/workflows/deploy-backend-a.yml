@@ -107,7 +107,7 @@ jobs:
                 -e DB_PASSWORD=1234 \
                 -e MONGODB_URI=mongodb://mongodb:27017/mydb2 \
                 -e REDIS_HOST=redis-container \
-                -e OAUTH2_REDIRECT_HOST=www.ckdgkim.kro.kr:8080 \
+                -e OAUTH2_REDIRECT_HOST=www.flitnfill.kro.kr:8080 \
                 ckdgkim/backendproject:back-${{ env.TAG }}
 
               exit
