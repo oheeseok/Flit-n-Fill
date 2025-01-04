@@ -37,7 +37,6 @@ const Header = () => {
         localStorage.clear();
         setIsLoggedIn(false);
         Swal.fire("로그아웃 완료", "로그아웃 되었습니다.", "success");
-        stopSSE(); // SSE 연결 종료
         navigate("/");
       }
     });
