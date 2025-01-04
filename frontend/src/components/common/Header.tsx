@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Swal from "sweetalert2";
 import Icon from "../../assets/icon.png";
 import "../../styles/common/Header.css";
@@ -12,35 +12,10 @@ const apiUrl = import.meta.env.VITE_API_URL;
 const Header = () => {
   const { stopSSE } = useSSEContext();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [showNotification, setShowNotification] = useState<boolean>(false);
   const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
-
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    const userProfile = localStorage.getItem("userProfile");
-
-    if (token) {
-      setIsLoggedIn(true);
-    }
-
-    // userProfile이 null이면 기본 아이콘, 아니면 userProfile에 저장된 이미지 불러오기
-    if (userProfile !== "undefined" && userProfile !== null) {
-      setProfileImage(userProfile);
-    } else {
-      setProfileImage("/assets/user-icon.png"); // 기본 아이콘
-    }
-  }, []);
-
-  const toggleNotification = () => {
-    setShowNotification((prev) => !prev);
-  };
-
-  const toggleUserMenu = () => {
-    setShowUserMenu((prev) => !prev);
-  };
 
   const handleLogout = () => {
     Swal.fire({
@@ -72,6 +47,59 @@ const Header = () => {
     toggleUserMenu();
   };
 
+  const menuRef = useRef<HTMLDivElement>(null); // 메뉴 참조
+  const navigate = useNavigate();
+
+  // 외부 클릭 감지 핸들러
+  const handleClickOutside = (event: MouseEvent) => {
+    if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+      setShowUserMenu(false); // 메뉴 닫기
+    }
+  };
+
+  // 이벤트 리스너 추가 및 제거
+  useEffect(() => {
+    if (showUserMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showUserMenu]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    const userProfile = localStorage.getItem("userProfile");
+
+    if (token) {
+      setIsLoggedIn(true);
+    }
+
+    // userProfile이 null이면 기본 아이콘, 아니면 userProfile에 저장된 이미지 불러오기
+    if (userProfile !== "undefined" && userProfile !== null) {
+      setProfileImage(userProfile);
+    } else {
+      setProfileImage("/assets/user-icon.png"); // 기본 아이콘
+    }
+
+    if (localStorage.getItem("role") === "ADMIN") {
+      setIsAdmin(true);
+    } else {
+      setIsAdmin(false);
+    }
+  }, []);
+
+  const toggleNotification = () => {
+    setShowNotification((prev) => !prev);
+  };
+
+  const toggleUserMenu = () => {
+    setShowUserMenu((prev) => !prev);
+  };
+
   return (
     <div className="header">
       <Link to="/" className="logo">
@@ -83,7 +111,7 @@ const Header = () => {
         <Link to="/recipe">recipe</Link>
         <Link to="/community">community</Link>
         <Link to="/cart">cart</Link>
-        <Link to="/adminpage">adminpage</Link>{" "}
+        {isLoggedIn && isAdmin && <Link to="/adminpage">adminpage</Link>}
         {/* adminpage로 이동하는 링크 추가 */}
         {/* 로그인 상태에 따라 메뉴 다르게 표시 */}
         {isLoggedIn ? (
@@ -94,19 +122,19 @@ const Header = () => {
               onClick={toggleNotification}
             >
               <img src="/assets/notification-icon.png" alt="notification" />
-            </a>
+            
             {/* 알림 팝업 */}
             {showNotification && (
               <NotificationPopup setShowNotification={setShowNotification} />
             )}
-
+            </a>
             {/* 사용자 메뉴 버튼 */}
             <a href="#" className="header-user" onClick={toggleUserMenu}>
               <img src={profileImage || "/assets/user-icon.png"} alt="user" />
-            </a>
+            
             {/* 사용자 메뉴창 */}
             {showUserMenu && (
-              <div className="header-user-menu">
+              <div className="header-user-menu" ref={menuRef}>
                 <ul>
                   <li>
                     <Link to="/mypage" onClick={handleMenuClick}>
@@ -120,7 +148,7 @@ const Header = () => {
                   </li>
                   <li>
                     <Link to="#" onClick={handleMenuClick}>
-                      내 거래글 보기
+                      내 거래방 보기
                     </Link>
                   </li>
                   <li>
@@ -136,6 +164,7 @@ const Header = () => {
                 </ul>
               </div>
             )}
+            </a>
           </>
         ) : (
           <>

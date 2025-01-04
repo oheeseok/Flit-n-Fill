@@ -29,14 +29,14 @@ interface FoodListViewDto {
 }
 
 interface  LocationState {
-  bucketItemId: number;
+  bucketItemId?: number;
 }
 
 const CommunityRegister = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
   const location = useLocation();
-  const { bucketItemId } = location.state as LocationState;
+  const { bucketItemId } = location.state as LocationState || {};
 
   // 상태 관리
   const [uploadedImage1, setUploadedImage1] = useState<File | null>(null);

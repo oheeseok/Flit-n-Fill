@@ -357,7 +357,7 @@ public class RecipeService {
     LocalDate startDate = today.minusDays(2);
     LocalDate endDate = today.plusDays(3);
     // 소비기한이 임박한 food 조회
-    List<Food> foodByExpDateRange = myfridgeRepository.findFoodByExpDateRange(startDate, endDate);
+    List<Food> foodByExpDateRange = myfridgeRepository.findByUser_UserIdAndFoodExpDateBetween(userId, startDate, endDate);
 
     // 동일한 이름의 food가 존재하면, 소비기한이 가장 짧은 것만 남기고 중복 제거
     Map<String, Food> filteredFoodMap = new HashMap<>();
@@ -460,6 +460,31 @@ public class RecipeService {
           User user = recipe.getUserId() != null ? userRepository.findById(recipe.getUserId()).orElse(null) : null;
           RecipeSimpleDto recipeSimpleDto = RecipeSimpleDto.of(recipe, user);
           recipeSimpleDto.setRecipeIsBookmarked(true);
+          return recipeSimpleDto;
+        })
+        .collect(Collectors.toList());
+  }
+
+  public List<RecipeSimpleDto> searchRecipesByFoods(Long userId, List<String> foods) {
+    List<String> bookmarkedRecipeIds = bookmarkedRecipeRepository.findRecipeIdsByUserId(userId);
+
+    // 동적 Criteria 생성
+    List<Criteria> foodCriteriaList = foods.stream()
+            .map(food -> Criteria.where("recipeFoodDetails").regex("(?i).*" + food + ".*"))
+            .toList();
+
+    // 모든 조건을 AND로 묶음
+    Criteria criteria = new Criteria().andOperator(foodCriteriaList.toArray(new Criteria[0]));
+
+    // MongoDB Query 생성
+    Query query = new Query(criteria);
+    List<Recipe> recipes = mongoTemplate.find(query, Recipe.class);
+
+    return recipes.stream()
+        .map(recipe -> {
+          User user = recipe.getUserId() != null ? userRepository.findById(recipe.getUserId()).orElse(null) : null;
+          RecipeSimpleDto recipeSimpleDto = RecipeSimpleDto.of(recipe, user);
+          recipeSimpleDto.setRecipeIsBookmarked(bookmarkedRecipeIds.contains(recipeSimpleDto.getRecipeId()));
           return recipeSimpleDto;
         })
         .collect(Collectors.toList());

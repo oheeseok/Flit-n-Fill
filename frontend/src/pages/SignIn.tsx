@@ -10,6 +10,7 @@ interface UserLoginResponse {
   userProfile: string;
   blacked: boolean;
   blacklistExpiryDate: Date;
+  role: string;
 }
 
 const SignIn: React.FC = () => {
@@ -39,6 +40,7 @@ const SignIn: React.FC = () => {
       localStorage.setItem("accessToken", response.data.accessToken);
       localStorage.setItem("userEmail", response.data.userEmail);
       localStorage.setItem("userProfile", response.data.userProfile);
+      localStorage.setItem("role", response.data.role);
 
       console.log("response data:", response.data);
       if (response.data.blacked) {
@@ -107,11 +109,6 @@ const SignIn: React.FC = () => {
             value={password}
             onChange={handleChangePassword}
           />
-
-          <label>
-            <input type="checkbox" />
-            Remember your id
-          </label>
 
           <button onClick={handleLogin}>Log In</button>
 

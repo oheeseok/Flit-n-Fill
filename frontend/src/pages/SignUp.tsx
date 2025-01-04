@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import "../styles/common/SignUp.css";
+import { area } from "../data/area";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const SignUp = () => {
@@ -11,18 +12,44 @@ const SignUp = () => {
   const [password, setPassword] = useState<string>("");
   const [nickname, setNickname] = useState<string>(""); // 추가된 상태: Nickname
   const [phone, setPhone] = useState<string>(""); // 추가된 상태: Phone
-  const [address, setAddress] = useState<string>(""); // 추가된 상태: Address
+
+  const [selectedArea, setSelectedArea] = useState<string>("");
+  const [selectedSubArea, setSelectedSubArea] = useState<string>("");
+  const [selectWidth, setSelectWidth] = useState<number>(200); // 초기값 설정
+
+  const areaSelectRef = useRef<HTMLSelectElement>(null);
+
+  // 선택된 지역에 따라 하위 지역 목록을 가져옴
+  const subAreas =
+    area.find((area) => area.name === selectedArea)?.subArea || [];
+
+  // 이벤트 핸들러
+  const handleAreaChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedArea(e.target.value);
+    setSelectedSubArea(""); // 새로운 지역 선택 시 하위 지역 초기화
+  };
+
+  const handleSubAreaChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedSubArea(e.target.value);
+  };
+
+  useEffect(() => {
+    if (areaSelectRef.current) {
+      setSelectWidth(areaSelectRef.current.offsetWidth); // 첫 번째 select의 너비를 계산
+    }
+  }, [selectedArea]);
 
   // Sign Up 요청 처리 함수
   const handleSignUp = async () => {
     try {
+      const fullAddress = `${selectedArea} ${selectedSubArea}`;
       const response = await axios.post(`${apiUrl}/api/user/register`, {
         userName: name,
         userEmail: email,
         userPassword: password,
         userNickname: nickname, // Nickname 포함
         userPhone: phone, // Phone 포함
-        userAddress: address, // Address 포함
+        userAddress: fullAddress,
       });
       console.log("회원가입 성공:", response.data); // response 사용
       // 성공 시 처리
@@ -83,11 +110,6 @@ const SignUp = () => {
     setPhone(e.target.value);
   };
 
-  // Address 입력 값 변경 처리
-  const handleChangeAddress = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setAddress(e.target.value);
-  };
-
   return (
     <>
       <div className="signupbody">
@@ -146,14 +168,36 @@ const SignUp = () => {
 
           {/* Address 입력 */}
           <div className="signup-text-address">Address</div>
-          <input
-            type="text"
-            className="signup-text-address-input"
-            placeholder="Enter your address"
-            value={address}
-            onChange={handleChangeAddress}
-          />
+          <div className="select-container">
+            <select
+              ref={areaSelectRef}
+              value={selectedArea}
+              onChange={handleAreaChange}
+              style={{ width: `${selectWidth}px` }} // 고정된 너비 적용
+            >
+              <option value="">지역</option>
+              {area.map((area) => (
+                <option key={area.name} value={area.name}>
+                  {area.name}
+                </option>
+              ))}
+            </select>
 
+            {selectedArea && (
+              <select
+                value={selectedSubArea}
+                onChange={handleSubAreaChange}
+                style={{ width: `${selectWidth}px` }}
+              >
+                <option value="">시, 군, 구</option>
+                {subAreas.map((subArea) => (
+                  <option key={subArea} value={subArea}>
+                    {subArea}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
           {/* Sign Up 버튼 */}
           <div className="signup-button-container">
             <button className="signup-button-login" onClick={handleSignUp}>

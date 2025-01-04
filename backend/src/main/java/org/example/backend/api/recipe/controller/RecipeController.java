@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -27,6 +28,9 @@ public class RecipeController {
     public ResponseEntity<Object> getAllRecipes(HttpServletRequest request,
                                                 @RequestParam(value = "search-query", required = false) String keyword,
                                                 @RequestParam(value = "src", required = false) String src,
+                                                @RequestParam(value = "food1", required = false) String food1,
+                                                @RequestParam(value = "food2", required = false) String food2,
+                                                @RequestParam(value = "food3", required = false) String food3,
                                                 @RequestParam(value = "page", defaultValue = "0") int page,  // 기본 값 0
                                                 @RequestParam(value = "size", defaultValue = "18") int size) {
         log.info("Received search query: {}", keyword); // 검색어 로그
@@ -36,7 +40,17 @@ public class RecipeController {
         }
 
         Object result;
-        if (keyword != null && ! keyword.isEmpty()) {
+
+        List<String> foods = Arrays.asList(food1, food2, food3)
+            .stream()
+            .filter(food -> food != null && !food.isEmpty())
+            .toList();
+
+        // food1 ~ food5가 포함된 경우 처리
+        if (!foods.isEmpty()) {
+            result = recipeService.searchRecipesByFoods(userId, foods);
+        }
+        else if (keyword != null && ! keyword.isEmpty()) {
             // src이 null이 아니면 src와 keyword를 모두 사용하여 검색
             if ("youtube".equals(src)) {
                 result = recipeService.searchYoutubeRecipes(keyword);

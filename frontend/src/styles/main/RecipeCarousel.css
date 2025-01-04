@@ -43,8 +43,8 @@
   color: white;
   border: none;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -64,12 +64,12 @@
 
 .carousel-button:nth-of-type(1) {
   top: -190px;
-  left: 34%; /* 왼쪽 버튼 위치 */
+  left: 34%;
 }
 
 .carousel-button:nth-of-type(2) {
   top: -190px;
-  right: 34%; /* 오른쪽 버튼 위치 */
+  right: 34%;
 }
 
 .carousel-navigation {
