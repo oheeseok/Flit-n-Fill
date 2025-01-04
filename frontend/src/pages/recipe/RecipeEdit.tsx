@@ -70,6 +70,7 @@ const RecipeEdit = () => {
   }, [id]);
 
   const handleSave = async () => {
+    console.log("Recipe methods before submission:", recipeMethods);
     if (!recipeTitle.trim()) {
       Swal.fire({
         icon: "info",
@@ -111,41 +112,38 @@ const RecipeEdit = () => {
     }
 
     try {
-      const formData = new FormData();
-
-      // 레시피 데이터 생성
       const recipeUpdateDto = {
         recipeTitle,
         recipeFoodDetails: recipeIngredients,
-        recipeSteps: recipeMethods.map((method) => {
-          if (method.photo && typeof method.photo === "string") {
-            // 이미지 URL이 있으면 그대로 사용
-            if (method.photo !== "") {
-              return {
-                seq: method.seq,
-                description: method.description,
-                photo: method.photo, // method.photo,
-              };
-            } else {
-              return {
-                seq: method.seq,
-                description: method.description,
-                photo: RECIPE_STEP_DEFAULT_IMG_URL,
-              };
-            }
-          } else {
-            // method.photo가 undefined일 경우
-            return {
-              seq: method.seq,
-              description: method.description,
-              photo: RECIPE_STEP_DEFAULT_IMG_URL,
-            };
+        recipeSteps: recipeMethods.map((method, idx) => {
+          let photoUrl = method.photo;
+
+          // `File` 객체인 경우 URL 생성
+          if (method.photo instanceof File) {
+            photoUrl = URL.createObjectURL(method.photo);
           }
+
+          return {
+            seq: idx + 1,
+            description: method.description || "",
+            photo: photoUrl || RECIPE_STEP_DEFAULT_IMG_URL, // URL 또는 기본 이미지
+          };
         }),
       };
 
+      recipeUpdateDto.recipeSteps.forEach((step, index) => {
+        console.log(`Step ${index + 1}:`, {
+          seq: step.seq,
+          description: step.description,
+          photo: step.photo,
+        });
+      });
+
+      const formData = new FormData();
+      // DTO 확인
+      console.log("Generated recipeUpdateDto:", recipeUpdateDto);
+
       formData.append("recipeUpdateDto", JSON.stringify(recipeUpdateDto));
-      console.log(recipeUpdateDto.recipeSteps); // 업데이트 전 기존 recipeMethods
 
       // 메인 이미지 파일 추가
       if (recipeImage instanceof File) {
@@ -153,6 +151,7 @@ const RecipeEdit = () => {
       }
 
       const stepPhotos = recipeMethods.map((method) => method.photo);
+
       stepPhotos.forEach((photo) => {
         if (typeof photo === "string" && photo) {
           // photo가 string이고 빈 문자열이 아니면 처리
@@ -166,11 +165,23 @@ const RecipeEdit = () => {
         }
       });
 
-      // for (var key of formData.keys()) {
-      //   console.log("formData key: ", key);
-      //   console.log("formData value: ", formData.get(key));
-      // }
+      console.log("Final Recipe Update DTO:", recipeUpdateDto);
 
+      formData.append(
+        "recipeStepPhotos",
+        new Blob(["Test content"], { type: "text/plain" })
+      );
+      
+      for (const [key, value] of formData.entries()) {
+        if (value instanceof Blob) {
+          console.log(`${key} is a Blob:`, {
+            size: value.size,
+            type: value.type,
+          });
+        } else {
+          console.log(`${key}:`, value);
+        }
+      }
       // 서버에 PUT 요청 (axios 사용)
       const response = await axios.put(`/api/recipes/${id}`, formData, {
         headers: {
@@ -180,7 +191,7 @@ const RecipeEdit = () => {
         },
         withCredentials: true,
       });
-
+      console.log("Recipe updated successfully:", response.data);
       if (response.status === 200) {
         Swal.fire({
           icon: "success",
@@ -210,11 +221,16 @@ const RecipeEdit = () => {
   };
 
   const delRecipeMethod = (index: number) => {
-    setRecipeMethods((prevMethods) =>
-      prevMethods
+    setRecipeMethods((prevMethods) => {
+      const deletedMethod = prevMethods[index];
+      console.log("Deleted method:", deletedMethod);
+
+      const updatedMethods = prevMethods
         .filter((_, i) => i !== index)
-        .map((method, idx) => ({ ...method, seq: idx + 1 }))
-    );
+        .map((method, idx) => ({ ...method, seq: idx + 1 }));
+
+      return updatedMethods;
+    });
   };
 
   const handleImageChange = (file: File | null) => {
