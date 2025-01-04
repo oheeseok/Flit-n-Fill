@@ -67,19 +67,42 @@ const RecipeList = () => {
     }
   }, [isLoading, hasMore, currentPage, fetchRecipes, searchQuery]);
 
+  // 무한 스크롤 이벤트 설정
   useEffect(() => {
     const handleScroll = () => {
       if (
         window.innerHeight + document.documentElement.scrollTop >=
         document.documentElement.offsetHeight - 200
       ) {
-        loadMoreRecipes();
+        if (
+          !isLoading &&
+          hasMore &&
+          (!showBookmarksOnly || displayedRecipes.length >= PAGE_SIZE)
+        ) {
+          const currentScrollY = window.scrollY;
+
+          // 데이터 로드 후 스크롤 위치 복원
+          loadMoreRecipes().then(() => {
+            setTimeout(() => {
+              window.scrollTo(0, currentScrollY);
+            }, 0);
+          });
+        }
       }
     };
 
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [loadMoreRecipes]);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [
+    loadMoreRecipes,
+    isLoading,
+    hasMore,
+    showBookmarksOnly,
+    displayedRecipes.length,
+  ]);
 
   // 북마크 클릭 핸들러 (즉시 반영)
   const handleBookmarkClick = async (recipeId: string) => {
@@ -96,6 +119,9 @@ const RecipeList = () => {
 
     setDisplayedRecipes(filteredRecipes);
 
+    if (showBookmarksOnly) {
+      setHasMore(filteredRecipes.length >= PAGE_SIZE);
+    }
     try {
       await toggleBookmark(recipeId);
     } catch (error) {
@@ -144,11 +170,13 @@ const RecipeList = () => {
             </div>
             <div className="recipe-list-box-card">
               <div className="recipe-list-box-card-img-container">
-                <img
-                  className="recipe-list-box-card-img"
-                  src={recipe.recipeMainPhoto || "/placeholder.jpg"}
-                  alt={recipe.recipeTitle}
-                />
+                <Link to={`/recipe/detail/${recipe.recipeId}`}>
+                  <img
+                    className="recipe-list-box-card-img"
+                    src={recipe.recipeMainPhoto || "/placeholder.jpg"}
+                    alt={recipe.recipeTitle}
+                  />
+                </Link>
               </div>
               <div className="recipe-list-box-card-profile-container">
                 <div
@@ -187,14 +215,6 @@ const RecipeList = () => {
           </div>
         ))}
       </div>
-
-      {/* 무한 스크롤 로드 버튼 */}
-      {hasMore && !isLoading && (
-        <div className="load-more-container">
-          <button onClick={loadMoreRecipes}>Load More</button>
-        </div>
-      )}
-      {isLoading && <div>Loading...</div>}
     </>
   );
 };
