@@ -12,6 +12,7 @@ const apiUrl = import.meta.env.VITE_API_URL;
 const Header = () => {
   const { stopSSE } = useSSEContext();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [showNotification, setShowNotification] = useState<boolean>(false);
   const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -83,6 +84,12 @@ const Header = () => {
     } else {
       setProfileImage("/assets/user-icon.png"); // 기본 아이콘
     }
+
+    if (localStorage.getItem("role") === "ADMIN") {
+      setIsAdmin(true);
+    } else {
+      setIsAdmin(false);
+    }
   }, []);
 
   const toggleNotification = () => {
@@ -104,7 +111,7 @@ const Header = () => {
         <Link to="/recipe">recipe</Link>
         <Link to="/community">community</Link>
         <Link to="/cart">cart</Link>
-        <Link to="/adminpage">adminpage</Link>{" "}
+        {isLoggedIn && isAdmin && <Link to="/adminpage">adminpage</Link>}
         {/* adminpage로 이동하는 링크 추가 */}
         {/* 로그인 상태에 따라 메뉴 다르게 표시 */}
         {isLoggedIn ? (
