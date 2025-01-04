@@ -287,8 +287,6 @@ const FridgeRegister = () => {
     setName("");
     setQuantity("");
     setUnit("PIECE");
-    setExpirationDate("");
-    setManufactureDate("");
     setStorageMethod("REFRIGERATED");
     setRemarks("");
     setAdminRequest("");

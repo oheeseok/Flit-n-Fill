@@ -15,6 +15,7 @@ interface RecipeStepDto {
 }
 
 const RecipeEdit = () => {
+  const apiUrl = import.meta.env.VITE_API_URL;
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
@@ -27,7 +28,7 @@ const RecipeEdit = () => {
 
   const fetchRecipeDetail = async () => {
     try {
-      const response = await axios.get(`/api/recipes/${id}`, {
+      const response = await axios.get(`${apiUrl}/api/recipes/${id}`, {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -185,7 +186,7 @@ const RecipeEdit = () => {
       });
 
       // 서버에 PUT 요청 (axios 사용)
-      const response = await axios.put(`/api/recipes/${id}`, formData, {
+      const response = await axios.put(`${apiUrl}/api/recipes/${id}`, formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           userEmail: localStorage.getItem("userEmail"),

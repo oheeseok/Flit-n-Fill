@@ -140,7 +140,7 @@ const CommunityRegister = () => {
       console.log("formData: ", formData)
 
       const response = await axios.post(
-        "/api/posts",
+        `${apiUrl}/api/posts`,
         formData,
         {
           withCredentials: true,

@@ -17,6 +17,7 @@ interface RecipeStepDto {
 }
 
 const RecipeRegister = () => {
+  const apiUrl = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
   // const { addRecipe } = useRecipe();
 
@@ -77,7 +78,7 @@ const RecipeRegister = () => {
       });
 
       // API 요청
-      const response = await axios.post("/api/recipes", formData, {
+      const response = await axios.post(`${apiUrl}/api/recipes`, formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           userEmail: localStorage.getItem("userEmail"),
