@@ -26,6 +26,7 @@ public class PostSimpleDto {
     private String address;
     private Progress progress;
     private String postContent;
+    private String userEmail;
 
     public static PostSimpleDto of(Post post, User user) {
         PostSimpleDto dto = new PostSimpleDto();
@@ -37,12 +38,15 @@ public class PostSimpleDto {
         dto.setAddress(post.getAddress());
         dto.setProgress(post.getProgress());
         dto.setPostContent(post.getPostContent());
+
         if (user != null) {
             dto.setUserNickname(user.getUserNickname());
             dto.setUserProfile(user.getUserProfile());
+            dto.setUserEmail(user.getUserEmail());
         } else {
             dto.setUserNickname(null);
             dto.setUserProfile(null);
+            dto.setUserEmail(null);
         }
         return dto;
     }
