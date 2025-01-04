@@ -4,6 +4,8 @@ import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.backend.api.user.model.entity.User;
+import org.example.backend.api.user.model.entity.UserCart;
+import org.example.backend.api.user.repository.UserCartRepository;
 import org.example.backend.api.user.repository.UserRepository;
 import org.example.backend.security.model.OAuth2UserInfo;
 import org.example.backend.security.model.PrincipalDetails;
@@ -21,6 +23,7 @@ import java.util.Map;
 @Slf4j
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private final UserRepository userRepository;
+    private final UserCartRepository userCartRepository;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -64,8 +67,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         try {
             OAuth2UserInfo userInfo = OAuth2UserInfo.of(registrationId, attributes);
+            User user = userRepository.save(userInfo.toEntity());
 
-            return userRepository.save(userInfo.toEntity());
+            UserCart userCart = new UserCart();
+            userCart.setUser(user);
+            userCartRepository.save(userCart);
+
+            return user;
         } catch (AuthException e) {
             throw new OAuth2AuthenticationException("Failed to register new user by social account.");
         }

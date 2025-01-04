@@ -46,7 +46,7 @@ public class SpringConfig {
         // 인증 요청 페이지 설정
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/user/register", "/api/user/login", "/oauth2/**", "/api/subscribe/**", "/api/auth/**",
+                        .requestMatchers("/api/user/register", "/api/user/login", "api/user/login/social", "/oauth2/**", "/api/subscribe/**", "/api/auth/**",
                                 "/api/admin/login", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/**").authenticated()
