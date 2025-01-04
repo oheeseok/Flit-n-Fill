@@ -51,6 +51,7 @@ const SignIn: React.FC = () => {
           window.location.href = "/";
         })
         .catch((error) => {
+          console.log(error)
           alert("소셜 로그인 실패");
         });
     }
