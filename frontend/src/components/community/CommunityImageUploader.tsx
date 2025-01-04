@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import sample from "../../assets/images/sample.png";
+import sample from "../../assets/images/community.png";
 
 const Container = styled.div`
   display: flex;
