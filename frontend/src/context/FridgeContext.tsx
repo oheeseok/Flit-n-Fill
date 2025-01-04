@@ -111,6 +111,7 @@ interface FridgeContextType {
   removeFromBucket: (id: number) => void;
   fetchFridgeItems: () => Promise<void>; // 비동기 함수로 수정
   requestAddIngredient: (requestFood: string) => Promise<void>;
+  addFridgeItemToCart: (id: number) => void;
 }
 
 // 기본 Context 값 설정
@@ -125,6 +126,7 @@ const FridgeContext = createContext<FridgeContextType>({
   removeFromBucket: () => {},
   fetchFridgeItems: async () => {}, // 비어 있는 비동기 함수로 설정
   requestAddIngredient: async () => {},
+  addFridgeItemToCart: () => {},
 });
 
 // Provider 컴포넌트
@@ -278,6 +280,26 @@ export const FridgeProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const addFridgeItemToCart = async (id: number) => {
+    try {
+      const response = await axios.post(
+        `${apiUrl}/api/my-fridge/add/${id}`,
+        {},
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "text/plain",
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
+          },
+        }
+      );
+      console.log("장바구니 추가 성공: ", response.data)
+    } catch (error) {
+      console.error("장바구니 추가에 실패했습니다: ", error);
+    }
+  }
+
   // 저장 방법으로 필터링
   const filterByStorageMethod = (
     method: "REFRIGERATED" | "FROZEN" | "ROOM_TEMPERATURE"
@@ -303,6 +325,7 @@ export const FridgeProvider = ({ children }: { children: React.ReactNode }) => {
         removeFromBucket,
         fetchFridgeItems,
         requestAddIngredient,
+        addFridgeItemToCart,
       }}
     >
       {children}

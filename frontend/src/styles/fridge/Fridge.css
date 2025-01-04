@@ -419,6 +419,16 @@
   margin-right: 0; /* 마지막 버튼 간격 제거 */
 }
 
+.fridge-item-delete-icon {
+  width: 30px; /* 원하는 너비 */
+  height: 30px; /* 원하는 높이 */
+}
+
+.fridge-item-edit-icon {
+  width: 28px; /* 원하는 너비 */
+  height: 28px; /* 원하는 높이 */
+}
+
 /* 미디어 쿼리 */
 @media (max-width: 1024px) {
   .fridge-container {
@@ -432,9 +442,7 @@
     height: auto;
     border-radius: 30px 30px 0px 0px;
   }
-  .cold-side {
-    
-  }
+  
   .cold-back {
     width: 90%;
     gap: 10px;
