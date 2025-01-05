@@ -3,7 +3,6 @@ package org.example.backend.security;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.backend.api.user.model.dto.UserLoginResponse;
@@ -12,6 +11,7 @@ import org.example.backend.api.user.repository.UserRepository;
 import org.example.backend.api.user.service.TokenManagementService;
 import org.example.backend.exceptions.UserNotFoundException;
 import org.example.backend.security.model.PrincipalDetails;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -25,6 +25,9 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private final UserRepository userRepository;
     private final TokenManagementService tokenManagementService;
 
+    @Value("${server.host}")
+    private String host;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
@@ -37,8 +40,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
         String accessToken = userLoginResponse.getAccessToken();
         // 메인 페이지로 리디렉션
-//        response.sendRedirect("http://www.flitnfill.kro.kr/signin?socialtoken="+accessToken);
-        response.sendRedirect("http://54.180.201.220/signin?socialtoken="+accessToken);
-//        response.sendRedirect("http://localhost:5173/signin?socialtoken="+accessToken);
+        String redirectUrl = "http://" + host + "signin?socialtoken=" + accessToken;
+        response.sendRedirect(redirectUrl);
     }
 }
