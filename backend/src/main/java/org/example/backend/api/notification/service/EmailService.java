@@ -56,7 +56,7 @@ public class EmailService {
         try {
             MimeMessage message = mailSender.createMimeMessage();
 //            MimeMessageHelper helper = new MimeMessageHelper(message, false, "UTF-8");
-
+            
             message.setRecipients(MimeMessage.RecipientType.TO, to);    // 이메일 받을 주소
             message.setSubject(subject, "UTF-8");
             message.setContent(content, "text/html; charset=utf-8");
