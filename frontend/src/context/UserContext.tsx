@@ -127,7 +127,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
 
     try {
       const response = await axios.put<User>(
-        "http://localhost:8080/api/user/info",
+          `${apiUrl}/api/user/info`,
         formData,
         {
           headers: {
