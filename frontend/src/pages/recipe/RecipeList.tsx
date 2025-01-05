@@ -53,11 +53,19 @@ const RecipeList = () => {
       const params = {
         page: currentPage + 1,
         size: PAGE_SIZE,
-        search: searchQuery.trim() || undefined,
+        search: searchQuery.trim() || undefined, // 검색어가 있을 경우 파라미터에 포함
       };
 
       const response = await fetchRecipes(params);
-      setDisplayedRecipes((prev) => [...prev, ...(response.content || [])]);
+
+      // 검색 결과 또는 북마크 필터링 상태에 따라 데이터 추가
+      setDisplayedRecipes((prev) => [
+        ...prev,
+        ...(showBookmarksOnly
+          ? response.content.filter((recipe) => recipe.recipeIsBookmarked)
+          : response.content || []),
+      ]);
+
       setCurrentPage((prev) => prev + 1);
       setHasMore(response.content.length === PAGE_SIZE);
     } catch (error) {
@@ -65,26 +73,37 @@ const RecipeList = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, hasMore, currentPage, fetchRecipes, searchQuery]);
+  }, [
+    isLoading,
+    hasMore,
+    currentPage,
+    fetchRecipes,
+    searchQuery,
+    showBookmarksOnly,
+  ]);
 
-  // 무한 스크롤 이벤트 설정
   useEffect(() => {
+    let isFetching = false; // 데이터 로드 상태 플래그
+
     const handleScroll = () => {
-      if (
-        window.innerHeight + document.documentElement.scrollTop >=
-        document.documentElement.offsetHeight - 200
-      ) {
+      if (isFetching) return; // 이미 데이터 로드 중이면 실행하지 않음
+
+      const scrollPosition =
+        window.innerHeight + document.documentElement.scrollTop;
+      const offsetHeight = document.documentElement.offsetHeight;
+
+      if (scrollPosition >= offsetHeight - 100) {
         if (
           !isLoading &&
           hasMore &&
           (!showBookmarksOnly || displayedRecipes.length >= PAGE_SIZE)
         ) {
+          isFetching = true; // 플래그 설정
           const currentScrollY = window.scrollY;
 
-          // 데이터 로드 후 스크롤 위치 복원
           loadMoreRecipes().then(() => {
             setTimeout(() => {
-              window.scrollTo(0, currentScrollY);
+              window.scrollTo(0, currentScrollY - 200);
             }, 0);
           });
         }

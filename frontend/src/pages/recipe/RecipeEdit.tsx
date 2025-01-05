@@ -13,6 +13,7 @@ interface RecipeStepDto {
   photo: File | string | null; // 파일 또는 URL 처리
   description: string;
 }
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const RecipeEdit = () => {
   const RECIPE_STEP_DEFAULT_IMG_URL =
@@ -26,10 +27,11 @@ const RecipeEdit = () => {
   const [recipeMethods, setRecipeMethods] = useState<RecipeStepDto[]>([]);
   const [recipeIsVisibility, setRecipeIsVisibility] = useState(true);
   // const [isLoading, setIsLoading] = useState(false);
+  const [deletedSeqs, setDeletedSeqs] = useState<number[]>([]);
 
   const fetchRecipeDetail = async () => {
     try {
-      const response = await axios.get(`/api/recipes/${id}`, {
+      const response = await axios.get(`${apiUrl}/api/recipes/${id}`, {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -115,34 +117,17 @@ const RecipeEdit = () => {
       const recipeUpdateDto = {
         recipeTitle,
         recipeFoodDetails: recipeIngredients,
-        recipeSteps: recipeMethods.map((method, idx) => {
-          let photoUrl = method.photo;
-
-          // `File` 객체인 경우 URL 생성
-          if (method.photo instanceof File) {
-            photoUrl = URL.createObjectURL(method.photo);
-          }
-
-          return {
-            seq: idx + 1,
-            description: method.description || "",
-            photo: photoUrl || RECIPE_STEP_DEFAULT_IMG_URL, // URL 또는 기본 이미지
-          };
-        }),
+        recipeSteps: recipeMethods.map((method, idx) => ({
+          seq: idx + 1,
+          description: method.description || "",
+        })),
       };
 
-      recipeUpdateDto.recipeSteps.forEach((step, index) => {
-        console.log(`Step ${index + 1}:`, {
-          seq: step.seq,
-          description: step.description,
-          photo: step.photo,
-        });
-      });
-
-      const formData = new FormData();
-      // DTO 확인
       console.log("Generated recipeUpdateDto:", recipeUpdateDto);
 
+      const formData = new FormData();
+
+      // DTO 추가
       formData.append("recipeUpdateDto", JSON.stringify(recipeUpdateDto));
 
       // 메인 이미지 파일 추가
@@ -150,47 +135,69 @@ const RecipeEdit = () => {
         formData.append("recipeMainPhoto", recipeImage);
       }
 
-      const stepPhotos = recipeMethods.map((method) => method.photo);
+      // 전체 스텝 처리
+      const totalSteps = Math.max(
+        ...recipeMethods.map((m) => m.seq),
+        ...deletedSeqs
+      ); // 최대 스텝 수 계산
 
-      stepPhotos.forEach((photo) => {
-        if (typeof photo === "string" && photo) {
-          // photo가 string이고 빈 문자열이 아니면 처리
-          formData.append("recipeStepPhotos", new Blob([]));
-        } else if (photo instanceof File) {
-          // photo가 File 객체라면 해당 파일을 formData에 추가
-          formData.append("recipeStepPhotos", photo);
+      // 스텝 사진 처리
+      for (let i = 1; i <= totalSteps; i++) {
+        const method = recipeMethods.find((m) => m.seq === i);
+
+        if (deletedSeqs.includes(i)) {
+          // 삭제된 스텝: 빈 Blob 추가
+          console.log(`Deleted step: seq=${i}, adding empty Blob.`);
+          formData.append(
+            "recipeStepPhotos",
+            new Blob([], { type: "image/png" })
+          );
+        } else if (method?.photo instanceof File) {
+          // 새로 추가된 파일
+          console.log(`Adding step photo for seq=${i}`);
+          formData.append("recipeStepPhotos", method.photo);
+        } else if (
+          method &&
+          typeof method.photo === "string" &&
+          method.photo.startsWith("http")
+        ) {
+          // 기존 URL 처리: 빈 Blob 추가
+          console.log(`Existing URL for seq=${i}, adding empty Blob.`);
+          formData.append(
+            "recipeStepPhotos",
+            new Blob([], { type: "image/png" })
+          ); // 서버에서 URL 처리
         } else {
-          // photo가 undefined일 경우 빈 Blob 추가
-          formData.append("recipeStepPhotos", new Blob([]));
-        }
-      });
-
-      console.log("Final Recipe Update DTO:", recipeUpdateDto);
-
-      formData.append(
-        "recipeStepPhotos",
-        new Blob(["Test content"], { type: "text/plain" })
-      );
-      
-      for (const [key, value] of formData.entries()) {
-        if (value instanceof Blob) {
-          console.log(`${key} is a Blob:`, {
-            size: value.size,
-            type: value.type,
-          });
-        } else {
-          console.log(`${key}:`, value);
+          // 기본 빈 Blob 처리 (예상치 못한 경우)
+          console.warn(
+            `No valid method or photo for seq=${i}, adding empty Blob.`
+          );
+          formData.append(
+            "recipeStepPhotos",
+            new Blob([], { type: "image/png" })
+          );
         }
       }
+
+      // 폼데이터 디버깅
+      for (const [key, value] of formData.entries()) {
+        console.log(
+          `Key: ${key}, Value: ${value instanceof File ? value.name : value}`
+        );
+      }
       // 서버에 PUT 요청 (axios 사용)
-      const response = await axios.put(`/api/recipes/${id}`, formData, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          userEmail: localStorage.getItem("userEmail"),
-          // "Content-Type" 제거: axios는 자동으로 처리함
-        },
-        withCredentials: true,
-      });
+      const response = await axios.put(
+        `${apiUrl}/api/recipes/${id}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
+            // "Content-Type" 제거: axios는 자동으로 처리함
+          },
+          withCredentials: true,
+        }
+      );
       console.log("Recipe updated successfully:", response.data);
       if (response.status === 200) {
         Swal.fire({
@@ -231,6 +238,8 @@ const RecipeEdit = () => {
 
       return updatedMethods;
     });
+
+    setDeletedSeqs((prevSeqs) => [...prevSeqs, index + 1]); // 삭제된 seq를 저장
   };
 
   const handleImageChange = (file: File | null) => {

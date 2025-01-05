@@ -2,6 +2,8 @@ import { useNavigate } from "react-router-dom";
 import "../../styles/fridge/ToRecipeButton.css";
 import { useFridge } from "../../context/FridgeContext";
 import { useRecipe } from "../../context/RecipeContext";
+const apiUrl = import.meta.env.VITE_API_URL;
+import axios from "axios";
 
 const ToRecipeButton = () => {
   const { bucketItems } = useFridge();
@@ -14,15 +16,34 @@ const ToRecipeButton = () => {
       ? bucketItems.map((item) => item.name).join(",")
       : "default"; // 기본값 설정
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     console.log("Bucket Items:", bucketItems); // 디버깅용
     console.log("Query:", query); // 디버깅용
 
-    // searchQuery 설정
-    setSearchQuery(query);
-
-    // 검색 결과 페이지로 이동
-    navigate(`/recipe/list?query=${encodeURIComponent(query)}`);
+    try {
+      const response = await axios.get(`${apiUrl}/api/recipes`, {
+        params: {
+          "search-query": query,
+          food1: bucketItems[0]?.name || undefined,
+          food2: bucketItems[1]?.name || undefined,
+          food3: bucketItems[2]?.name || undefined,
+          page: 0,
+          size: 18,
+        },
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          userEmail: localStorage.getItem("userEmail"),
+        },
+      });
+  
+      console.log("Fetched Recipes:", response.data); // 디버깅용
+      setSearchQuery(query); // 검색어 저장
+      navigate(`/recipe/list?query=${encodeURIComponent(query)}`); // 페이지 이동
+    } catch (error) {
+      console.error("Error fetching recipes:", error);
+      alert("Failed to fetch recipes. Please try again.");
+    }
   };
 
   return (

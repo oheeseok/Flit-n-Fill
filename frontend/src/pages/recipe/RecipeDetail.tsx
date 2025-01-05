@@ -4,6 +4,7 @@ import "../../styles/recipe/RecipeDetail.css";
 import Swal from "sweetalert2";
 import axios from "axios";
 
+const apiUrl = import.meta.env.VITE_API_URL;
 const RecipeDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ const RecipeDetail = () => {
   // 현재 로그인한 사용자 정보 가져오기
   const fetchUserNickname = async () => {
     try {
-      const response = await axios.get("/api/user/info", {
+      const response = await axios.get(`${apiUrl}/api/user/info`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           userEmail: localStorage.getItem("userEmail"),
@@ -41,7 +42,7 @@ const RecipeDetail = () => {
         setUserNickname(loggedInNickname);
 
         // 레시피 정보 가져오기
-        const response = await axios.get(`/api/recipes/${id}`, {
+        const response = await axios.get(`${apiUrl}/api/recipes/${id}`, {
           withCredentials: true,
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -98,7 +99,7 @@ const RecipeDetail = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .delete(`/api/recipes/${id}`, {
+          .delete(`${apiUrl}/api/recipes/${id}`, {
             withCredentials: true,
             headers: {
               Authorization: `Bearer ${localStorage.getItem("accessToken")}`,

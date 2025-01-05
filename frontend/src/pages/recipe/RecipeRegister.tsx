@@ -15,6 +15,7 @@ interface RecipeStepDto {
   photo: File | null; // 파일 객체 처리
   description: string;
 }
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const RecipeRegister = () => {
   const navigate = useNavigate();
@@ -87,7 +88,7 @@ const RecipeRegister = () => {
       });
 
       // API 요청
-      const response = await axios.post("/api/recipes", formData, {
+      const response = await axios.post(`${apiUrl}/api/recipes`, formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           userEmail: localStorage.getItem("userEmail"),
