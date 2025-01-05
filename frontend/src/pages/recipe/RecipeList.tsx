@@ -3,12 +3,16 @@ import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import RecipeSearchBar from "../../components/recipe/RecipeSearchBar";
 import "../../styles/recipe/RecipeList.css";
+import axios from "axios";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const RecipeList = () => {
   const { toggleBookmark, searchQuery, fetchRecipes } = useRecipe();
   const [displayedRecipes, setDisplayedRecipes] = useState<any[]>([]); // 타입을 any[]로 설정하여 오류 방지
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+
+  const [searchQueryString, setSearchQueryString] = useState<string>("");
   const [hasMore, setHasMore] = useState(true);
   const [showBookmarksOnly, setShowBookmarksOnly] = useState(false);
 
@@ -21,11 +25,13 @@ const RecipeList = () => {
       const params = {
         search: searchQuery.trim() || "", // 검색어 적용
       };
+      setSearchQueryString(params.search);
 
       const response = await fetchRecipes(params);
       console.log("Fetched response:", response);
 
       // 검색 결과를 필터링 없이 적용
+
       setDisplayedRecipes(response?.content || response || []);
     } catch (error) {
       console.error("Failed to fetch filtered recipes:", error);
@@ -110,6 +116,24 @@ const RecipeList = () => {
       );
     }
   };
+
+  const handleButtonClick = async (searchQuery: string) => {
+    const response = await axios.get(
+      `${apiUrl}/api/recipes?search-query=${searchQuery}&src=youtube`,
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          userEmail: localStorage.getItem("userEmail"),
+        },
+      }
+    );
+
+    const youtubeLink = response.data;
+    console.log("youtubeLink: ", youtubeLink);
+    window.open(youtubeLink, "_blank", "noopener,noreferrer");
+  };
+
   // 레시피 데이터가 없는 경우 처리 (로딩 중이거나 데이터가 없음)
   if (isLoading) {
     return <div>Loading...</div>;
@@ -118,12 +142,22 @@ const RecipeList = () => {
   if (!displayedRecipes.length) {
     return <div>No recipes found</div>;
   }
+
   return (
     <>
       {/* 검색 바 */}
       <div className="recipe-list-searchbar-container">
         <RecipeSearchBar />
       </div>
+
+      {searchQueryString !== "" && searchQueryString.length > 0 && (
+        <button
+          style={{ background: "#d4efc7" }}
+          onClick={() => handleButtonClick(searchQueryString)}
+        >
+          더 많은 레시피 보러가기
+        </button>
+      )}
 
       {/* 북마크 필터 */}
       <div className="recipe-list-option-container">
@@ -144,13 +178,13 @@ const RecipeList = () => {
             </div>
             <div className="recipe-list-box-card">
               <div className="recipe-list-box-card-img-container">
-              <Link to={`/recipe/detail/${recipe.recipeId}`}>
-                <img
-                  className="recipe-list-box-card-img"
-                  src={recipe.recipeMainPhoto || "/placeholder.jpg"}
-                  alt={recipe.recipeTitle}
-                />
-              </Link>
+                <Link to={`/recipe/detail/${recipe.recipeId}`}>
+                  <img
+                    className="recipe-list-box-card-img"
+                    src={recipe.recipeMainPhoto || "/placeholder.jpg"}
+                    alt={recipe.recipeTitle}
+                  />
+                </Link>
               </div>
               <div className="recipe-list-box-card-profile-container">
                 <div
