@@ -37,7 +37,8 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
         String accessToken = userLoginResponse.getAccessToken();
         // 메인 페이지로 리디렉션
-        response.sendRedirect("http://www.flitnfill.kro.kr/signin?socialtoken="+accessToken);
+//        response.sendRedirect("http://www.flitnfill.kro.kr/signin?socialtoken="+accessToken);
+        response.sendRedirect("http://54.180.201.220/signin?socialtoken="+accessToken);
 //        response.sendRedirect("http://localhost:5173/signin?socialtoken="+accessToken);
     }
 }
