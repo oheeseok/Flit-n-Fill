@@ -104,8 +104,18 @@ export const SSEProvider = ({ children }: { children: React.ReactNode }) => {
       }
     }
 
+    const handleBeforeUnload = () => {
+      const userEmail = localStorage.getItem("userEmail");
+      if (userEmail) {
+        stopSSE(`${apiUrl}/api/subscribe/${userEmail}`);
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
     // 컴포넌트 언마운트 시 SSE 종료
     return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
       const userEmail = localStorage.getItem("userEmail");
       if (userEmail) {
         console.log("컴포넌트 언마운트 시 SSE 종료");
