@@ -2,6 +2,7 @@ package org.example.backend.api.notification.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.backend.api.notification.service.PushNotificationService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -12,6 +13,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RestController
 @RequestMapping("/api/subscribe")
 @RequiredArgsConstructor
+@Slf4j
 public class PushNotificationController {
   private final PushNotificationService pushNotificationService;
   @Value("${server.host}") String origin;
