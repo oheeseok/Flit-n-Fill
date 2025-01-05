@@ -205,7 +205,7 @@ const FridgeRegister = () => {
           message: "수량을 입력해주세요.",
         },
         {
-          condition: new Date(expirationDate) <= new Date(),
+          condition: new Date(expirationDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0),
           message: "소비기한은 오늘 이후 날짜로 설정해야 합니다.",
         },
       ];
