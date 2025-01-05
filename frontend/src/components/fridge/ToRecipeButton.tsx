@@ -11,10 +11,10 @@ const ToRecipeButton = () => {
   const navigate = useNavigate();
 
   const handleSearch = async () => {
-    const query = bucketItems.map((item) => item.name).join(",");
+    const query = bucketItems.map((item) => item.name).join(" ");
     console.log("Bucket Items:", bucketItems);
     console.log("Query:", query);
-
+  
     try {
       const response = await axios.get(`${apiUrl}/api/recipes`, {
         params: {
@@ -29,10 +29,19 @@ const ToRecipeButton = () => {
           userEmail: localStorage.getItem("userEmail"),
         },
       });
-
+  
       console.log("Fetched Recipes:", response.data); // 디버깅용
       setSearchQuery(query); // 검색어 설정
-      navigate(`/recipe/list?query=${encodeURIComponent(query)}`); // 검색 결과 페이지로 이동
+  
+      // food1, food2, food3 기반으로 쿼리 생성
+      const queryParams = new URLSearchParams({
+        food1: bucketItems[0]?.name || "",
+        food2: bucketItems[1]?.name || "",
+        food3: bucketItems[2]?.name || "",
+      });
+  
+      // 검색 결과 페이지로 이동
+      navigate(`/recipe/list?${queryParams.toString()}`);
     } catch (error) {
       console.error("Error fetching recipes:", error);
       alert("Failed to fetch recipes. Please try again.");

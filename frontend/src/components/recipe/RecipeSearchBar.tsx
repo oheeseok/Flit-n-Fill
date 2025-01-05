@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../../styles/fridge/FridgeSearchBar.css";
 import SearchIcon from "../common/SearchIcon";
 import { useState } from "react";
-import Swal from "sweetalert2";
+// import Swal from "sweetalert2";
 
 const RecipeSearchBar = () => {
   const { setSearchQuery } = useRecipe(); // Context에서 setSearchQuery만 사용
@@ -12,17 +12,10 @@ const RecipeSearchBar = () => {
 
   // 검색 실행 함수
   const handleSearch = () => {
-    if (inputValue.trim() === "") {
-      Swal.fire({
-        icon: "info",
-        title: "검색어를 입력해주세요.",
-        confirmButtonText: "확인",
-      });
-      return;
-    }
-
-    // 쉼표로 검색어 나누기
-    const keywords = inputValue.split(",").map((item) => item.trim());
+    const keywords = inputValue
+    .split(" ") // 쉼표로 나눔
+    .map((item) => item.trim()) // 공백 제거
+    .filter((item) => item); // 빈 문자열 제
 
     // Context에 검색어 업데이트
     setSearchQuery(inputValue);
@@ -33,7 +26,7 @@ const RecipeSearchBar = () => {
       food2: keywords[1] || "",
       food3: keywords[2] || "",
     });
-
+    setSearchQuery(inputValue);
     // 검색 결과 페이지로 이동
     navigate(`/recipe/list?${queryParams.toString()}`);
   };
