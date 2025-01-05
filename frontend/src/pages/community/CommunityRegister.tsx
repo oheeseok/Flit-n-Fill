@@ -272,7 +272,7 @@ const CommunityRegister = () => {
           
       { category !== "SHARING" && (
           <div>
-            <label>원하는 재료</label>
+            <label>교환 원하는 재료</label>
             <select
               className="community-register-text"
               value={proposerFoodListId}
