@@ -22,8 +22,13 @@ import Swal from "sweetalert2";
 // }
 
 const Fridge: React.FC = () => {
-  const { fridgeItems, removeFridgeItem, updateFridgeItem, fetchFridgeItems, addFridgeItemToCart } =
-    useFridge();
+  const {
+    fridgeItems,
+    removeFridgeItem,
+    updateFridgeItem,
+    fetchFridgeItems,
+    addFridgeItemToCart,
+  } = useFridge();
   const { bucketItems, addToBucket, removeFromBucket } = useFridge(); // FridgeContext에서 가져옴
   // const [bucketItems, setBucketItems] = useState<FridgeItem[]>([]); 이거 fridgecontext에서 사용하자자
   const [editingItemId, setEditingItemId] = useState<number | null>(null);
@@ -194,7 +199,6 @@ const Fridge: React.FC = () => {
                   cancelButtonText: "취소",
                 }).then((result) => {
                   if (result.isConfirmed) {
-
                     Swal.fire({
                       title: "장바구니에 추가하시겠습니까?",
                       text: `${item.name}을(를) 장바구니에 추가하시겠습니까?`,
@@ -213,7 +217,7 @@ const Fridge: React.FC = () => {
                           icon: "success",
                           confirmButtonColor: "#d33",
                           confirmButtonText: "확인",
-                        })
+                        });
                       } else {
                         // removeFridgeItem(item.id); // 삭제 로직 호출
                         Swal.fire(
@@ -223,8 +227,7 @@ const Fridge: React.FC = () => {
                         );
                       }
                       removeFridgeItem(item.id); // 삭제 로직 호출
-                    })
-                  
+                    });
                   }
                 });
               }}
@@ -311,7 +314,9 @@ const Fridge: React.FC = () => {
         </div>
         <div className="button-container">
           <ToRecipeButton />
-          { bucketItems.length == 1 && <ToCommunityButton bucketItemId={bucketItems[0].id} />}
+          {bucketItems.length == 1 && (
+            <ToCommunityButton bucketItemId={bucketItems[0].id} />
+          )}
         </div>
       </div>
 
@@ -334,8 +339,10 @@ const Fridge: React.FC = () => {
               onChange={(e) => setEditedUnit(e.target.value)}
             >
               <option value="PIECE">개</option>
-              <option value="L">L</option>
               <option value="G">g</option>
+              <option value="KG">kg</option>
+              <option value="ML">mL</option>
+              <option value="L">L</option>
             </select>
           </div>
           <div>

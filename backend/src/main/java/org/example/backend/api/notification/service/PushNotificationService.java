@@ -25,53 +25,55 @@ public class PushNotificationService {
     if (emitters.containsKey(userEmail)) {
       log.info("[SseEmitter] Already subscribed for user {}", userEmail);
       // 구독된 사용자 수 로그
-      log.info("[SseEmitter] Current subscription count: {}", emitters.size());
-      return emitters.get(userEmail); // 기존 emitter 반환
-    } else {
-      // 구독이 안되어 있는 경우에만 새로운 emitter 생성
-      long timeout = 1000L * 60 * 60; // sse emitter 연결 시간, 1시간
-
-      SseEmitter emitter = new SseEmitter(timeout); // timeout마다 한번씩 연결 재요청을 보냄
-      // 클라이언트와 서버 간의 연결이 활성 상태로 유지되는 최대 시간
-      // 30초 동안 클라이언트로부터 추가적인 요청(keep-alive 등)이 없으면 연결이 자동으로 종료
-      emitters.put(userEmail, emitter);
-      log.info("[SseEmitter] New subscription for user {}", userEmail);
-      // 구독된 사용자 수 로그
-      log.info("[SseEmitter] Current subscription count: {}", emitters.size());
-
-      // 연결이 완료되거나 오류가 발생하면 emitter를 제거
-      emitter.onCompletion(() -> {
-        if (emitters.containsKey(userEmail)) {
-          emitters.remove(userEmail);
-          log.info("[SseEmitter] emitter.onCompletion({})", userEmail);
-          log.info("[SseEmitter] Current subscription count after completion: {}", emitters.size());
-        }
-      });
-      emitter.onTimeout(() -> {
-        if (emitters.containsKey(userEmail)) {
-          emitters.remove(userEmail);
-          log.info("[SseEmitter] emitter.onTimeout({})", userEmail);
-          log.info("[SseEmitter] Current subscription count after timeout: {}", emitters.size());
-        }
-      });
-      emitter.onError((e) -> {
-        if (emitters.containsKey(userEmail)) {
-          emitters.remove(userEmail);
-          log.info("[SseEmitter] SSE connection error for user {}: {}", userEmail, e.getMessage());
-          log.info("[SseEmitter] Current subscription count after error: {}", emitters.size());
-        }
-      });
-
-      try {
-        emitter.send(SseEmitter.event()
-            .name("connect")
-            .data("connected")); //503 에러 방지를 위한 더미 데이터
-      } catch (IOException e) {
-        throw new RuntimeException(e);
+      SseEmitter oldEmitter = emitters.remove(userEmail);
+      if (oldEmitter != null) {
+        oldEmitter.complete();
       }
-
-      return emitter;
+      log.info("[SseEmitter] Removed existing subscription for user {}", userEmail);
+      log.info("[SseEmitter] Current subscription count: {}", emitters.size());
+//      return emitters.get(userEmail); // 기존 emitter 반환
     }
+
+    // 새로운 Emitter 생성 및 등록
+    // 구독이 안되어 있는 경우에만 새로운 emitter 생성
+    long timeout = 1000L * 60 * 60; // sse emitter 연결 시간, 1시간
+
+    SseEmitter emitter = new SseEmitter(timeout); // timeout마다 한번씩 연결 재요청을 보냄
+    // 클라이언트와 서버 간의 연결이 활성 상태로 유지되는 최대 시간
+    // 30초 동안 클라이언트로부터 추가적인 요청(keep-alive 등)이 없으면 연결이 자동으로 종료
+    emitters.put(userEmail, emitter);
+    log.info("[SseEmitter] New subscription for user {}, current sub count: {}", userEmail, emitters.size());
+
+    // 연결이 완료되거나 오류가 발생하면 emitter를 제거
+    emitter.onCompletion(() -> {
+      if (emitters.containsKey(userEmail)) {
+        emitters.remove(userEmail);
+        log.info("[SseEmitter] emitter.onCompletion({}), current sub count: {}", userEmail, emitters.size());
+      }
+    });
+    emitter.onTimeout(() -> {
+      if (emitters.containsKey(userEmail)) {
+        emitters.remove(userEmail);
+        log.info("[SseEmitter] emitter.onTimeout({}), current sub count: {}", userEmail, emitters.size());
+      }
+    });
+    emitter.onError((e) -> {
+      if (emitters.containsKey(userEmail)) {
+        emitters.remove(userEmail);
+        log.info("[SseEmitter] SSE connection error for user {}: {}", userEmail, e.getMessage());
+        log.info("[SseEmitter] Current subscription count after error: {}", emitters.size());
+      }
+    });
+
+    try {
+      emitter.send(SseEmitter.event()
+          .name("connect")
+          .data("connected")); //503 에러 방지를 위한 더미 데이터
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+
+    return emitter;
   }
 
   // 구독 취소 메서드 (Unsubscribe)
