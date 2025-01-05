@@ -6,6 +6,7 @@ import "../../styles/common/Header.css";
 import NotificationPopup from "../../pages/NotificationPopup";
 
 import { useSSEContext } from "../../context/SSEContext";
+import axios from "axios";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 
@@ -17,7 +18,7 @@ const Header = () => {
   const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {  // handleLogout을 async 함수로 선언
     Swal.fire({
       title: "로그아웃",
       text: "정말 로그아웃 하시겠습니까?",
@@ -27,18 +28,32 @@ const Header = () => {
       cancelButtonColor: "#d33",
       confirmButtonText: "로그아웃",
       cancelButtonText: "취소",
-    }).then((result) => {
+    }).then(async (result) => {  // then에서 비동기 함수 처리
       if (result.isConfirmed) {
         const userEmail = localStorage.getItem("userEmail");
         if (userEmail) {
           const userUrl = `${apiUrl}/api/subscribe/${userEmail}`;
           stopSSE(userUrl); // SSE 연결 종료
         }
-        localStorage.clear();
-        setIsLoggedIn(false);
-        Swal.fire("로그아웃 완료", "로그아웃 되었습니다.", "success");
-        stopSSE(); // SSE 연결 종료
-        navigate("/");
+        try {
+          // 로그아웃 요청 보내기
+          await axios.get(`${apiUrl}/api/user/logout`, {
+            withCredentials: true,
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+              userEmail: localStorage.getItem("userEmail"),
+            },
+          });
+  
+          localStorage.clear();
+          setIsLoggedIn(false);
+  
+          Swal.fire("로그아웃 완료", "로그아웃 되었습니다.", "success");
+          navigate("/");
+        } catch (error) {
+          console.error("로그아웃 요청 실패:", error);
+          Swal.fire("오류", "로그아웃 요청에 실패했습니다.", "error");
+        }
       }
     });
   };
