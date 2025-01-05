@@ -38,7 +38,6 @@ dependencies {
 
     //mail
     implementation 'org.springframework.boot:spring-boot-starter-mail'
-    implementation 'commons-net:commons-net:3.6'
 
     testImplementation 'org.springframework.security:spring-security-test'
     compileOnly 'org.projectlombok:lombok'
