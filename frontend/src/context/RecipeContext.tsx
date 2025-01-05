@@ -57,16 +57,22 @@ interface RecipeContextType {
   ) => Promise<RecipeDetailDto>;
   toggleBookmark: (recipeId: string) => Promise<void>;
   fetchRecipes: (params?: {
-    sort?: string;
     search?: string;
+    src?: string;
     page?: number;
     size?: number;
   }) => Promise<RecipePageResponse>;
+  fetchMultiSearchRecipes: (params?: {
+    food1?: string;
+    food2?: string;
+    food3?: string;
+  }) => Promise<RecipeSimpleDto[]>; // 다중 검색 함수 추가
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   searchRecipes: () => Promise<void>;
   getRecipeDetail: (recipeId: string) => Promise<RecipeDetailDto>;
 }
+
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const RecipeContext = createContext<RecipeContextType>({
@@ -79,6 +85,7 @@ const RecipeContext = createContext<RecipeContextType>({
   setSearchQuery: () => {},
   searchRecipes: async () => Promise.resolve(),
   getRecipeDetail: async () => Promise.resolve({} as RecipeDetailDto),
+  fetchMultiSearchRecipes: async () => Promise.resolve([]), // 초기값으로 빈 배열 반환
 });
 
 export const RecipeProvider = ({ children }: { children: React.ReactNode }) => {
@@ -114,6 +121,32 @@ export const RecipeProvider = ({ children }: { children: React.ReactNode }) => {
       return response.data;
     } catch (error) {
       console.error("Failed to fetch recipes:", error);
+      throw error;
+    }
+  };
+
+  const fetchMultiSearchRecipes = async (params?: {
+    food1?: string;
+    food2?: string;
+    food3?: string;
+  }): Promise<RecipeSimpleDto[]> => {
+    try {
+      const response = await axios.get<RecipeSimpleDto[]>(`${apiUrl}/api/recipes`, {
+        params: {
+          food1: params?.food1 || "",
+          food2: params?.food2 || "",
+          food3: params?.food3 || "",
+        },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          userEmail: localStorage.getItem("userEmail"),
+        },
+        withCredentials: true,
+      });
+      console.log("Fetched multi-search recipes:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch multi-search recipes:", error);
       throw error;
     }
   };
@@ -231,6 +264,7 @@ export const RecipeProvider = ({ children }: { children: React.ReactNode }) => {
         searchRecipes,
         setSearchQuery,
         getRecipeDetail,
+        fetchMultiSearchRecipes,
       }}
     >
       {children}

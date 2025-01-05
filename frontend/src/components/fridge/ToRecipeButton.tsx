@@ -19,9 +19,9 @@ const ToRecipeButton = () => {
       const response = await axios.get(`${apiUrl}/api/recipes`, {
         params: {
           searchQuery: query, // 다중 검색어
-          food1: bucketItems[0]?.name || "", // 첫 번째 재료
-          food2: bucketItems[1]?.name || "", // 두 번째 재료
-          food3: bucketItems[2]?.name || "", // 세 번째 재료
+          food1: bucketItems[0]?.name || "", 
+          food2: bucketItems[1]?.name || "",
+          food3: bucketItems[2]?.name || "", 
         },
         withCredentials: true,
         headers: {
@@ -30,7 +30,7 @@ const ToRecipeButton = () => {
         },
       });
   
-      console.log("Fetched Recipes:", response.data); // 디버깅용
+      console.log("Fetched Recipes:", response.data); 
       setSearchQuery(query); // 검색어 설정
   
       // food1, food2, food3 기반으로 쿼리 생성

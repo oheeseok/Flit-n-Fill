@@ -3,6 +3,9 @@ import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import RecipeSearchBar from "../../components/recipe/RecipeSearchBar";
 import "../../styles/recipe/RecipeList.css";
+const apiUrl = import.meta.env.VITE_API_URL;
+import axios from "axios";
+import { RecipeSimpleDto } from "../../context/RecipeContext";
 
 const RecipeList = () => {
   const { toggleBookmark, searchQuery, fetchRecipes } = useRecipe();
@@ -11,6 +14,52 @@ const RecipeList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [showBookmarksOnly, setShowBookmarksOnly] = useState(false);
+  // const [isMultuSearch, setIsMultiSearch] = useState(false);
+  // const [recipes, setRecipes] = useState<RecipeSimpleDto[]>([]); // RecipeSimpleDto 타입의 배열
+
+
+  const fetchMultiSearchRecipes = async (
+    food1: string,
+    food2: string,
+    food3: string
+  ) => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get<RecipeSimpleDto[]>(`${apiUrl}/api/recipes`, {
+        params: { food1, food2, food3 },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          userEmail: localStorage.getItem("userEmail"),
+        },
+        withCredentials: true,
+      });
+  
+      console.log("Fetched multi-search recipes:", response.data);
+  
+      setDisplayedRecipes(response.data); // 다중 검색 결과를 displayedRecipes로 설정
+    } catch (error) {
+      console.error("Failed to fetch multi-search recipes:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  // 다중 검색 파라미터 감지
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const food1 = urlParams.get("food1") || "";
+    const food2 = urlParams.get("food2") || "";
+    const food3 = urlParams.get("food3") || "";
+  
+    // 유효한 값이 없으면 함수 호출 중단
+    if (!food1 && !food2 && !food3) {
+      console.warn("No food parameters provided for multi-search.");
+      return;
+    }
+  
+    fetchMultiSearchRecipes(food1, food2, food3);
+  }, [location.search]);
+  
 
   const PAGE_SIZE = 18;
 
@@ -49,25 +98,54 @@ const RecipeList = () => {
     if (isLoading || !hasMore) return;
 
     setIsLoading(true);
+
     try {
-      const params = {
-        page: currentPage + 1,
-        size: PAGE_SIZE,
-        search: searchQuery.trim() || undefined, // 검색어가 있을 경우 파라미터에 포함
-      };
+      let additionalRecipes: any[] = [];
 
-      const response = await fetchRecipes(params);
+      // URL에서 food1, food2, food3 확인
+      const urlParams = new URLSearchParams(window.location.search);
+      const food1 = urlParams.get("food1");
+      const food2 = urlParams.get("food2");
+      const food3 = urlParams.get("food3");
 
-      // 검색 결과 또는 북마크 필터링 상태에 따라 데이터 추가
-      setDisplayedRecipes((prev) => [
-        ...prev,
-        ...(showBookmarksOnly
-          ? response.content.filter((recipe) => recipe.recipeIsBookmarked)
-          : response.content || []),
-      ]);
+      if (food1 || food2 || food3) {
+        // 다중 검색 로직
+        console.log("Loading more for multi-search");
+        const response = await fetchMultiSearchRecipes(
+          food1 || "",
+          food2 || "",
+          food3 || ""
+        );
 
+        if (Array.isArray(response)) {
+          additionalRecipes = response;
+        } else {
+          console.error("Unexpected response for multi-search:", response);
+        }
+      } else {
+        // 단일 검색 로직
+        console.log("Loading more for single search");
+        const params = {
+          page: currentPage + 1,
+          size: PAGE_SIZE,
+          search: searchQuery.trim() || undefined,
+        };
+
+        const response = await fetchRecipes(params);
+
+        if (response?.content) {
+          additionalRecipes = showBookmarksOnly
+            ? response.content.filter((recipe) => recipe.recipeIsBookmarked)
+            : response.content;
+          setHasMore(response.content.length === PAGE_SIZE);
+        } else {
+          console.error("Unexpected response for single search:", response);
+        }
+      }
+
+      // 새로운 레시피 추가
+      setDisplayedRecipes((prev) => [...prev, ...additionalRecipes]);
       setCurrentPage((prev) => prev + 1);
-      setHasMore(response.content.length === PAGE_SIZE);
     } catch (error) {
       console.error("Failed to load more recipes:", error);
     } finally {
@@ -78,6 +156,7 @@ const RecipeList = () => {
     hasMore,
     currentPage,
     fetchRecipes,
+    fetchMultiSearchRecipes,
     searchQuery,
     showBookmarksOnly,
   ]);
