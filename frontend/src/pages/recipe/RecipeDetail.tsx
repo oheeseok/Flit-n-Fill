@@ -134,22 +134,6 @@ const RecipeDetail = () => {
     navigate(`/recipe/edit/${id}`);
   };
 
-  const getYoutubeLink = async () => {
-    const response = await axios.get(
-      `${apiUrl}/api/recipes?search-query=${recipe.recipeTitle}&src=youtube`,
-      {
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          userEmail: localStorage.getItem("userEmail"),
-        },
-      }
-    );
-
-    const youtubeLink = response.data;
-    return youtubeLink;
-  };
-
   return (
     <div className="recipe-detail-body">
       <div className="recipe-detail-title-container">
