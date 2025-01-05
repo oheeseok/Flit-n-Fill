@@ -269,20 +269,23 @@ const CommunityRegister = () => {
           </option>
         ))}
       </select>
-          원하는 재료
+          
       { category !== "SHARING" && (
-          <select
-            className="community-register-text"
-            value={proposerFoodListId}
-            onChange={(e) => setProposerFoodListId(Number(e.target.value))}
-          >
-            <option value="">재료를 선택하세요</option>
-            {foodList.map((food) => (
-              <option key={food.foodListId} value={food.foodListId}>
-                {food.foodListProduct !== null ? food.foodListProduct : food.foodListType}
-              </option>
-            ))}
-          </select>
+          <div>
+            <label>원하는 재료</label>
+            <select
+              className="community-register-text"
+              value={proposerFoodListId}
+              onChange={(e) => setProposerFoodListId(Number(e.target.value))}
+            >
+              <option value="">재료를 선택하세요</option>
+              {foodList.map((food) => (
+                <option key={food.foodListId} value={food.foodListId}>
+                  {food.foodListProduct !== null ? food.foodListProduct : food.foodListType}
+                </option>
+              ))}
+            </select>
+          </div>
       )}
       
       {/* 내용 입력 */}

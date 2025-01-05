@@ -15,7 +15,7 @@ const CommunityEdit = () => {
   const [meetingPlace, setMeetingPlace] = useState("");
   const [meetingTime, setMeetingTime] = useState("");
   const [postPhoto1, setPostPhoto1] = useState<File | null>(null);
-  const [writerFoodId, setWriterFoodId] = useState(0);
+  const [writerFoodName, setWriterFoodName] = useState("");
   const [proposerFoodListId, setProposerFoodListId] = useState(0);
 
   // 기존 데이터 가져오기
@@ -37,7 +37,7 @@ const CommunityEdit = () => {
         setMeetingPlace(post.meetingPlace);
         setMeetingTime(post.meetingTime);
         setPostPhoto1(post.postPhoto1); 
-        setWriterFoodId(post.writerFoodId);
+        setWriterFoodName(post.writerFoodName);
         setProposerFoodListId(post.proposerFoodListId);
       } catch (error) {
         console.error("게시글 가져오기 실패:", error);
@@ -81,7 +81,7 @@ const CommunityEdit = () => {
         postContent,
         meetingPlace,
         meetingTime,
-        writerFoodId,
+        writerFoodName,
         proposerFoodListId,
       };
       formData.append("postUpdateDto", JSON.stringify(postUpdateDto));
@@ -173,8 +173,8 @@ const CommunityEdit = () => {
       <input
         type="number"
         className="community-edit-text"
-        value={writerFoodId}
-        onChange={(e) => setWriterFoodId(Number(e.target.value))}
+        value={writerFoodName}
+        onChange={(e) => setWriterFoodName(Number(e.target.value))}
       />
       교환 원하는 재료
       <input
