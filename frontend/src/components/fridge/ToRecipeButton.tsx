@@ -10,25 +10,18 @@ const ToRecipeButton = () => {
   const { setSearchQuery } = useRecipe();
   const navigate = useNavigate();
 
-  // 버킷에 있는 재료 이름들을 쿼리로 변환
-  const query =
-    bucketItems.length > 0
-      ? bucketItems.map((item) => item.name).join(",")
-      : "default"; // 기본값 설정
-
   const handleSearch = async () => {
-    console.log("Bucket Items:", bucketItems); // 디버깅용
-    console.log("Query:", query); // 디버깅용
+    const query = bucketItems.map((item) => item.name).join(",");
+    console.log("Bucket Items:", bucketItems);
+    console.log("Query:", query);
 
     try {
       const response = await axios.get(`${apiUrl}/api/recipes`, {
         params: {
-          "search-query": query,
-          food1: bucketItems[0]?.name || undefined,
-          food2: bucketItems[1]?.name || undefined,
-          food3: bucketItems[2]?.name || undefined,
-          page: 0,
-          size: 18,
+          searchQuery: query, // 다중 검색어
+          food1: bucketItems[0]?.name || "", // 첫 번째 재료
+          food2: bucketItems[1]?.name || "", // 두 번째 재료
+          food3: bucketItems[2]?.name || "", // 세 번째 재료
         },
         withCredentials: true,
         headers: {
@@ -36,10 +29,10 @@ const ToRecipeButton = () => {
           userEmail: localStorage.getItem("userEmail"),
         },
       });
-  
+
       console.log("Fetched Recipes:", response.data); // 디버깅용
-      setSearchQuery(query); // 검색어 저장
-      navigate(`/recipe/list?query=${encodeURIComponent(query)}`); // 페이지 이동
+      setSearchQuery(query); // 검색어 설정
+      navigate(`/recipe/list?query=${encodeURIComponent(query)}`); // 검색 결과 페이지로 이동
     } catch (error) {
       console.error("Error fetching recipes:", error);
       alert("Failed to fetch recipes. Please try again.");
