@@ -373,10 +373,10 @@ const RecipeList = () => {
                 ></div>
               </div>
               <div className="recipe-list-box-card-title">
-                {recipe.recipeTitle}
+                {recipe.recipeTitle.slice(0, 20)}
               </div>
               <div className="recipe-list-box-card-detail">
-                {recipe.recipeFoodDetails.slice(0, 30)}...
+                {recipe.recipeFoodDetails.slice(0, 26)}...
               </div>
               <div className="recipe-list-box-card-more">
                 <Link to={`/recipe/detail/${recipe.recipeId}`}>Read more</Link>
