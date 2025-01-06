@@ -8,7 +8,10 @@ interface PrivateRouteProps {
   children: React.ReactNode;
 }
 
-const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, allowedPages }) => {
+const PrivateRoute: React.FC<PrivateRouteProps> = ({
+  children,
+  allowedPages,
+}) => {
   const [authState, setAuthState] = useState({
     authenticated: false,
     blacked: false,
@@ -30,45 +33,38 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, allowedPages }) =
           },
         });
 
-        console.log("response Data:", response.data);
         const { authenticated, blacked, expirationDate } = response.data;
-        console.log("authenticated:", authenticated);
-        console.log("blacked:", blacked);
 
         setAuthState({
-          authenticated : response.data.authenticated,
-          blacked : response.data.blacked,
-          expirationDate: response.data.blacked ? response.data.expirationDate : "",
+          authenticated,
+          blacked,
+          expirationDate: blacked ? expirationDate : "",
           isLoading: false,
         });
 
-        console.log("authState:",authState);
-
         if (blacked && allowedPages.includes("community")) {
-            Swal.fire({
-              icon: "warning",
-              title: "접근 제한",
-              html: `커뮤니티 기능 이용이 제한됩니다.<br>블랙리스트 만료기한: <strong>${expirationDate}</strong>`,
-            }).then(() => {
-              navigate("/");
-            });
-          }
-        } catch (error) {
-          console.error("Auth check failed", error);
-          Swal.fire({
-            icon: "error",
-            title: "로그인 오류",
-            text: "로그인이 필요한 페이지입니다.",
-          }).then(() => {
-            setAuthState({
-              authenticated: false,
-              blacked: false,
-              expirationDate: "",
-              isLoading: false,
-            });
-            navigate("/signin"); // Swal 확인 후에만 리다이렉트
+          await Swal.fire({
+            icon: "warning",
+            title: "접근 제한",
+            html: `커뮤니티 기능 이용이 제한됩니다.<br>블랙리스트 만료기한: <strong>${expirationDate}</strong>`,
           });
+          navigate("/");
         }
+      } catch (error) {
+        console.error("Auth check failed", error);
+        await Swal.fire({
+          icon: "error",
+          title: "인증 오류",
+          text: "로그인이 필요한 페이지입니다.",
+        });
+        setAuthState({
+          authenticated: false,
+          blacked: false,
+          expirationDate: "",
+          isLoading: false,
+        });
+        navigate("/signin");
+      }
     };
 
     fetchAuth();

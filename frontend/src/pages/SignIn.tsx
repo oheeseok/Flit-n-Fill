@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, useEffect } from "react";
+import React, { useState, ChangeEvent, useEffect, KeyboardEvent, useRef } from "react";
 import axios from "axios";
 import "../styles/common/SignIn.css";
 import { useSSEContext } from "../context/SSEContext";
@@ -26,6 +26,9 @@ const SignIn: React.FC = () => {
     null
   );
 
+  // Ref 생성
+  const passwordInputRef = useRef<HTMLInputElement>(null);
+
   // 리디렉션 URL에서 토큰을 가져오는 useEffect
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -50,15 +53,15 @@ const SignIn: React.FC = () => {
           localStorage.setItem("userEmail", response.data.userEmail);
           localStorage.setItem("userProfile", response.data.userProfile);
           localStorage.setItem("role", response.data.role);
-          localStorage.setItem("fevel", response.data.userKindness.toString())
-          localStorage.setItem("userNickname", response.data.userNickname)
+          localStorage.setItem("fevel", response.data.userKindness.toString());
+          localStorage.setItem("userNickname", response.data.userNickname);
 
           alert("소셜 로그인 성공");
           // 이후 대시보드로 리디렉션
           window.location.href = "/";
         })
         .catch((error) => {
-          console.log(error)
+          console.log(error);
           alert("소셜 로그인 실패");
         });
     }
@@ -85,8 +88,8 @@ const SignIn: React.FC = () => {
       localStorage.setItem("userEmail", response.data.userEmail);
       localStorage.setItem("userProfile", response.data.userProfile);
       localStorage.setItem("role", response.data.role);
-      localStorage.setItem("fevel", response.data.userKindness.toString())
-      localStorage.setItem("userNickname", response.data.userNickname)
+      localStorage.setItem("fevel", response.data.userKindness.toString());
+      localStorage.setItem("userNickname", response.data.userNickname);
 
       console.log("response data:", response.data);
       if (response.data.blacked) {
@@ -129,6 +132,20 @@ const SignIn: React.FC = () => {
     setPassword(e.target.value);
   };
 
+  // Enter 키 핸들러
+  const handleKeyDown = (
+    event: KeyboardEvent<HTMLInputElement>,
+    nextRef?: React.RefObject<HTMLInputElement>
+  ) => {
+    if (event.key === "Enter") {
+      if (nextRef && nextRef.current) {
+        nextRef.current.focus(); // 다음 입력 필드로 포커스 이동
+      } else {
+        handleLogin(); // 포커스가 없으면 로그인 처리
+      }
+    }
+  };
+
   return (
     <>
       <div className="signinbody">
@@ -145,6 +162,7 @@ const SignIn: React.FC = () => {
             placeholder="이메일 주소를 입력해주세요."
             value={email}
             onChange={handleChangeEmail}
+            onKeyDown={(e) => handleKeyDown(e, passwordInputRef)}
           />
 
           <div className="signin-text">비밀번호</div>
@@ -154,6 +172,8 @@ const SignIn: React.FC = () => {
             placeholder="비밀번호를 입력해주세요."
             value={password}
             onChange={handleChangePassword}
+            ref={passwordInputRef} // Ref 연결
+            onKeyDown={(e) => handleKeyDown(e)} // Enter 시 로그인 처리
           />
 
           <button className="signin-button-login" onClick={handleLogin}>
@@ -162,26 +182,22 @@ const SignIn: React.FC = () => {
 
           <div className="signup-button-or">or</div>
           <div className="signin-button-container2">
-            <button className="signin-button-google"
+            <button
+              className="signin-button-google"
               onClick={() =>
                 (window.location.href = `${apiUrl}/oauth2/authorization/google`)
               }
             >
-              <img
-                src="src/assets/google_login.png"
-                alt="Google 로그인"
-              />
+              <img src="src/assets/google_login.png" alt="Google 로그인" />
             </button>
 
-            <button className="signin-button-kakao"
+            <button
+              className="signin-button-kakao"
               onClick={() =>
                 (window.location.href = `${apiUrl}/oauth2/authorization/kakao`)
               }
             >
-              <img
-                src="src/assets/kakao_login.png"
-                alt="Kakao 로그인"
-              />
+              <img src="src/assets/kakao_login.png" alt="Kakao 로그인" />
             </button>
           </div>
 
