@@ -49,12 +49,15 @@ public class TokenManagementService {
         addCookie(response, "accessToken", accessToken);
 
         boolean isBlacked = false;
-        LocalDateTime blacklistUser = isBlacklistUser(user.getUserEmail());
-        if (blacklistUser != null) {
+        LocalDateTime blacklistExp = isBlacklistUser(user.getUserEmail());
+        if (blacklistExp != null) {
             isBlacked = true;
         }
 
-        return new UserLoginResponse(accessToken, refreshToken, user.getUserEmail(), user.getUserProfile(), isBlacked, blacklistUser, user.getRole());
+        return new UserLoginResponse(accessToken, refreshToken,
+                user.getUserEmail(), user.getUserProfile(),
+                user.getUserNickname(), user.getUserKindness(),
+                isBlacked, blacklistExp, user.getRole());
     }
 
 

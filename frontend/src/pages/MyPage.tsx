@@ -18,6 +18,7 @@ const MyPage: React.FC = () => {
   const [nickname, setNickname] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const [fevel, setFevel] = useState(0);
   const [password, setPassword] = useState<string>(""); // 비밀번호 상태 추가
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -141,6 +142,7 @@ const MyPage: React.FC = () => {
       setEmail(user.userEmail);
       setNickname(user.userNickname || "");
       setPhone(user.userPhone || "");
+      setFevel(user.userKindness);
 
       // user.userAddress가 유효한 경우에만 split 호출
       if (user.userAddress) {
@@ -263,6 +265,33 @@ const MyPage: React.FC = () => {
             uploadedImage={profileImage}
           />
         </div>
+        <div className="mypage-level">
+            <div className="mypage-level-header">
+              <div className="mypage-level-header">
+                <h3>My f-evel</h3>
+                <div className="mypage-fevel-container">
+                  <progress
+                    className="mypage-fevel"
+                    value={fevel}
+                    max="7"
+                  ></progress>
+                  <div className="mypage-level-steps">
+                    {[...Array(8)].map((_, index) => (
+                      <span
+                        key={index}
+                        className={`mypage-level-step ${
+                          index === fevel ? "active" : ""
+                        }
+                         ${fevel === 0 ? "zero-step" : ""}`}
+                      >
+                        {index}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         <form className="mypage-form" onSubmit={handleEditProfile}>
           <div className="mypage-form-group">
             <label htmlFor="email">email</label>

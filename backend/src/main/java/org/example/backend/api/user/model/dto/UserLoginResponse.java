@@ -17,6 +17,8 @@ public class UserLoginResponse {
     private String refreshToken;
     private String userEmail;
     private String userProfile;
+    private String userNickname;
+    private int userKindness;
     private boolean isBlacked;
     private LocalDateTime blacklistExpiryDate;
     private Role role;

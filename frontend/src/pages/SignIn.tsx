@@ -11,6 +11,8 @@ interface UserLoginResponse {
   blacked: boolean;
   blacklistExpiryDate: Date;
   role: string;
+  userNickname: string;
+  userKindness: number;
 }
 
 const SignIn: React.FC = () => {
@@ -48,6 +50,8 @@ const SignIn: React.FC = () => {
           localStorage.setItem("userEmail", response.data.userEmail);
           localStorage.setItem("userProfile", response.data.userProfile);
           localStorage.setItem("role", response.data.role);
+          localStorage.setItem("fevel", response.data.userKindness.toString())
+          localStorage.setItem("userNickname", response.data.userNickname)
 
           alert("소셜 로그인 성공");
           // 이후 대시보드로 리디렉션
@@ -81,6 +85,8 @@ const SignIn: React.FC = () => {
       localStorage.setItem("userEmail", response.data.userEmail);
       localStorage.setItem("userProfile", response.data.userProfile);
       localStorage.setItem("role", response.data.role);
+      localStorage.setItem("fevel", response.data.userKindness.toString())
+      localStorage.setItem("userNickname", response.data.userNickname)
 
       console.log("response data:", response.data);
       if (response.data.blacked) {
