@@ -8,17 +8,29 @@ import { area } from "../data/area";
 
 const MyPage: React.FC = () => {
   // 상태 관리
-  const { user, fetchUserData, updateUserInfoWithFile, deleteUserAccount } =
-    useUser();
+  const {
+    user,
+    fetchUserData,
+    updateUserInfoWithFile,
+    deleteUserAccount,
+    setUser,
+  } = useUser();
   const [nickname, setNickname] = useState("");
   const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState(""); // 비밀번호 상태 추가
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState<string>(""); // 비밀번호 상태 추가
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null); // 파일 상태 추가
 
   const [selectedArea, setSelectedArea] = useState<string>("");
   const [selectedSubArea, setSelectedSubArea] = useState<string>("");
   const [selectWidth, setSelectWidth] = useState<number>(400); // 초기값 설정
+
+  const [passwordError, setPasswordError] = useState<string>("");
+  const [phoneError, setPhoneError] = useState<string>("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState<string>("");
+  const [formValid, setFormValid] = useState(false);
 
   const areaSelectRef = useRef<HTMLSelectElement>(null);
 
@@ -27,6 +39,75 @@ const MyPage: React.FC = () => {
   // 선택된 지역에 따라 하위 지역 목록을 가져옴
   const subAreas =
     area.find((area) => area.name === selectedArea)?.subArea || [];
+
+  // 비밀번호 유효성 검사
+  const validatePassword = (password: string) => {
+    const minLength = 8; // 비밀번호 최소 길이
+    const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/;
+    return password.length >= minLength && regex.test(password);
+  };
+
+  // 비밀번호 확인 검사
+  const validateConfirmPassword = (
+    password: string,
+    confirmPassword: string
+  ) => {
+    return password === confirmPassword;
+  };
+
+  // 전화번호 유효성 검사
+  const validatePhone = (phone: string) => {
+    const regex = /^\d{3}-\d{4}-\d{4}$/;
+    return regex.test(phone);
+  };
+
+  // 실시간 유효성 검사
+  useEffect(() => {
+    setPasswordError(
+      password === ""
+        ? ""
+        : validatePassword(password)
+        ? ""
+        : "비밀번호는 최소 8자 이상, 영문과 숫자를 포함해야 합니다."
+    );
+    setConfirmPasswordError(
+      confirmPassword === ""
+        ? ""
+        : validateConfirmPassword(password, confirmPassword)
+        ? ""
+        : "비밀번호가 일치하지 않습니다."
+    );
+    setPhoneError(
+      phone === ""
+        ? ""
+        : validatePhone(phone)
+        ? ""
+        : "전화번호는 000-0000-0000 형식으로 입력해주세요."
+    );
+
+    console.log(
+      "passwordcheck:",
+      validatePassword(password) || password === ""
+    );
+    console.log(
+      "passwordconfirmcheck:",
+      validateConfirmPassword(password, confirmPassword) ||
+        (password === null && confirmPassword === null)
+    );
+    console.log(
+      "phonecheck:",
+      validatePhone(phone) || phone === user?.userPhone
+    );
+
+    // 폼이 모두 유효한지 체크
+    setFormValid(
+      (validatePassword(password) || password === "") &&
+        (validateConfirmPassword(password, confirmPassword) ||
+          (password === "" && confirmPassword === "")) &&
+        (validatePhone(phone) || phone === user?.userPhone)
+    );
+    console.log("formvaild:", formValid);
+  }, [password, confirmPassword, phone]);
 
   // 이벤트 핸들러
   const handleAreaChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -57,10 +138,21 @@ const MyPage: React.FC = () => {
 
   useEffect(() => {
     if (user) {
+      setEmail(user.userEmail);
       setNickname(user.userNickname || "");
       setPhone(user.userPhone || "");
-      setSelectedArea(user.userAddress.split(" ")[0] || "지역");
-      setSelectedSubArea(user.userAddress.split(" ")[1] || "시, 군, 구구");
+
+      // user.userAddress가 유효한 경우에만 split 호출
+      if (user.userAddress) {
+        const addressParts = user.userAddress.split(" ");
+        setSelectedArea(addressParts[0] || "지역");
+        setSelectedSubArea(addressParts[1] || "시, 군, 구");
+      } else {
+        // user.userAddress가 없을 경우 기본값 설정
+        setSelectedArea("지역");
+        setSelectedSubArea("시, 군, 구");
+      }
+
       setProfileImage(user.userProfile || null);
     }
   }, [user]);
@@ -72,23 +164,40 @@ const MyPage: React.FC = () => {
     const fullAddress = `${selectedArea} ${selectedSubArea}`;
     const userUpdateDto = {
       userNickname: nickname,
-      userPassword: password,
       userPhone: phone,
       userAddress: fullAddress,
+      userPassword: password, // password가 비어있지 않을 때만 추가
+      userProfile: profileImage || "",
     };
+
+    if (!formValid) {
+      Swal.fire({
+        title: "회원정보 변경 실패",
+        text: "입력하신 정보가 올바르지 않습니다.",
+        icon: "error",
+        confirmButtonColor: "#d33",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
 
     try {
       const updatedUser = await updateUserInfoWithFile(
         userUpdateDto,
         selectedFile
       );
+
       Swal.fire({
         icon: "success",
         title: "프로필 업데이트 완료",
         text: "프로필 정보가 성공적으로 업데이트되었습니다.",
         confirmButtonText: "확인",
+      }).then(() => {
+        setUser(updatedUser);
+        localStorage.setItem("userProfile", updatedUser.userProfile);
+        navigate("/mypage");
       });
-      setProfileImage(updatedUser.userProfile); // 상태 갱신
+      // setProfileImage(updatedUser.userProfile); // 상태 갱신
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -156,6 +265,10 @@ const MyPage: React.FC = () => {
         </div>
         <form className="mypage-form" onSubmit={handleEditProfile}>
           <div className="mypage-form-group">
+            <label htmlFor="email">email</label>
+            <input id="email" type="text" value={email} disabled />
+          </div>
+          <div className="mypage-form-group">
             <label htmlFor="nickname">Nickname</label>
             <input
               id="nickname"
@@ -175,6 +288,9 @@ const MyPage: React.FC = () => {
               placeholder="Edit your phone number"
             />
           </div>
+          {phoneError && (
+            <div className="mypage-error-message">{phoneError}</div>
+          )}
           <div className="mypage-form-group">
             <label htmlFor="address">Address</label>
             <div className="select-container">
@@ -215,9 +331,27 @@ const MyPage: React.FC = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Edit your password"
+              placeholder="변경하실 비밀번호를 입력해주세요."
             />
+            {passwordError && (
+              <div className="mypage-error-message">{passwordError}</div>
+            )}
           </div>
+          {/* Confirm Password 입력 */}
+          <div className="mypage-form-group">
+            <label htmlFor="confirmPassword">Confirm Password</label>
+            <input
+              id="confirmPassword"
+              type="password"
+              placeholder="비밀번호를 다시 입력해주세요."
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+            {confirmPasswordError && (
+              <div className="mypage-error-message">{confirmPasswordError}</div>
+            )}
+          </div>
+
           <div className="mypage-delete-id">
             <button
               type="button"

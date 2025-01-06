@@ -5,11 +5,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.backend.api.user.model.dto.UserLoginResponse;
 import org.example.backend.api.user.model.entity.User;
 import org.example.backend.api.user.repository.UserRepository;
 import org.example.backend.api.user.service.TokenManagementService;
 import org.example.backend.exceptions.UserNotFoundException;
 import org.example.backend.security.model.PrincipalDetails;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -23,6 +25,9 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private final UserRepository userRepository;
     private final TokenManagementService tokenManagementService;
 
+    @Value("${server.host}")
+    private String host;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
@@ -31,8 +36,11 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         User user = userRepository.findByUserEmail(userEmail)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        tokenManagementService.handleSuccessfulLogin(user, response);
+        UserLoginResponse userLoginResponse = tokenManagementService.handleSuccessfulLogin(user, response);
+
+        String accessToken = userLoginResponse.getAccessToken();
         // 메인 페이지로 리디렉션
-        response.sendRedirect("/api/recipes");
+        String redirectUrl = "http://" + host + "signin?socialtoken=" + accessToken;
+        response.sendRedirect(redirectUrl);
     }
 }

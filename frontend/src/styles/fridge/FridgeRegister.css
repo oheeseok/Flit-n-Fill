@@ -112,6 +112,7 @@
 .fridge-register-radio-group {
   display: flex;
   gap: 10px;
+  justify-content: center;
 }
 
 .fridge-register-radio-group label {
@@ -157,4 +158,9 @@
   font-style: normal;
   font-weight: 700;
   line-height: 20px; /* 125% */
+}
+
+textarea {
+  resize: none;
+  height: 100px;
 }

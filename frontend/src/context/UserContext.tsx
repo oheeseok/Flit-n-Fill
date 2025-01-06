@@ -5,7 +5,6 @@ import Swal from "sweetalert2";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
-
 // 사용자 타입 정의
 interface User {
   userId: number;
@@ -31,6 +30,7 @@ interface UserContextType {
       userPassword: string;
       userPhone: string;
       userAddress: string;
+      userProfile: string;
     },
     userProfileFile: File | null
   ) => Promise<User>; // 반환 타입을 `Promise<User>`로 수정
@@ -81,17 +81,13 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
 
     try {
       console.log("Updating user info:", updatedUser);
-      const response = await axios.put(
-        `${apiUrl}/api/user/info`,
-        updatedUser,
-        {
-          withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-            userEmail: localStorage.getItem("userEmail"),
-          },
-        }
-      );
+      const response = await axios.put(`${apiUrl}/api/user/info`, updatedUser, {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          userEmail: localStorage.getItem("userEmail"),
+        },
+      });
 
       if (response.status === 200) {
         console.log("User info updated successfully:", response.data);
@@ -114,6 +110,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
       userPassword: string;
       userPhone: string;
       userAddress: string;
+      userProfile: string;
     },
     userProfileFile: File | null
   ): Promise<User> => {
@@ -130,7 +127,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
 
     try {
       const response = await axios.put<User>(
-        "http://localhost:8080/api/user/info",
+          `${apiUrl}/api/user/info`,
         formData,
         {
           headers: {

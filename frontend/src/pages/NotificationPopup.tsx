@@ -169,7 +169,7 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({
     }
   };
   return (
-    <div className="notification-popup" ref={popupRef}>
+    <div className="notification-popup" ref={popupRef} onClick={(e) => e.stopPropagation()}>
       <div className="notification-header">
         <button onClick={() => markAllAsRead()}>전체 읽음</button>
         <button onClick={handleDeleteAll}>전체 삭제</button>

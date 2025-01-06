@@ -49,17 +49,14 @@ public class EmailService {
     @Value("${server.host}")
     private String host;
 
-    @Value("${server.port}")
-    private String port;
-
     public void sendEmail(String to, String subject, String content) {  // 이메일 전송
         try {
             MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, false, "UTF-8");
+//            MimeMessageHelper helper = new MimeMessageHelper(message, false, "UTF-8");
 
-            helper.setTo(to);    // 이메일 받을 주소
-            helper.setSubject(subject);
-            helper.setText(content, true);
+            message.setRecipients(MimeMessage.RecipientType.TO, to);    // 이메일 받을 주소
+            message.setSubject(subject, "UTF-8");
+            message.setContent(content, "text/html; charset=utf-8");
             mailSender.send(message);
         } catch (Exception e) {
             throw new RuntimeException("이메일 전송 실패", e);
@@ -98,7 +95,7 @@ public class EmailService {
                     content.append("<br>");
                 }
             }
-            content.append("<strong><a href=\"http://" + host + ":" + 5173 + "/api/recipes\" target=\"_blank\">추천 레시피 보러가기</a></strong>");
+            content.append("<strong><a href=\"http://" + host + "/recipe\">추천 레시피 보러가기</a></strong>");
 
             if (!foodList.isEmpty()) {
                 sendEmail(user.getUserEmail(), "[소비기한 임박 알림]", content.toString());
@@ -127,6 +124,7 @@ public class EmailService {
         TradeType type = post.getTradeType();
         String subject = "";
         StringBuilder content = new StringBuilder();
+        log.info("====== {}", host);
 
         if (type.equals(TradeType.EXCHANGE)) {
             subject = "[교환 요청 알림]";
@@ -137,7 +135,7 @@ public class EmailService {
             content.append("<h3>회원님의 게시글에 대해 나눔 요청이 접수되었습니다.</h3>" +
                     "<h3>자세한 내용은 아래 정보를 확인해 주세요!</h3><br>");
         }
-        content.append("<strong><a href=\"http://" + host + ":" + 5173 + "/api/posts/" + postId + "\">게시글 보러가기</a></strong>");
+        content.append("<strong><a href=\"http://" + host + "/community/detail/" + postId + "\">게시글 보러가기</a></strong>");
         content.append("<br>요청자 : " + proposer.getUserNickname() + "님");
 
         sendEmail(writer.getUserEmail(), subject, content.toString());

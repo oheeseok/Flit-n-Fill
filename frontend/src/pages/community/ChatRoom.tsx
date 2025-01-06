@@ -28,6 +28,8 @@ const ChatRoom: React.FC = () => {
   const [newMessage, setNewMessage] = useState<string>("");
   const [postInfo, setPostInfo] = useState<PostSimpleDto | null>(null);
 
+  const [visibleInfoIndex, setVisibleInfoIndex] = useState<number | null>(null); // 하나의 인덱스를 저장
+
   const [reportMessage, setReportMessage] = useState<string>("");
 
   const { user, fetchUserData } = useUser();
@@ -184,7 +186,6 @@ const ChatRoom: React.FC = () => {
   };
 
   const reportUser = async () => {
-    console.log("reportUser()");
     if (reportMessage.trim() === "") return;
 
     // 이스케이프된 문자를 처리
@@ -229,7 +230,7 @@ const ChatRoom: React.FC = () => {
         console.error("An unknown error occurred:", error);
         Swal.fire({
           icon: "error",
-          text: "An unknown error occurred",
+          text: "신고가 정상적으로 이루어지지 않았습니다.",
         });
       }
     }
@@ -244,6 +245,9 @@ const ChatRoom: React.FC = () => {
       showCancelButton: true,
       confirmButtonText: "신고하기",
       cancelButtonText: "취소",
+      inputAttributes: {
+        style: "resize: none;", // resize none을 추가
+      },
       preConfirm: (inputValue) => {
         if (!inputValue) {
           Swal.showValidationMessage("신고 사유를 입력해주세요.");
@@ -259,67 +263,96 @@ const ChatRoom: React.FC = () => {
     });
   };
 
+  // 프로필 클릭 시, 해당 인덱스에 대한 토글을 처리
+  const handleProfileClick = (index: number) => {
+    setVisibleInfoIndex((prevIndex) => (prevIndex === index ? null : index)); // 클릭한 인덱스가 이미 보이고 있으면 숨기고, 아니면 보여주기
+  };
+
+  const handleWidgetClick = (e: React.MouseEvent, index: number) => {
+    // 클릭된 위젯이 이미 보이고 있으면 닫고, 아니면 열기
+    e.stopPropagation(); // 프로필 클릭 이벤트와 겹치지 않도록 이벤트 전파를 막음
+    setVisibleInfoIndex((prevIndex) => (prevIndex === index ? null : index));
+  };
+
+  const handlePostClick = () => {
+    if (postInfo) {
+      navigate(`/community/detail/${postInfo.postId}`);
+    }
+  };
+
   return (
     <div className="chatroom-container">
       {/* 채팅방 헤더 */}
       <div className="chatroom-header">
         <h2>
-          {fromEnumToDescription(postInfo?.progress ?? "")}
-          {postInfo
-            ? `[${fromEnumToDescription(postInfo.tradeType)}/${
-                postInfo.address
-              }] ${postInfo.postTitle}`
-            : ""}
+          <span
+            className={`progress-text ${
+              postInfo?.progress === "IN_PROGRESS"
+                ? "progress-inprogress"
+                : postInfo?.progress === "COMPLETED"
+                ? "progress-completed"
+                : postInfo?.progress === "CANCELED"
+                ? "progress-canceled"
+                : "progress-pending"
+            }`}
+          >
+            {fromEnumToDescription(postInfo?.progress ?? "")}
+          </span>
+          {postInfo ? (
+            <span
+              className="post-title"
+              onClick={handlePostClick}
+              style={{ cursor: "pointer" }}
+            >
+              [{fromEnumToDescription(postInfo.tradeType)}/{postInfo.address}]{" "}
+              {postInfo.postTitle}
+            </span>
+          ) : (
+            ""
+          )}
         </h2>
         <div className="chatroom-header-info">
-          {/* <span>{postInfo?.userNickname}</span> */}
-          <span>
+          <div className="user-info">
             <img
               src={postInfo?.userProfile}
               alt={postInfo?.userNickname}
               className="chatroom-profile-image"
             />
-          </span>
-          <span>
-            {postInfo?.postCreatedDate
-              ? format(
-                  new Date(postInfo.postCreatedDate),
-                  "yyyy-MM-dd HH:mm:ss"
-                )
-              : ""}
-          </span>
-          <span>
+            <div className="nickname-time">
+              <span className="nickname">{postInfo?.userNickname}</span>
+              <span className="post-time">
+                {postInfo?.postCreatedDate
+                  ? format(
+                      new Date(postInfo.postCreatedDate),
+                      "yyyy-MM-dd HH:mm:ss"
+                    )
+                  : ""}
+              </span>
+            </div>
+          </div>
+          <div className="button-group">
             <button
               className="chatroom-send-button"
               onClick={() => handleTrade(TRADE_COMPLETE)}
+              style={{ backgroundColor: "#4CAF50", color: "white" }}
             >
               거래완료
             </button>
-          </span>
-          <span>
             <button
-              className="chatroom-send-button"
+              className="chatroom-send-button trade-cancel"
               onClick={() => handleTrade(TRADE_CANCEL)}
+              style={{ backgroundColor: "#f44336", color: "white" }}
             >
               거래취소
             </button>
-          </span>
-          <span>
             <button
-              className="chatroom-send-button"
+              className="chatroom-send-button report"
               onClick={handleReportButtonClick}
+              style={{ backgroundColor: "#FF9800", color: "white" }}
             >
               신고하기
             </button>
-          </span>
-          <span>
-            <button
-              className="chatroom-send-button"
-              onClick={() => navigate("/chatroomlist")}
-            >
-              거래방 목록
-            </button>
-          </span>
+          </div>
         </div>
       </div>
 
@@ -332,19 +365,68 @@ const ChatRoom: React.FC = () => {
               message.userId === user?.userId ? "my-message" : "other-message"
             }`}
           >
-            <div className="chatroom-message-author">
-              {message.userId === user?.userId
-                ? myInfo?.userNickname
-                : otherUserInfo?.userNickname}
-            </div>
-            <div className="chatroom-profile-image">
-              {message.userId === user?.userId
-                ? myInfo?.userProfile
-                : otherUserInfo?.userProfile}
-            </div>
-            <div className="chatroom-message-content">{message.comment}</div>
-            <div className="chatroom-message-time">
-              {format(new Date(message.time), "yyyy-MM-dd HH:mm:ss")}
+            <div className="chatroom-message-container">
+              <div className="chatroom-user-info">
+                <div
+                  className="chatroom-profile-image"
+                  onClick={() => handleProfileClick(index)} // 클릭된 인덱스를 전달
+                >
+                  <img
+                    src={
+                      message.userId === user?.userId
+                        ? myInfo?.userProfile
+                        : otherUserInfo?.userProfile
+                    }
+                    className="chatroom-profile-image"
+                  />
+                </div>
+                {/* 클릭한 인덱스에 해당하는 프로필 정보만 보이도록 조건부 렌더링 */}
+                <div
+                  className={`profile-info-widget ${
+                    visibleInfoIndex === index ? "open" : ""
+                  }`}
+                  onClick={(e) => handleWidgetClick(e, index)}
+                >
+                  <img
+                    src={
+                      message.userId === user?.userId
+                        ? myInfo?.userProfile
+                        : otherUserInfo?.userProfile
+                    }
+                    className="chatroom-profile-image"
+                  />
+                  <p>
+                    {message.userId === user?.userId
+                      ? myInfo?.userNickname
+                      : otherUserInfo?.userNickname}
+                    님
+                  </p>
+                  <p>
+                    {message.userId === user?.userId
+                      ? myInfo?.userAddress
+                      : otherUserInfo?.userAddress}
+                  </p>
+                  <p>
+                    Fevel .
+                    {message.userId === user?.userId
+                      ? myInfo?.userKindness
+                      : otherUserInfo?.userKindness}
+                  </p>
+                </div>
+                <div className="chatroom-message-author">
+                  {message.userId === user?.userId
+                    ? myInfo?.userNickname
+                    : otherUserInfo?.userNickname}
+                </div>
+              </div>
+              <div className="chatroom-message-content-container">
+                <div className="chatroom-message-content">
+                  {message.comment}
+                </div>
+                <div className="chatroom-message-time">
+                  {format(new Date(message.time), "yyyy-MM-dd HH:mm:ss")}
+                </div>
+              </div>
             </div>
           </div>
         ))}
@@ -358,7 +440,8 @@ const ChatRoom: React.FC = () => {
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder="댓글을 남겨 보세요."
         />
-        <button className="chatroom-send-button" onClick={handleSendMessage}>
+        <button className="chatroom-send-button" onClick={handleSendMessage}
+        style={{ backgroundColor: "#85b573", color: "white" }}>
           입력하기
         </button>
       </div>

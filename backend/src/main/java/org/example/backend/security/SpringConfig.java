@@ -46,7 +46,7 @@ public class SpringConfig {
         // 인증 요청 페이지 설정
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/user/register", "/api/user/login", "/oauth2/**", "/api/subscribe/**", "/api/auth/**",
+                        .requestMatchers("/api/user/register", "/api/user/login", "api/user/login/social", "/oauth2/**", "/api/subscribe/**", "/api/auth/**",
                                 "/api/admin/login", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/**").authenticated()
@@ -82,7 +82,16 @@ public class SpringConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedOrigin("http://localhost:5173"); // React 개발 서버 주소
+        configuration.addAllowedOrigin("http://localhost:4173"); // React 개발 서버 주소
+        configuration.addAllowedOrigin("http://54.180.201.220/");
+        configuration.addAllowedOrigin("http://54.180.201.220"); // React 개발 서버 주소
         configuration.addAllowedOrigin("http://3.39.21.24"); // React 개발 서버 주소
+        configuration.addAllowedOrigin("http://52-1068271922.ap-northeast-2.elb.amazonaws.com/"); // React 개발 서버 주소
+        configuration.addAllowedOrigin("https://52-1068271922.ap-northeast-2.elb.amazonaws.com/"); // React 개발 서버 주소
+        configuration.addAllowedOrigin("http://www.flitnfill.kro.kr/"); // React 개발 서버 주소
+        configuration.addAllowedOrigin("http://www.flitnfill.kro.kr:8080/"); // React 개발 서버 주소
+        configuration.addAllowedOrigin("https://www.flitnfill.kro.kr/"); // React 개발 서버 주소
+
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
         configuration.setAllowCredentials(true);

@@ -3,7 +3,8 @@ name: Deploy Frontend to EC2-a
 on:
   push:
     branches:
-      - feature/129  # main 브랜치에 push될 때 실행
+      - dev  # main 브랜치에 push될 때 실행
+
 
 jobs:
   frontend-a:

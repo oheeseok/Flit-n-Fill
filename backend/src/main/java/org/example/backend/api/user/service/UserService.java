@@ -17,6 +17,7 @@ import org.example.backend.enums.RequestType;
 import org.example.backend.enums.TaskStatus;
 import org.example.backend.exceptions.LoginFailedException;
 import org.example.backend.exceptions.PasswordMismatchException;
+import org.example.backend.exceptions.UnauthorizedException;
 import org.example.backend.exceptions.UserNotFoundException;
 import org.example.backend.security.JwtTokenProvider;
 import org.example.backend.security.model.PrincipalDetails;
@@ -95,6 +96,17 @@ public class UserService {
        return tokenManagementService.handleSuccessfulLogin(user, response);
     }
 
+    public UserLoginResponse socialLogin(String socialToken, HttpServletResponse response) {
+        if (!jwtTokenProvider.isTokenExpired(socialToken)) {
+            String userEmail = jwtTokenProvider.getUserEmailFromToken(socialToken);
+            User user = userRepository.findByUserEmail(userEmail)
+                    .orElseThrow();
+            return tokenManagementService.handleSuccessfulLogin(user, response);
+        } else {
+            throw new UnauthorizedException("로그인 세션이 만료되었습니다.");
+        }
+    }
+
     public void logout(String token, String userEmail, HttpServletResponse response) {
         if (userEmail == null) {
             throw new IllegalArgumentException("이메일이 존재하지 않습니다.");
@@ -115,7 +127,7 @@ public class UserService {
         } catch (Exception e) {
             log.info(e + "이미 만료된 토큰입니다.");
         }
-//        log.info("만료기한 : {}", tokenExpiration);
+
         tokenManagementService.addBlacklistToken(token, tokenExpiration, response);
     }
 
@@ -150,19 +162,26 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
         user.setUserNickname(updateDto.getUserNickname() != null ? updateDto.getUserNickname() : user.getUserNickname());
-        if (updateDto.getUserPassword() != null && !passwordEncoder.matches(updateDto.getUserPassword(), user.getUserPassword())) {
+        if (updateDto.getUserPassword() != null && !updateDto.getUserPassword().equals("") && !passwordEncoder.matches(updateDto.getUserPassword(), user.getUserPassword())) {
             String password = passwordEncoder.encode(updateDto.getUserPassword());
             user.setUserPassword(password);
         }
         user.setUserPhone(updateDto.getUserPhone() != null ? updateDto.getUserPhone() : user.getUserPassword());
         user.setUserAddress(updateDto.getUserAddress() != null ? updateDto.getUserAddress() : user.getUserAddress());
-        if (userProfile != null && !userProfile.equals(PROFILE_DEFAULT_IMG_URL)) {
-            s3Service.deleteFile(user.getUserProfile());
-            String newProfile = s3Service.uploadFile(userProfile, "users/profile");
-            user.setUserProfile(newProfile);
-        } else {  // 프로필 삭제 시 기본 프로필로 변경
-//            s3Service.deleteFile(user.getUserProfile());
-            user.setUserProfile(PROFILE_DEFAULT_IMG_URL);
+
+        String oldMainProfile = user.getUserProfile();
+        MultipartFile newProfile = userProfile;
+        String backupProfile = "";
+
+        if (oldMainProfile != null && !oldMainProfile.isEmpty() && !oldMainProfile.equals(PROFILE_DEFAULT_IMG_URL)) {
+            backupProfile = oldMainProfile;
+        }
+
+        if (newProfile != null && !newProfile.isEmpty()) {
+            String newProfileUrl = s3Service.uploadFile(newProfile, "users/profile");
+            user.setUserProfile(newProfileUrl);
+        } else {
+            user.setUserProfile(backupProfile);
         }
 
         User updatedUser = userRepository.save(user);

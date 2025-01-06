@@ -75,21 +75,23 @@ const CommunityList: React.FC<CommunityListProps> = ({ filter }) => {
         {filteredPosts.map((post) => (
           <div className="recipe-list-container" key={post.postId}>
             <div className="recipe-list-box-name-title">
-              [{post.tradeType === "EXCHANGE" ? "교환" : "나눔"}]
+              [{post.tradeType === "EXCHANGE" ? "교환" : "나눔"} / {post.address}]
             </div>
+            <div className="recipe-list-box-card-title">{post.postTitle}</div>
             <div className="recipe-list-box-card">
               <div className="recipe-list-box-card-img-container">
                 {post.postPhoto1 ? (
+                  <Link to={`/community/detail/${post.postId}`}>
                   <img
                     className="recipe-list-box-card-img"
                     src={post.postPhoto1}
                     alt={post.postTitle}
                   />
+                  </Link>
                 ) : (
                   <p>이미지가 없습니다.</p>
                 )}
               </div>
-              <div className="recipe-list-box-card-title">{post.postTitle}</div>
               <div className="recipe-list-box-card-detail">
                 {post.userProfile ? (
                     <img

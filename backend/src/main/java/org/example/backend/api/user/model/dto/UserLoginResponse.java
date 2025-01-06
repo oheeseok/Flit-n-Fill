@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.backend.enums.Role;
 
 import java.time.LocalDateTime;
 
@@ -18,4 +19,5 @@ public class UserLoginResponse {
     private String userProfile;
     private boolean isBlacked;
     private LocalDateTime blacklistExpiryDate;
+    private Role role;
 }

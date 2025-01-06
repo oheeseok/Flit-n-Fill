@@ -174,6 +174,14 @@ const FridgeRegister = () => {
     ingredientType,
   ]);
 
+  useEffect(() => {
+    // 오늘 날짜를 구하고 YYYY-MM-DD 형식으로 변환
+    const today = new Date();
+    const formattedDate = today.toISOString().split("T")[0]; // YYYY-MM-DD 형식
+    setExpirationDate(formattedDate); // 기본값으로 설정
+    setManufactureDate(formattedDate);
+  }, []);
+
   const handleRegister = (): void => {
     // 유효성 검사 함수
     const validateInput = (): boolean => {
@@ -197,7 +205,7 @@ const FridgeRegister = () => {
           message: "수량을 입력해주세요.",
         },
         {
-          condition: new Date(expirationDate) <= new Date(),
+          condition: new Date(expirationDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0),
           message: "소비기한은 오늘 이후 날짜로 설정해야 합니다.",
         },
       ];
@@ -343,8 +351,6 @@ const FridgeRegister = () => {
     setName("");
     setQuantity("");
     setUnit("PIECE");
-    setExpirationDate("");
-    setManufactureDate("");
     setStorageMethod("REFRIGERATED");
     setRemarks("");
     setAdminRequest("");
@@ -361,8 +367,6 @@ const FridgeRegister = () => {
     setName("");
     setQuantity("");
     setUnit("PIECE");
-    setExpirationDate("");
-    setManufactureDate("");
     setStorageMethod("REFRIGERATED");
     setRemarks("");
     setAdminRequest("");
@@ -380,8 +384,6 @@ const FridgeRegister = () => {
     setName("");
     setQuantity("");
     setUnit("PIECE");
-    setExpirationDate("");
-    setManufactureDate("");
     setStorageMethod("REFRIGERATED");
     setRemarks("");
     setAdminRequest("");
@@ -521,10 +523,10 @@ const FridgeRegister = () => {
               />
               <select value={unit} onChange={(e) => setUnit(e.target.value)}>
                 <option value="PIECE">개</option>
-                <option value="L">L</option>
                 <option value="G">g</option>
                 <option value="KG">Kg</option>
                 <option value="ML">mL</option>
+                <option value="L">L</option>
               </select>
             </div>
           </div>
@@ -694,7 +696,7 @@ const FridgeRegister = () => {
             ></textarea>
           </div>
           <button className="edit" onClick={handleRequestRegister}>
-            저장
+            요청
           </button>
           <button onClick={() => setRequestPopupOpen(false)}>취소</button>
         </div>

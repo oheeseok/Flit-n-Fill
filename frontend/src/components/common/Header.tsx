@@ -6,17 +6,19 @@ import "../../styles/common/Header.css";
 import NotificationPopup from "../../pages/NotificationPopup";
 
 import { useSSEContext } from "../../context/SSEContext";
+import axios from "axios";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 
 const Header = () => {
   const { stopSSE } = useSSEContext();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [showNotification, setShowNotification] = useState<boolean>(false);
   const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {  // handleLogout을 async 함수로 선언
     Swal.fire({
       title: "로그아웃",
       text: "정말 로그아웃 하시겠습니까?",
@@ -26,18 +28,32 @@ const Header = () => {
       cancelButtonColor: "#d33",
       confirmButtonText: "로그아웃",
       cancelButtonText: "취소",
-    }).then((result) => {
+    }).then(async (result) => {  // then에서 비동기 함수 처리
       if (result.isConfirmed) {
         const userEmail = localStorage.getItem("userEmail");
         if (userEmail) {
           const userUrl = `${apiUrl}/api/subscribe/${userEmail}`;
           stopSSE(userUrl); // SSE 연결 종료
         }
-        localStorage.clear();
-        setIsLoggedIn(false);
-        Swal.fire("로그아웃 완료", "로그아웃 되었습니다.", "success");
-        stopSSE(); // SSE 연결 종료
-        navigate("/");
+        try {
+          // 로그아웃 요청 보내기
+          await axios.get(`${apiUrl}/api/user/logout`, {
+            withCredentials: true,
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+              userEmail: localStorage.getItem("userEmail"),
+            },
+          });
+  
+          localStorage.clear();
+          setIsLoggedIn(false);
+  
+          Swal.fire("로그아웃 완료", "로그아웃 되었습니다.", "success");
+          navigate("/");
+        } catch (error) {
+          console.error("로그아웃 요청 실패:", error);
+          Swal.fire("오류", "로그아웃 요청에 실패했습니다.", "error");
+        }
       }
     });
   };
@@ -83,6 +99,12 @@ const Header = () => {
     } else {
       setProfileImage("/assets/user-icon.png"); // 기본 아이콘
     }
+
+    if (localStorage.getItem("role") === "ADMIN") {
+      setIsAdmin(true);
+    } else {
+      setIsAdmin(false);
+    }
   }, []);
 
   const toggleNotification = () => {
@@ -104,7 +126,7 @@ const Header = () => {
         <Link to="/recipe">recipe</Link>
         <Link to="/community">community</Link>
         <Link to="/cart">cart</Link>
-        <Link to="/adminpage">adminpage</Link>{" "}
+        {isLoggedIn && isAdmin && <Link to="/adminpage">adminpage</Link>}
         {/* adminpage로 이동하는 링크 추가 */}
         {/* 로그인 상태에 따라 메뉴 다르게 표시 */}
         {isLoggedIn ? (
@@ -130,23 +152,35 @@ const Header = () => {
               <div className="header-user-menu" ref={menuRef}>
                 <ul>
                   <li>
-                    <Link to="/mypage" onClick={handleMenuClick}>
+                    <Link to="/mypage" onClick={() => {
+                      handleMenuClick(); 
+                      setShowUserMenu((prev) => !prev)
+                      }}>
                       회원 정보 수정
                     </Link>
                   </li>
                   <li>
-                    <Link to="#" onClick={handleMenuClick}>
-                      내 게시글 보기
+                    <Link to="/myposts" onClick={() => {
+                      handleMenuClick(); 
+                      setShowUserMenu((prev) => !prev)
+                      }}>
+                      내 게시글 목록
                     </Link>
                   </li>
                   <li>
-                    <Link to="#" onClick={handleMenuClick}>
-                      내 거래방 보기
+                    <Link to="/chatroomlist" onClick={() => {
+                      handleMenuClick(); 
+                      setShowUserMenu((prev) => !prev)
+                      }}>
+                      내 거래방 목록
                     </Link>
                   </li>
                   <li>
-                    <Link to="#" onClick={handleMenuClick}>
-                      내 레시피 보기
+                    <Link to="/myrecipes" onClick={() => {
+                      handleMenuClick(); 
+                      setShowUserMenu((prev) => !prev)
+                      }}>
+                      내 레시피 목록
                     </Link>
                   </li>
                   <li>

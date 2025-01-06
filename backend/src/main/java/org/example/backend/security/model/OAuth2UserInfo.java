@@ -15,6 +15,8 @@ public record OAuth2UserInfo(
         AuthProvider authProvider
 ) {
 
+    private static final String PROFILE_DEFAULT_IMG_URL = "https://flitnfill.s3.ap-northeast-2.amazonaws.com/default-img/profile-default-img.jpg";
+
     public static OAuth2UserInfo of(String registrationId, Map<String, Object> attributes) throws AuthException {
         return switch (registrationId) {
             case "google" -> ofGoogle(attributes);
@@ -49,9 +51,11 @@ public record OAuth2UserInfo(
         User user = new User();
         user.setUserEmail(email);
         user.setUserName(name);
-        user.setUserProfile(profile);
+        user.setUserProfile(profile == null ? PROFILE_DEFAULT_IMG_URL : profile);
         user.setUserNickname(email.split("@")[0]);
         user.setAuthProvider(authProvider);
+        user.setUserKindness(1);
+        user.setUserExp(50);
         return user;
     }
 }

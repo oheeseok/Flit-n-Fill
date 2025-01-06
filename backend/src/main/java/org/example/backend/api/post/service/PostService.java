@@ -130,9 +130,17 @@ public class PostService {
       throw new NoSuchElementException("Food does not exist with ID: " + postUpdateDto.getWriterFoodId());
     }
 
-    Optional<FoodList> foodList = foodListRepository.findById(postUpdateDto.getProposerFoodListId());
-    if (! foodList.isPresent()) {
-      throw new NoSuchElementException("FoodList does not exist with ID: " + postUpdateDto.getProposerFoodListId());
+    if (postUpdateDto.getProposerFoodListId() != null) {  // 교환일 경우에만 foodList 검증
+      Optional<FoodList> foodList = foodListRepository.findById(postUpdateDto.getProposerFoodListId());
+      if (! foodList.isPresent()) {
+        throw new NoSuchElementException("FoodList does not exist with ID: " + postUpdateDto.getProposerFoodListId());
+      }
+      post.setProposerFoodList(foodList.get());
+      String proposerFoodName = foodList.get().getFoodListType() == null ?
+          foodList.get().getFoodListProduct() :
+          foodList.get().getFoodListType();
+      post.setProposerFoodList(foodList.get());
+
     }
 
     if (postMainPhoto != null && !postMainPhoto.isEmpty()) {
@@ -143,11 +151,8 @@ public class PostService {
     }
 
     String writerFoodName = writerFood.get().getFoodListName();
-    String proposerFoodName = foodList.get().getFoodListType() == null ?
-        foodList.get().getFoodListProduct() :
-        foodList.get().getFoodListType();
 
-    log.info("[PostService.updatePost] writerFoodName: {}, proposerFoodName: {}", writerFoodName, proposerFoodName);
+//    log.info("[PostService.updatePost] writerFoodName: {}, proposerFoodName: {}", writerFoodName, proposerFoodName);
 
     // 글 수정 시 교환, 나눔은 불변
     // 글 수정 시 사용자의 위치로 변경
@@ -160,7 +165,6 @@ public class PostService {
     post.setAddress(post.getUser().getUserAddress());
 
     post.setWriterFood(writerFood.get());
-    post.setProposerFoodList(foodList.get());
 
     postRepository.save(post);
 

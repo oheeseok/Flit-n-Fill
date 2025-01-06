@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { useToastContext } from "./ToastContext";
+import { EventSourcePolyfill } from "event-source-polyfill";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const SSEContext = createContext<any>(null);
@@ -19,7 +20,12 @@ export const SSEProvider = ({ children }: { children: React.ReactNode }) => {
       return;
     }
 
-    let es: EventSource | null = new EventSource(url);
+    let es: EventSourcePolyfill | null = new EventSourcePolyfill(url, {
+      withCredentials: true,
+      headers: {
+        "Access-Control-Allow-Origin": `${apiUrl}`,
+      },
+    });
 
     // 연결이 성공적으로 이루어졌을 때
     es.onopen = () => {
@@ -28,20 +34,20 @@ export const SSEProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     // 'connect' 이벤트 수신
-    es.addEventListener("connect", (event) => {
+    es.addEventListener("connect", (event: any) => {
       const message = (event as MessageEvent).data;
       console.log("SSE First Connect Message:", message);
     });
 
     // 'notification' 이벤트 수신
-    es.addEventListener("notification", (event) => {
+    es.addEventListener("notification", (event: any) => {
       const message = (event as MessageEvent).data;
       console.log("SSE Message:", message);
       addToast(message); // Toast 메시지 추가
     });
 
     // 연결 오류 발생 시 재연결 시도
-    es.onerror = (error) => {
+    es.onerror = (error: any) => {
       console.error("SSE Error: ", error);
       es?.close(); // 기존 연결 종료
       setIsConnected(false); // 연결 상태 false로 설정
@@ -98,8 +104,18 @@ export const SSEProvider = ({ children }: { children: React.ReactNode }) => {
       }
     }
 
+    const handleBeforeUnload = () => {
+      const userEmail = localStorage.getItem("userEmail");
+      if (userEmail) {
+        stopSSE(`${apiUrl}/api/subscribe/${userEmail}`);
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
     // 컴포넌트 언마운트 시 SSE 종료
     return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
       const userEmail = localStorage.getItem("userEmail");
       if (userEmail) {
         console.log("컴포넌트 언마운트 시 SSE 종료");

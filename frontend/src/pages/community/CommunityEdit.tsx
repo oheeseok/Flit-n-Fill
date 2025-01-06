@@ -5,6 +5,29 @@ import axios from "axios";
 import "../../styles/community/CommunityEdit.css";
 import CommunityImageEdit from "../../components/community/CommunityImageEdit";
 
+interface FoodDetailDto {
+  foodId: number;
+  foodListName: string;
+  foodRegistDate: string;
+  foodCount: number;
+  foodUnit: string;
+  foodProDate: string;
+  foodExpDate: string;
+  foodStorage: string;
+  foodIsThaw: boolean;
+  foodDescription: string;
+  foodListIcon: string;
+  foodListId: number;
+}
+
+interface FoodListViewDto {
+  foodListId: number;
+  foodListGroup: string;
+  foodListType: string;
+  foodListProduct: string;
+  foodListIcon: number;
+}
+
 const CommunityEdit = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
@@ -15,8 +38,12 @@ const CommunityEdit = () => {
   const [meetingPlace, setMeetingPlace] = useState("");
   const [meetingTime, setMeetingTime] = useState("");
   const [postPhoto1, setPostPhoto1] = useState<File | null>(null);
-  const [writerFoodId, setWriterFoodId] = useState(0);
-  const [proposerFoodListId, setProposerFoodListId] = useState(0);
+  const [proposerFoodName, setProposerFoodName] = useState("");
+  const [writerFoodId, setWriterFoodId] = useState<number>(0);
+  const [proposerFoodListId, setProposerFoodListId] = useState<number | null>(null);
+  const [tradeType, setTradeType] = useState("");
+  const [fridgeItems, setFridgeItems] = useState<FoodDetailDto[]>([]);
+  const [foodList, setFoodList] = useState<FoodListViewDto[]>([]);
 
   // 기존 데이터 가져오기
   useEffect(() => {
@@ -38,7 +65,8 @@ const CommunityEdit = () => {
         setMeetingTime(post.meetingTime);
         setPostPhoto1(post.postPhoto1); 
         setWriterFoodId(post.writerFoodId);
-        setProposerFoodListId(post.proposerFoodListId);
+        setProposerFoodName(post.proposerFoodName);
+        setTradeType(post.tradeType);
       } catch (error) {
         console.error("게시글 가져오기 실패:", error);
         Swal.fire("오류", "게시글 데이터를 가져오는 데 실패했습니다.", "error").then(
@@ -53,6 +81,58 @@ const CommunityEdit = () => {
       fetchPostData();
     }
   }, [postId, navigate]);
+
+  // 작성자의 재료 목록 가져오기
+  useEffect(() => {
+    const fetchFridgeItems = async () => {
+      try {
+        const response = await axios.get<FoodDetailDto[]>(`${apiUrl}/api/my-fridge`, {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
+          },
+        });
+        const filteredItems = response.data.filter((item) => item.foodListId !== null)
+
+        const uniqueItems = Array.from(
+          new Map(filteredItems.map((item) => [item.foodListName, item])).values()
+        );
+
+        console.log("fridge items: ", response.data)
+        setFridgeItems(uniqueItems);
+      } catch (error) {
+        console.error("작성자의 재료를 가져오는 데 실패했습니다:", error);
+        Swal.fire("오류", "작성자의 재료를 가져오는 데 실패했습니다.", "error");
+      }
+    };
+
+    fetchFridgeItems();
+  }, []);
+
+  // 음식 리스트 가져오기
+  useEffect(() => {
+    const fetchFoodList = async () => {
+      try {
+        const response = await axios.get<FoodListViewDto[]>(
+          `${apiUrl}/api/foodlist`,
+          {
+            withCredentials: true,
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+              userEmail: localStorage.getItem("userEmail"),
+            },
+          }
+        );
+        console.log("foodList: ", response.data)
+        setFoodList(response.data); // 가져온 데이터를 상태에 저장
+      } catch (error) {
+        console.error("음식 리스트를 가져오는 데 실패했습니다:", error);
+      }
+    };
+
+    fetchFoodList();
+  }, []);
 
   const handlePhoto1Change = (image: File) => setPostPhoto1(image);
 
@@ -137,6 +217,10 @@ const CommunityEdit = () => {
 
   return (
     <div className="community-edit-body">
+      {/* 교환/나눔 표시 */}
+      <div className="community-detail-category">
+        [{tradeType === "EXCHANGE" ? "교환" : "나눔"}]
+      </div>
       {/* 제목 입력 */}
       <input
         type="text"
@@ -152,6 +236,7 @@ const CommunityEdit = () => {
           uploadedImage={postPhoto1}
         />
       </div>
+      거래 장소
       {/* 장소 입력 */}
       <input
         type="text"
@@ -160,6 +245,7 @@ const CommunityEdit = () => {
         onChange={(e) => setMeetingPlace(e.target.value)}
         placeholder="만남 장소를 입력하세요"
       />
+      거래 시간
       {/* 시간 입력 */}
       <input
         type="datetime-local"
@@ -169,20 +255,35 @@ const CommunityEdit = () => {
         placeholder="만남 시간을 입력하세요"
       />
       {/* 작성자/제안자 음식 ID 입력 */}
-      작성자의 재료
-      <input
-        type="number"
-        className="community-edit-text"
+      나의 재료
+      <select
+        className="community-register-text"
         value={writerFoodId}
         onChange={(e) => setWriterFoodId(Number(e.target.value))}
-      />
-      교환 원하는 재료
-      <input
-        type="number"
-        className="community-edit-text"
-        value={proposerFoodListId}
-        onChange={(e) => setProposerFoodListId(Number(e.target.value))}
-      />
+      >
+        {fridgeItems.map((item) => (
+          <option key={item.foodId} value={item.foodId}>
+            {item.foodListName}
+          </option>
+        ))}
+      </select>
+      { tradeType !== "SHARING" && (
+          <div>
+            <label>교환 원하는 재료</label>
+            <select
+              className="community-register-text"
+              onChange={(e) => 
+                setProposerFoodListId(Number(e.target.value))}
+            >
+              <option value="">{proposerFoodName}</option>
+              {foodList.map((food) => (
+                <option key={food.foodListId} value={food.foodListId}>
+                  {food.foodListProduct !== null ? food.foodListProduct : food.foodListType}
+                </option>
+              ))}
+            </select>
+          </div>
+      )}
       {/* 내용 입력 */}
       <textarea
         className="community-edit-box-input"

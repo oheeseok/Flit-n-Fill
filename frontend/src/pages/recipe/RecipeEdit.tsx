@@ -16,8 +16,10 @@ interface RecipeStepDto {
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const RecipeEdit = () => {
+
   const RECIPE_STEP_DEFAULT_IMG_URL =
     "https://flitnfill.s3.ap-northeast-2.amazonaws.com/default-img/recipe-step-default-img.png";
+
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
@@ -186,6 +188,7 @@ const RecipeEdit = () => {
         );
       }
       // 서버에 PUT 요청 (axios 사용)
+
       const response = await axios.put(
         `${apiUrl}/api/recipes/${id}`,
         formData,
@@ -199,6 +202,7 @@ const RecipeEdit = () => {
         }
       );
       console.log("Recipe updated successfully:", response.data);
+
       if (response.status === 200) {
         Swal.fire({
           icon: "success",

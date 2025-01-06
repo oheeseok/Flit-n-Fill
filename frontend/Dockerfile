@@ -19,6 +19,9 @@ RUN npm run build
 # 2단계: 서버 단계 (Nginx를 사용하여 빌드된 파일을 서빙)
 FROM nginx:alpine
 
+# Nginx 설정 파일을 복사하여 덮어쓰기
+COPY nginx.conf /etc/nginx/nginx.conf
+
 # 빌드된 리액트 파일들을 Nginx 기본 웹 디렉토리로 복사
 COPY --from=build /app/dist /usr/share/nginx/html
 
