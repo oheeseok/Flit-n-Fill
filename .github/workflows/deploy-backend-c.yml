@@ -1,0 +1,118 @@
+name: Deploy Backend-a
+
+
+on:
+  push:
+    branches:
+      - dev  # main 브랜치에 push될 때 실행
+
+
+jobs:
+  backend-a:
+    runs-on: ubuntu-latest  # 실행 환경을 Ubuntu로 설정 (Windows 환경에서 Java 17을 설치하는 방법도 있지만, Ubuntu에서 설정하는 방법이 더 일반적입니다)
+
+    steps:
+      # 1. 코드 체크아웃
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          path: Flit-n-Fill  # 경로를 정확하게 확인
+
+      # 2. Java 17 설치 (Temurin JDK 사용)
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'  # Java 17 버전 설치
+          distribution: 'temurin'  # JDK 배포판 지정 (Temurin)
+
+
+      - name: Set YML
+        run: |
+          mkdir -p Flit-n-Fill/backend/src/main/resources  # 올바른 경로로 생성
+          echo "${{ secrets.APPLICATION_YML }}" | base64 --decode > Flit-n-Fill/backend/src/main/resources/application.yml
+          echo "DB_HOST=${{ secrets.DB_HOST }}"  # 환경 변수 확인
+          find Flit-n-Fill  # 디렉토리 확인
+
+
+      # 3. Gradle 실행 권한 부여
+      - name: Grant execute permission to gradlew
+        run: chmod +x Flit-n-Fill/backend/gradlew  # gradlew에 실행 권한 부여
+
+      # 4. Gradle로 빌드
+      - name: Build with Gradle
+        run: |
+          cd Flit-n-Fill/backend  # 정확한 경로로 이동
+          ls -la  # 디렉토리 내용 확인
+          ./gradlew clean build -x test  # gradlew로 빌드 실행
+      
+
+      #      # 3. Docker 이미지 빌드 및 Docker Hub에 푸시
+      #      - name: Build and Push Docker Image
+      #        run: |
+      #          cd Flit-n-Fill/backend
+      #          docker build -t ckdgkim/backendproject:back-1 .
+      #          echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+      #          docker push ckdgkim/backendproject:back-1
+
+
+      # 5. Docker 이미지 태그 생성
+      - name: Generate Docker Image Tag
+        id: docker_tag
+        run: |
+          # 시간 기반 + SHA 앞 7자리 태그 생성
+          tag=$(date +'%Y%m%d%H%M%S')-$(echo "${{ github.sha }}" | cut -c1-7)
+          echo "TAG=${tag}" >> $GITHUB_ENV
+
+      # 6. Docker 이미지 빌드 및 푸시
+      - name: Build and Push Docker Image
+        run: |
+          cd Flit-n-Fill/backend
+          docker build -t ckdgkim/backendproject:back-${{ env.TAG }} .
+          echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+          docker push ckdgkim/backendproject:back-${{ env.TAG }}
+
+
+
+
+      # 7. EC2로 배포
+      - name: Deploy to EC2 via Bastion
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.QWE_PEM }}" > ~/.ssh/qwe.pem
+          chmod 600 ~/.ssh/qwe.pem
+          # 베스천 서버로 접속
+          echo "Step 1: Connecting to Bastion server (${{ vars.PUB_IP_C }})"
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/qwe.pem ec2-user@"${{ vars.PUB_IP_C }}" << EOF
+            echo "Connected to Bastion server (${{ vars.PUB_IP_C }})"
+            # 사내 EC2로 접속
+            echo "Step 2: Connecting to internal EC2 (${{ vars.PRIVATE_IP_C }})"
+            ssh -i /home/ec2-user/qwe.pem ec2-user@"${{ vars.PRIVATE_IP_C }}" << INNER_EOF
+              echo "Connected to internal EC2 (${{ vars.PRIVATE_IP_C }})"
+              # Docker 이미지 가져오기
+              docker pull ckdgkim/backendproject:back-${{ env.TAG }}
+
+              # 네트워크 생성 (이미 존재하면 무시)
+              docker network create mynetwork || true
+
+              # 기존 컨테이너 종료 및 삭제
+              docker stop backend-container-c || true
+              docker rm backend-container-c || true
+
+              # 새 컨테이너 실행
+              docker run -d --name backend-container-c \
+                --network mynetwork \
+                -p 8080:8080 \
+                -e DB_HOST="${{ vars.PRIVATE_IP_A }}" \
+                -e DB_PORT=3306 \
+                -e DB_USER=root \
+                -e DB_PASSWORD=1234 \
+                -e MONGODB_URI=mongodb://"${{ vars.PRIVATE_IP_A }}":27017/flitnfill \
+                -e REDIS_HOST="${{ vars.PRIVATE_IP_A }}" \
+                -e OAUTH2_REDIRECT_HOST=www.flitnfill.kro.kr \
+                ckdgkim/backendproject:back-${{ env.TAG }}
+
+              exit
+            INNER_EOF
+
+            exit
+          EOF
