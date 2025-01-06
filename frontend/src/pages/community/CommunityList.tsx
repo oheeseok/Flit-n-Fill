@@ -44,7 +44,7 @@ const CommunityList: React.FC<CommunityListProps> = ({ filter }) => {
             userEmail: localStorage.getItem("userEmail"), 
           },
         });
-        console.log("query 적용한 response.data: ", response.data)
+        // console.log("query 적용한 response.data: ", response.data)
         setPosts(response.data); // 응답 데이터를 상태에 저장
       } catch (err) {
         console.error("게시글 목록 가져오기 실패:", err);

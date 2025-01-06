@@ -50,7 +50,7 @@ const CommunityRegister = () => {
   const [fridgeItems, setFridgeItems] = useState<FoodDetailDto[]>([])
   const [foodList, setFoodList] = useState<FoodListViewDto[]>([])
 
-  console.log(writerFoodId);
+  // console.log(writerFoodId);
   // 이미지 업로드 핸들러
   const handleImage1Change = (image: File) => setUploadedImage1(image);
 
