@@ -208,7 +208,8 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({
 
               {/* TRADE_REQUEST_RESULT 또는 SHARE_REQUEST_RESULT 타입일 때만 "거래방으로 이동" 링크 추가 */}
               {(notification.notificationType === "TRADE_REQUEST_RESULT" ||
-                notification.notificationType === "SHARE_REQUEST_RESULT") && (
+                notification.notificationType === "SHARE_REQUEST_RESULT") &&
+                  notification.notificationMessage.includes("수락") && (
                 <p>
                   <Link
                     to={`/chatroom/${notification.tradeRoomId}`}
