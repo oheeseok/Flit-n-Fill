@@ -44,8 +44,21 @@ function RecipeImageUploader({
   const onChangeFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setPreview(URL.createObjectURL(file)); // 선택한 파일의 미리보기 URL 생성
-      onChangeImage(file); // 파일 객체 전달
+      const previewUrl = URL.createObjectURL(file);
+      console.log("Selected File:", {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        previewUrl,
+      });
+      setPreview(previewUrl);
+      onChangeImage(file);
+  
+      return () => URL.revokeObjectURL(previewUrl);
+    } else {
+      console.log("File selection canceled.");
+      setPreview(null);
+      onChangeImage(null);
     }
   };
 

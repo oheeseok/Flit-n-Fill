@@ -8,7 +8,6 @@ import Community from "./pages/community/Community";
 import Cart from "./pages/Cart";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
-import ScrollToTop from "./components/common/ScrollToTop";
 import CommunityRegister from "./pages/community/CommunityRegister";
 import CommunityList from "./pages/community/CommunityList";
 import CommunityEdit from "./pages/community/CommunityEdit";
@@ -34,7 +33,6 @@ import PrivateRoute from "./route/PrivateRoute.tsx";
 function App() {
   return (
     <BrowserRouter>
-      <ScrollToTop />
       <GlobalProvider>
         <Routes>
           <Route
@@ -162,9 +160,9 @@ function App() {
             path="/community/register"
             element={
               <PrivateRoute allowedPages={["community"]}>
-              <Layout>
-                <CommunityRegister />
-              </Layout>
+                <Layout>
+                  <CommunityRegister />
+                </Layout>
               </PrivateRoute>
             }
           ></Route>
@@ -172,9 +170,9 @@ function App() {
             path="/community/list"
             element={
               <PrivateRoute allowedPages={["community"]}>
-              <Layout>
-                <CommunityList filter=""/>
-              </Layout>
+                <Layout>
+                  <CommunityList filter="" />
+                </Layout>
               </PrivateRoute>
             }
           ></Route>
@@ -182,9 +180,9 @@ function App() {
             path="/community/edit/:postId"
             element={
               <PrivateRoute allowedPages={["community"]}>
-              <Layout>
-                <CommunityEdit />
-              </Layout>
+                <Layout>
+                  <CommunityEdit />
+                </Layout>
               </PrivateRoute>
             }
           ></Route>
@@ -192,9 +190,9 @@ function App() {
             path="/community/detail/:postId"
             element={
               <PrivateRoute allowedPages={["community"]}>
-              <Layout>
-                <CommunityDetail />
-              </Layout>
+                <Layout>
+                  <CommunityDetail />
+                </Layout>
               </PrivateRoute>
             }
           ></Route>
@@ -202,9 +200,9 @@ function App() {
             path="/chatroomlist"
             element={
               <PrivateRoute allowedPages={["community"]}>
-              <Layout>
-                <ChatRoomList />
-              </Layout>
+                <Layout>
+                  <ChatRoomList />
+                </Layout>
               </PrivateRoute>
             }
           />
@@ -212,9 +210,9 @@ function App() {
             path="/chatroom/:tradeRoomId"
             element={
               <PrivateRoute allowedPages={["community"]}>
-              <Layout>
-                <ChatRoom />
-              </Layout>
+                <Layout>
+                  <ChatRoom />
+                </Layout>
               </PrivateRoute>
             }
           />
@@ -222,9 +220,9 @@ function App() {
             path="/feedback/:tradeRoomId"
             element={
               <PrivateRoute allowedPages={["community"]}>
-              <Layout>
-                <ChatRoomAfter />
-              </Layout>
+                <Layout>
+                  <ChatRoomAfter />
+                </Layout>
               </PrivateRoute>
             }
           />

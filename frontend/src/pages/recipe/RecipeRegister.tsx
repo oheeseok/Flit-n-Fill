@@ -15,6 +15,7 @@ interface RecipeStepDto {
   photo: File | null; // 파일 객체 처리
   description: string;
 }
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const RecipeRegister = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
@@ -72,8 +73,18 @@ const RecipeRegister = () => {
 
       // 단계별 이미지 추가
       recipeMethods.forEach((method) => {
-        if (method.photo instanceof File) {
-          formData.append(`recipeStepPhotos`, method.photo);
+        // if (method.photo instanceof File) {
+        //   formData.append(`recipeStepPhotos`, method.photo);
+        // }
+        if (method.photo) {
+          // 이미지가 있으면 파일을 첨부
+          formData.append("recipeStepPhotos", method.photo);
+        } else {
+          // 이미지가 없으면 null로 전송
+          formData.append(
+            "recipeStepPhotos",
+            new Blob([], { type: "application/json" })
+          );
         }
       });
 

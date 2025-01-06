@@ -57,16 +57,23 @@ interface RecipeContextType {
   ) => Promise<RecipeDetailDto>;
   toggleBookmark: (recipeId: string) => Promise<void>;
   fetchRecipes: (params?: {
-    sort?: string;
     search?: string;
+    src?: string;
     page?: number;
     size?: number;
   }) => Promise<RecipePageResponse>;
+  fetchMultiSearchRecipes: (params?: {
+    food1?: string;
+    food2?: string;
+    food3?: string;
+  }) => Promise<RecipeSimpleDto[]>; // 다중 검색 함수 추가
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   searchRecipes: () => Promise<void>;
   getRecipeDetail: (recipeId: string) => Promise<RecipeDetailDto>;
 }
+
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const RecipeContext = createContext<RecipeContextType>({
   recipes: [],
@@ -78,6 +85,7 @@ const RecipeContext = createContext<RecipeContextType>({
   setSearchQuery: () => {},
   searchRecipes: async () => Promise.resolve(),
   getRecipeDetail: async () => Promise.resolve({} as RecipeDetailDto),
+  fetchMultiSearchRecipes: async () => Promise.resolve([]), // 초기값으로 빈 배열 반환
 });
 
 export const RecipeProvider = ({ children }: { children: React.ReactNode }) => {
@@ -92,19 +100,22 @@ export const RecipeProvider = ({ children }: { children: React.ReactNode }) => {
   }): Promise<RecipePageResponse> => {
     try {
       // 검색 쿼리와 src, 페이지 및 사이즈를 포함한 요청
-      const response = await axios.get<RecipePageResponse>("/api/recipes", {
-        params: {
-          "search-query": params?.search || "", // search-query를 사용하여 검색어 전달
-          src: params?.src || "", // src를 설정할 수 있음, 기본적으로 비어있음
-          page: params?.page || 1, // 기본 페이지 0
-          size: params?.size || 18, // 기본 사이즈 18
-        },
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          userEmail: localStorage.getItem("userEmail"),
-        },
-        withCredentials: true,
-      });
+      const response = await axios.get<RecipePageResponse>(
+        `${apiUrl}/api/recipes`,
+        {
+          params: {
+            "search-query": params?.search || "", // search-query를 사용하여 검색어 전달
+            src: params?.src || "", // src를 설정할 수 있음, 기본적으로 비어있음
+            page: params?.page || 1, // 기본 페이지 0
+            size: params?.size || 18, // 기본 사이즈 18
+          },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
+          },
+          withCredentials: true,
+        }
+      );
       console.log("Response data:", response.data); // 응답 데이터 확인
       // 응답 데이터 처리
       return response.data;
@@ -114,12 +125,38 @@ export const RecipeProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const fetchMultiSearchRecipes = async (params?: {
+    food1?: string;
+    food2?: string;
+    food3?: string;
+  }): Promise<RecipeSimpleDto[]> => {
+    try {
+      const response = await axios.get<RecipeSimpleDto[]>(`${apiUrl}/api/recipes`, {
+        params: {
+          food1: params?.food1 || "",
+          food2: params?.food2 || "",
+          food3: params?.food3 || "",
+        },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          userEmail: localStorage.getItem("userEmail"),
+        },
+        withCredentials: true,
+      });
+      console.log("Fetched multi-search recipes:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch multi-search recipes:", error);
+      throw error;
+    }
+  };
+
   const getRecipeDetail = async (
     recipeId: string
   ): Promise<RecipeDetailDto> => {
     try {
       const response = await axios.get<RecipeDetailDto>(
-        `/api/recipes/${recipeId}`,
+        `${apiUrl}/api/recipes/${recipeId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -159,7 +196,7 @@ export const RecipeProvider = ({ children }: { children: React.ReactNode }) => {
         formData.append("recipeStepPhotos", photo)
       );
 
-      const response = await axios.post("/api/recipes", formData, {
+      const response = await axios.post(`${apiUrl}/api/recipes`, formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           userEmail: localStorage.getItem("userEmail"),
@@ -189,13 +226,17 @@ export const RecipeProvider = ({ children }: { children: React.ReactNode }) => {
 
   const toggleBookmark = async (recipeId: string): Promise<void> => {
     try {
-      const response = await axios.patch(`/api/recipes/${recipeId}`, null, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          userEmail: localStorage.getItem("userEmail"),
-        },
-        withCredentials: true,
-      });
+      const response = await axios.patch(
+        `${apiUrl}/api/recipes/${recipeId}`,
+        null,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
+          },
+          withCredentials: true,
+        }
+      );
 
       if (response.status === 200) {
         setRecipes((prev) =>
@@ -223,6 +264,7 @@ export const RecipeProvider = ({ children }: { children: React.ReactNode }) => {
         searchRecipes,
         setSearchQuery,
         getRecipeDetail,
+        fetchMultiSearchRecipes,
       }}
     >
       {children}

@@ -13,9 +13,13 @@ interface RecipeStepDto {
   photo: File | string | null; // 파일 또는 URL 처리
   description: string;
 }
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const RecipeEdit = () => {
-  const apiUrl = import.meta.env.VITE_API_URL;
+
+  const RECIPE_STEP_DEFAULT_IMG_URL =
+    "https://flitnfill.s3.ap-northeast-2.amazonaws.com/default-img/recipe-step-default-img.png";
+
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
@@ -25,6 +29,7 @@ const RecipeEdit = () => {
   const [recipeMethods, setRecipeMethods] = useState<RecipeStepDto[]>([]);
   const [recipeIsVisibility, setRecipeIsVisibility] = useState(true);
   // const [isLoading, setIsLoading] = useState(false);
+  const [deletedSeqs, setDeletedSeqs] = useState<number[]>([]);
 
   const fetchRecipeDetail = async () => {
     try {
@@ -38,18 +43,16 @@ const RecipeEdit = () => {
       const recipe = response.data;
 
       setRecipeTitle(recipe.recipeTitle);
-      setRecipeImage(recipe.recipeMainPhoto);
+      setRecipeImage(recipe.recipeMainPhoto); // 기존에 등록된 이미지 사용 (string 타입)
       setRecipeIngredients(recipe.recipeFoodDetails);
 
       const steps = recipe.recipeSteps.map((step: any, index: number) => ({
         seq: index + 1,
-        photo:
-          step.photo ||
-          "https://flitnfill.s3.ap-northeast-2.amazonaws.com/default-img/recipe-step-default-img.png", // 기본 이미지
+        photo: step.photo,
         description: step.description,
       }));
 
-      setRecipeMethods(steps);
+      setRecipeMethods(steps); // 기존에 등록된 recipeSteps (photo는 string 타입)
 
       console.log(
         "Loaded Step Photos:",
@@ -71,6 +74,7 @@ const RecipeEdit = () => {
   }, [id]);
 
   const handleSave = async () => {
+    console.log("Recipe methods before submission:", recipeMethods);
     if (!recipeTitle.trim()) {
       Swal.fire({
         icon: "info",
@@ -112,46 +116,20 @@ const RecipeEdit = () => {
     }
 
     try {
-      const formData = new FormData();
-
-      // 레시피 데이터 생성
       const recipeUpdateDto = {
         recipeTitle,
         recipeFoodDetails: recipeIngredients,
-        recipeSteps: recipeMethods.map((method) => {
-          // 스텝 이미지가 파일이 아니면 기존 이미지 URL을 사용
-          if (method.photo instanceof File) {
-            return {
-              seq: method.seq,
-              description: method.description,
-              photo: "", // 업로드된 파일은 FormData에서 처리
-            };
-          } else if (typeof method.photo === "string" && method.photo) {
-            // 이미지 URL이 있으면 그대로 사용
-            return {
-              seq: method.seq,
-              description: method.description,
-              photo: method.photo,
-            };
-          } else if (method.photo === null) {
-            // 스텝 이미지가 null인 경우 기본 이미지 URL로 설정
-            return {
-              seq: method.seq,
-              description: method.description,
-              photo:
-                "https://flitnfill.s3.ap-northeast-2.amazonaws.com/default-img/recipe-step-default-img.png",
-            };
-          }
-          // 이미지가 없으면 기본 이미지 URL로 설정
-          return {
-            seq: method.seq,
-            description: method.description,
-            photo:
-              "https://flitnfill.s3.ap-northeast-2.amazonaws.com/default-img/recipe-step-default-img.png",
-          };
-        }),
+        recipeSteps: recipeMethods.map((method, idx) => ({
+          seq: idx + 1,
+          description: method.description || "",
+        })),
       };
 
+      console.log("Generated recipeUpdateDto:", recipeUpdateDto);
+
+      const formData = new FormData();
+
+      // DTO 추가
       formData.append("recipeUpdateDto", JSON.stringify(recipeUpdateDto));
 
       // 메인 이미지 파일 추가
@@ -159,41 +137,71 @@ const RecipeEdit = () => {
         formData.append("recipeMainPhoto", recipeImage);
       }
 
-      // 새로 추가된 스텝 이미지를 FormData에 추가
-      const stepPhotos = recipeMethods
-        .filter((method) => method.photo instanceof File)
-        .map((method) => method.photo as File);
+      // 전체 스텝 처리
+      const totalSteps = Math.max(
+        ...recipeMethods.map((m) => m.seq),
+        ...deletedSeqs
+      ); // 최대 스텝 수 계산
 
-      stepPhotos.forEach((photo) => {
-        formData.append("recipeStepPhotos", photo);
-      });
+      // 스텝 사진 처리
+      for (let i = 1; i <= totalSteps; i++) {
+        const method = recipeMethods.find((m) => m.seq === i);
 
-      // 기존 스텝 이미지를 유지할 데이터도 명시적으로 추가
-      const existingStepPhotos = recipeMethods
-        .filter((method) => typeof method.photo === "string")
-        .map(
-          (method) =>
-            method.photo ||
-            "https://flitnfill.s3.ap-northeast-2.amazonaws.com/default-img/recipe-step-default-img.png"
+        if (deletedSeqs.includes(i)) {
+          // 삭제된 스텝: 빈 Blob 추가
+          console.log(`Deleted step: seq=${i}, adding empty Blob.`);
+          formData.append(
+            "recipeStepPhotos",
+            new Blob([], { type: "image/png" })
+          );
+        } else if (method?.photo instanceof File) {
+          // 새로 추가된 파일
+          console.log(`Adding step photo for seq=${i}`);
+          formData.append("recipeStepPhotos", method.photo);
+        } else if (
+          method &&
+          typeof method.photo === "string" &&
+          method.photo.startsWith("http")
+        ) {
+          // 기존 URL 처리: 빈 Blob 추가
+          console.log(`Existing URL for seq=${i}, adding empty Blob.`);
+          formData.append(
+            "recipeStepPhotos",
+            new Blob([], { type: "image/png" })
+          ); // 서버에서 URL 처리
+        } else {
+          // 기본 빈 Blob 처리 (예상치 못한 경우)
+          console.warn(
+            `No valid method or photo for seq=${i}, adding empty Blob.`
+          );
+          formData.append(
+            "recipeStepPhotos",
+            new Blob([], { type: "image/png" })
+          );
+        }
+      }
+
+      // 폼데이터 디버깅
+      for (const [key, value] of formData.entries()) {
+        console.log(
+          `Key: ${key}, Value: ${value instanceof File ? value.name : value}`
         );
-
-      formData.append("existingStepPhotos", JSON.stringify(existingStepPhotos));
-
-      console.log("FormData Debug:", {
-        recipeUpdateDto,
-        existingStepPhotos,
-        stepPhotos,
-      });
-
+      }
       // 서버에 PUT 요청 (axios 사용)
-      const response = await axios.put(`${apiUrl}/api/recipes/${id}`, formData, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          userEmail: localStorage.getItem("userEmail"),
-          // "Content-Type" 제거: axios는 자동으로 처리함
-        },
-        withCredentials: true,
-      });
+
+      const response = await axios.put(
+        `${apiUrl}/api/recipes/${id}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
+            // "Content-Type" 제거: axios는 자동으로 처리함
+          },
+          withCredentials: true,
+        }
+      );
+      console.log("Recipe updated successfully:", response.data);
 
       if (response.status === 200) {
         Swal.fire({
@@ -217,19 +225,25 @@ const RecipeEdit = () => {
       ...prev,
       {
         seq: prev.length + 1,
-        photo:
-          "https://flitnfill.s3.ap-northeast-2.amazonaws.com/default-img/recipe-step-default-img.png", // 디폴트 이미지 설정
+        photo: RECIPE_STEP_DEFAULT_IMG_URL, // 디폴트 이미지 설정
         description: "",
       },
     ]);
   };
 
   const delRecipeMethod = (index: number) => {
-    setRecipeMethods((prevMethods) =>
-      prevMethods
+    setRecipeMethods((prevMethods) => {
+      const deletedMethod = prevMethods[index];
+      console.log("Deleted method:", deletedMethod);
+
+      const updatedMethods = prevMethods
         .filter((_, i) => i !== index)
-        .map((method, idx) => ({ ...method, seq: idx + 1 }))
-    );
+        .map((method, idx) => ({ ...method, seq: idx + 1 }));
+
+      return updatedMethods;
+    });
+
+    setDeletedSeqs((prevSeqs) => [...prevSeqs, index + 1]); // 삭제된 seq를 저장
   };
 
   const handleImageChange = (file: File | null) => {
@@ -306,9 +320,11 @@ const RecipeEdit = () => {
               <RecipeStepImageUploader
                 stepIndex={seq}
                 uploadedImage={
-                  method.photo instanceof File
-                    ? URL.createObjectURL(method.photo)
-                    : method.photo
+                  typeof method.photo === "string" && method.photo !== ""
+                    ? method.photo // method.photo가 문자열이면서 빈 문자열이 아니면 원래 URL 사용
+                    : method.photo instanceof File
+                    ? URL.createObjectURL(method.photo) // method.photo가 File이면 해당 file로 URL 생성
+                    : RECIPE_STEP_DEFAULT_IMG_URL // 그 외의 경우는 기본 이미지 URL 사용
                 }
                 onImageChange={handleStepImageChange}
               />

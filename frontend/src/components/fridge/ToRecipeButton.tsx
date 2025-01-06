@@ -2,27 +2,50 @@ import { useNavigate } from "react-router-dom";
 import "../../styles/fridge/ToRecipeButton.css";
 import { useFridge } from "../../context/FridgeContext";
 import { useRecipe } from "../../context/RecipeContext";
+const apiUrl = import.meta.env.VITE_API_URL;
+import axios from "axios";
 
 const ToRecipeButton = () => {
   const { bucketItems } = useFridge();
   const { setSearchQuery } = useRecipe();
   const navigate = useNavigate();
 
-  // 버킷에 있는 재료 이름들을 쿼리로 변환
-  const query =
-    bucketItems.length > 0
-      ? bucketItems.map((item) => item.name).join(",")
-      : "default"; // 기본값 설정
-
-  const handleSearch = () => {
-    console.log("Bucket Items:", bucketItems); // 디버깅용
-    console.log("Query:", query); // 디버깅용
-
-    // searchQuery 설정
-    setSearchQuery(query);
-
-    // 검색 결과 페이지로 이동
-    navigate(`/recipe/list?query=${encodeURIComponent(query)}`);
+  const handleSearch = async () => {
+    const query = bucketItems.map((item) => item.name).join(" ");
+    console.log("Bucket Items:", bucketItems);
+    console.log("Query:", query);
+  
+    try {
+      const response = await axios.get(`${apiUrl}/api/recipes`, {
+        params: {
+          searchQuery: query, // 다중 검색어
+          food1: bucketItems[0]?.name || "", 
+          food2: bucketItems[1]?.name || "",
+          food3: bucketItems[2]?.name || "", 
+        },
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          userEmail: localStorage.getItem("userEmail"),
+        },
+      });
+  
+      console.log("Fetched Recipes:", response.data); 
+      setSearchQuery(query); // 검색어 설정
+  
+      // food1, food2, food3 기반으로 쿼리 생성
+      const queryParams = new URLSearchParams({
+        food1: bucketItems[0]?.name || "",
+        food2: bucketItems[1]?.name || "",
+        food3: bucketItems[2]?.name || "",
+      });
+  
+      // 검색 결과 페이지로 이동
+      navigate(`/recipe/list?${queryParams.toString()}`);
+    } catch (error) {
+      console.error("Error fetching recipes:", error);
+      alert("Failed to fetch recipes. Please try again.");
+    }
   };
 
   return (
