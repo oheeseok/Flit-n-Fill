@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const useAuth = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -29,7 +30,12 @@ const useAuth = () => {
 
         // 블랙 유저 상태에 따라 리다이렉트 처리
         if (isBlacked) {
-          alert(`일부 페이지에 접근할 수 없습니다. 블랙리스트 만료기한 : ${expirationDate}`); // 만료일도 알려주기
+          await Swal.fire({
+            icon: "error",
+            title: "권한 오류",
+            text: `일부 페이지에 접근할 수 없습니다. 블랙리스트 만료기한 : ${expirationDate}`,
+            confirmButtonText: "확인",
+          });
         }
       } catch (error) {
         console.error("Auth check failed", error);

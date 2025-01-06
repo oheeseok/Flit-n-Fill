@@ -1,6 +1,7 @@
 import "../styles/Cart.css";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Swal from "sweetalert2";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const Cart = () => {
@@ -22,7 +23,11 @@ const Cart = () => {
       setLines(response.data); // textarea에 표시할 텍스트로 변환
     } catch (error) {
       console.error("장바구니 조회 실패:", error);
-      alert("장바구니 조회 중 문제가 발생했습니다.");
+      Swal.fire({
+        icon: "error",
+        title: "조회 오류",
+        text: "장바구니 조회 실패",
+      });
     }
   };
 
@@ -68,11 +73,19 @@ const Cart = () => {
       );
       console.log("response: ", response);
       if (response.status === 201) {
-        alert("장바구니 저장 성공!");
+        Swal.fire({
+          icon: "success",
+          title: "저장 성공",
+          text: "장바구니 저장에 성공했습니다.",
+        });
       }
     } catch (error) {
       console.error("장바구니 저장 실패:", error);
-      alert("장바구니 저장 중 문제가 발생했습니다.");
+      Swal.fire({
+        icon: "error",
+        title: "저장 실패",
+        text: "장바구니 저장 중 문제가 발생했습니다.",
+      });
     }
   };
 
