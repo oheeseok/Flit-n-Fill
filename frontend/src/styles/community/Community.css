@@ -7,7 +7,7 @@
 .communitybody {
   position: relative;
   width: 100%;
-  height: 100vh;
+  height: 100%;
   max-width: 1541.74px;
   margin: 0 auto;
 }
@@ -23,7 +23,7 @@
   background-size: cover;
   background-position: center;
   opacity: 0.5;
-  z-index: -1; /* 배경을 뒤로 배치 */
+  z-index: -1;
 }
 
 /* 컨텐츠 */
@@ -31,6 +31,7 @@
   position: relative;
   z-index: 1; /* 배경보다 위에 배치 */
   width: 100%;
+  height: 100%;
 }
 
 /* 등록 버튼 */

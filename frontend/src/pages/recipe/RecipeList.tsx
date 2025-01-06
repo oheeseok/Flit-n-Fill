@@ -8,7 +8,6 @@ const apiUrl = import.meta.env.VITE_API_URL;
 import axios from "axios";
 import { RecipeSimpleDto } from "../../context/RecipeContext";
 
-
 const RecipeList = () => {
   const { toggleBookmark, searchQuery, fetchRecipes } = useRecipe();
   const [displayedRecipes, setDisplayedRecipes] = useState<any[]>([]); // 타입을 any[]로 설정하여 오류 방지
@@ -21,7 +20,6 @@ const RecipeList = () => {
   // const [isMultuSearch, setIsMultiSearch] = useState(false);
   // const [recipes, setRecipes] = useState<RecipeSimpleDto[]>([]); // RecipeSimpleDto 타입의 배열
 
-
   const fetchMultiSearchRecipes = async (
     food1: string,
     food2: string,
@@ -29,17 +27,20 @@ const RecipeList = () => {
   ) => {
     setIsLoading(true);
     try {
-      const response = await axios.get<RecipeSimpleDto[]>(`${apiUrl}/api/recipes`, {
-        params: { food1, food2, food3 },
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          userEmail: localStorage.getItem("userEmail"),
-        },
-        withCredentials: true,
-      });
-  
+      const response = await axios.get<RecipeSimpleDto[]>(
+        `${apiUrl}/api/recipes`,
+        {
+          params: { food1, food2, food3 },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
+          },
+          withCredentials: true,
+        }
+      );
+
       console.log("Fetched multi-search recipes:", response.data);
-  
+
       setDisplayedRecipes(response.data); // 다중 검색 결과를 displayedRecipes로 설정
     } catch (error) {
       console.error("Failed to fetch multi-search recipes:", error);
@@ -47,23 +48,22 @@ const RecipeList = () => {
       setIsLoading(false);
     }
   };
-  
+
   // 다중 검색 파라미터 감지
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const food1 = urlParams.get("food1") || "";
     const food2 = urlParams.get("food2") || "";
     const food3 = urlParams.get("food3") || "";
-  
+
     // 유효한 값이 없으면 함수 호출 중단
     if (!food1 && !food2 && !food3) {
       console.warn("No food parameters provided for multi-search.");
       return;
     }
-  
+
     fetchMultiSearchRecipes(food1, food2, food3);
   }, [location.search]);
-  
 
   const PAGE_SIZE = 18;
 
@@ -268,7 +268,7 @@ const RecipeList = () => {
   }
 
   return (
-    <>
+    <div className="recipe-list-body">
       {/* 검색 바 */}
       <div className="recipe-list-searchbar-container">
         <RecipeSearchBar />
@@ -287,13 +287,15 @@ const RecipeList = () => {
       <div className="recipe-list-option-container">
         <input
           type="checkbox"
+          className="recipe-list-option-container-bookmark"
           checked={showBookmarksOnly}
           onChange={(e) => setShowBookmarksOnly(e.target.checked)}
         />
-        <label>북마크</label>
+        <div className="recipe-list-option-container-bookmark-text">북마크</div>
       </div>
 
       {/* 레시피 리스트 */}
+
       <div className="recipelistbody">
         {displayedRecipes.map((recipe) => (
           <div className="recipe-list-container" key={recipe.recipeId}>
@@ -347,7 +349,7 @@ const RecipeList = () => {
           </div>
         ))}
       </div>
-    </>
+    </div>
   );
 };
 

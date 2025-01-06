@@ -37,7 +37,7 @@ const Footer = () => {
 
       <div className="footer-info">
         <span>사업자등록번호 220-82-03984</span>
-        <span>flit & fill 대표이사 한 별</span>
+        <span>flit & fill 대표이사 : 한 별</span>
         <span>TEL : 0507) 1309-9319</span>
         <span>경기도 성남시 성남대로 34 하나플라자 6층</span>
       </div>
