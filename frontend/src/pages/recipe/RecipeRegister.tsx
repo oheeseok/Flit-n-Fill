@@ -18,7 +18,6 @@ interface RecipeStepDto {
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const RecipeRegister = () => {
-  const apiUrl = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
   // const { addRecipe } = useRecipe();
 
