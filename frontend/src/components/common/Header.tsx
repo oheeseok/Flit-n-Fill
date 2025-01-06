@@ -195,8 +195,10 @@ const Header = () => {
           </>
         ) : (
           <>
-            <Link to="/signin">sign in</Link>
-            <Link to="/signup">sign up</Link>
+            <Link to="/signin"><img src="/assets/login.png" alt="Sign In" style={{ width: "20px", height: "20px", verticalAlign: "middle", marginRight: "8px" }}></img>
+            <span style={{ verticalAlign: "middle" }}>sign in</span></Link>
+            <Link to="/signup"><img src="/assets/signup.png" alt="Sign Up" style={{ width: "30px", height: "30px", verticalAlign: "middle", marginRight: "8px" }}></img>
+            <span style={{ verticalAlign: "middle" }}>sign up</span></Link>
           </>
         )}
       </ul>
