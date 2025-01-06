@@ -104,4 +104,10 @@
   background-color: #85b573;
   color: #fff;
   transform: scale(1.05);
+  border: 1px solid #85b573;
+}
+.community-button:focus {
+  background-color: #85b573;
+  color: #fff;
+  transform: scale(1.05);
 }
