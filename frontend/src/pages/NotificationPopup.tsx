@@ -4,6 +4,7 @@ import { useNotification } from "../context/NotificationContext";
 import { fromEnumToDescription } from "../components/enum";
 import Swal from "sweetalert2";
 import axios, { AxiosError } from "axios";
+import { Link } from "react-router-dom";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 interface NotificationPopupProps {
@@ -34,14 +35,11 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({
 
   // 팝업 외부 클릭 시 팝업 닫기
   const handleClickOutside = (event: MouseEvent) => {
-    if (
-      popupRef.current &&
-      !popupRef.current.contains(event.target as Node)
-    ) {
+    if (popupRef.current && !popupRef.current.contains(event.target as Node)) {
       setShowNotification(false);
     }
   };
-    
+
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
 
@@ -169,7 +167,11 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({
     }
   };
   return (
-    <div className="notification-popup" ref={popupRef} onClick={(e) => e.stopPropagation()}>
+    <div
+      className="notification-popup"
+      ref={popupRef}
+      onClick={(e) => e.stopPropagation()}
+    >
       <div className="notification-header">
         <button onClick={() => markAllAsRead()}>전체 읽음</button>
         <button onClick={handleDeleteAll}>전체 삭제</button>
@@ -186,8 +188,36 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({
               <p>
                 [{fromEnumToDescription(notification.notificationType)} 알림]
               </p>
-              
-              <p>{notification.notificationMessage}</p>
+
+              {/* NEW_COMMENT 알림에 대해 텍스트를 클릭할 수 있는 링크로 변경 */}
+              {notification.notificationType === "NEW_COMMENT" ? (
+                <p>
+                  <Link
+                    to={`/chatroom/${notification.tradeRoomId}`}
+                    className="notification-link"
+                  >
+                    {notification.notificationMessage}
+                    {/* 알림 메시지를 클릭 가능한 링크로 설정 */}
+                  </Link>
+                </p>
+              ) : (
+                <p>
+                  <span>{notification.notificationMessage}</span>
+                </p>
+              )}
+
+              {/* TRADE_REQUEST_RESULT 또는 SHARE_REQUEST_RESULT 타입일 때만 "거래방으로 이동" 링크 추가 */}
+              {(notification.notificationType === "TRADE_REQUEST_RESULT" ||
+                notification.notificationType === "SHARE_REQUEST_RESULT") && (
+                <p>
+                  <Link
+                    to={`/chatroom/${notification.tradeRoomId}`}
+                    className="notification-link"
+                  >
+                    거래방으로 이동
+                  </Link>
+                </p>
+              )}
               {!notification.notificationIsRead && (
                 <button
                   className="mark-as-read-button"
@@ -197,7 +227,8 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({
                 </button>
               )}
               <div className="notification-button">
-                <button className="notification-button-delete"
+                <button
+                  className="notification-button-delete"
                   onClick={() =>
                     handleDelete(
                       notification.notificationId,
@@ -210,7 +241,8 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({
                 {(notification.notificationType === "TRADE_REQUEST" ||
                   notification.notificationType === "SHARE_REQUEST") && (
                   <div>
-                    <button className="notification-button-accept"
+                    <button
+                      className="notification-button-accept"
                       onClick={() =>
                         handleRequest(
                           RESPONSE_ACCEPT,
@@ -220,9 +252,13 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({
                     >
                       수락
                     </button>
-                    <button className="notification-button-deny"
+                    <button
+                      className="notification-button-deny"
                       onClick={() =>
-                        handleRequest(RESPONSE_DENY, notification.notificationId)
+                        handleRequest(
+                          RESPONSE_DENY,
+                          notification.notificationId
+                        )
                       }
                     >
                       거절
