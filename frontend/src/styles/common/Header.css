@@ -10,13 +10,14 @@
   width: 65px;
   height: 90px;
   flex-shrink: 0;
+  margin-left: 20px;
 }
 
 .headermenu {
   display: flex;
   width: auto; /* 크기를 자동으로 설정 */
   align-items: center;
-  gap: 40px;
+  gap: 60px;
   color: #000;
   text-align: center;
   font-family: Ubuntu;
@@ -35,6 +36,7 @@
   height: 40px; /* 프로필 이미지 크기 설정 */
   border-radius: 50%; /* 둥근 형태로 만듦 */
   object-fit: cover; /* 이미지가 비율을 유지하며 잘리지 않도록 설정 */
+  margin-right: 40px;
 }
 
 /* Link 태그의 기본 스타일을 덮어쓰기 */
