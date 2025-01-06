@@ -191,20 +191,22 @@ export const FridgeProvider = ({ children }: { children: React.ReactNode }) => {
   const addFridgeItem = async (item: FridgeItem) => {
     try {
       const dto = convertToFoodDetailDto(item);
-      const response = await axios.post(
-        `${apiUrl}/api/my-fridge`,
-        dto,
-        {
-          withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-            userEmail: localStorage.getItem("userEmail"),
-          },
-        }
-      ); // 서버에 아이템 추가
+      const response = await axios.post(`${apiUrl}/api/my-fridge`, dto, {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          userEmail: localStorage.getItem("userEmail"),
+        },
+      }); // 서버에 아이템 추가
       setFridgeItems((prevItems) => [...prevItems, response.data]);
     } catch (error) {
       console.error("Error adding fridge item", error);
+      Swal.fire({
+        icon: "error",
+        title: "추가 실패",
+        text: "재료 등록에 실패했습니다.",
+      });
+      return;
     }
   };
 
@@ -237,7 +239,7 @@ export const FridgeProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     try {
-      await axios.put(
+      const response = await axios.put(
         `${apiUrl}/api/my-fridge/${convertedItem.foodId}`,
         convertedItem,
         {
@@ -248,9 +250,20 @@ export const FridgeProvider = ({ children }: { children: React.ReactNode }) => {
           },
         }
       ); // 서버에서 아이템 수정
+      // 응답 상태가 200이 아닐 경우
+      if (response.status !== 200) {
+        throw new Error(response.data || "알 수 없는 오류가 발생했습니다.");; // 이 경우 fetchFridgeItems는 호출하지 않음
+      }
       await fetchFridgeItems();
     } catch (error) {
-      console.error("Error updating fridge item", error);
+      if (axios.isAxiosError(error) && error.response?.data) {
+        // response.data를 string으로 단언
+        const errorMessage = (error.response.data as string)
+          .split("Location:")[0]
+          .trim();
+        throw new Error(errorMessage);
+      }
+      throw error;
     }
   };
 
@@ -294,11 +307,11 @@ export const FridgeProvider = ({ children }: { children: React.ReactNode }) => {
           },
         }
       );
-      console.log("장바구니 추가 성공: ", response.data)
+      console.log("장바구니 추가 성공: ", response.data);
     } catch (error) {
       console.error("장바구니 추가에 실패했습니다: ", error);
     }
-  }
+  };
 
   // 저장 방법으로 필터링
   const filterByStorageMethod = (

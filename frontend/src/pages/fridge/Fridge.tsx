@@ -119,12 +119,12 @@ const Fridge: React.FC = () => {
             text: "냉장고 항목이 수정되었습니다.",
           });
         })
-        .catch((error) => {
+        .catch((error: Error) => {
           // 실패 시 알림
           Swal.fire({
             icon: "error",
             title: "수정 실패",
-            text: "냉장고 항목 수정에 실패했습니다.",
+            text: error.message,
           });
           console.error("Error updating fridge item", error);
         });
