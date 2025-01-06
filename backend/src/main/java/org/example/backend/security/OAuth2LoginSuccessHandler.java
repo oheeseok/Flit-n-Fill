@@ -40,7 +40,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
         String accessToken = userLoginResponse.getAccessToken();
         // 메인 페이지로 리디렉션
-        String redirectUrl = "https://" + host + "signin?socialtoken=" + accessToken;
+        String redirectUrl = "https://" + host + "/signin?socialtoken=" + accessToken;
         response.sendRedirect(redirectUrl);
     }
 }
