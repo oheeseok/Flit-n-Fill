@@ -10,9 +10,9 @@ interface SearchBarProps {
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ query, onQueryChange }) => {
-  const [searchParams, setSearchParams] = useSearchParams()
-  console.log(searchParams)
-  const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams();
+  console.log(searchParams);
+  const navigate = useNavigate();
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     onQueryChange(event.target.value); // 검색어 상태 업데이트
   };
@@ -20,7 +20,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ query, onQueryChange }) => {
   // 검색 실행 함수
   const handleSearch = () => {
     if (query.trim() === "") {
-      navigate("/community")
+      navigate("/community");
       Swal.fire({
         icon: "info",
         title: "검색어를 입력해주세요.",
@@ -31,12 +31,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ query, onQueryChange }) => {
     setSearchParams({ searchQuery: query }); // URL query string 업데이트
   };
 
-
   return (
     <div className="searchbar-container">
       <input
         type="text"
-        placeholder="Search"
+        placeholder="원하시는 재료를 검색하세요"
         className="searchbar"
         value={query}
         onChange={handleInputChange}

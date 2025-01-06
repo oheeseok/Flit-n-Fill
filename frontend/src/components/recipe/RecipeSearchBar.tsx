@@ -40,7 +40,7 @@ const RecipeSearchBar = () => {
     <div className="searchbar-container">
       <input
         type="text"
-        placeholder="Search"
+        placeholder="재료를 검색하세요"
         className="searchbar"
         value={inputValue}
         onChange={handleInputChange}

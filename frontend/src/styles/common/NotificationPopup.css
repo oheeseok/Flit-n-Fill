@@ -11,6 +11,25 @@
   z-index: 1000;
 }
 
+.notification-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-header button {
+  font-family: Ubuntu;
+  font-size: 18px;
+  width: 130px;
+  margin: 5px 5px -5px;
+  background-color: #dfdcdc;
+}
+.notification-header button:hover {
+  background-color: #333;
+  color: #fff;
+  border: 1px solid #333;
+}
+
 .notification-list {
   max-height: 400px; /* 최대 높이 설정 */
   overflow-y: auto; /* 내용이 넘칠 경우 스크롤 활성화 */
@@ -43,8 +62,9 @@
   position: absolute;
   bottom: 10px; /* 아이템 하단에 위치 */
   left: 10px; /* 좌측에 위치 */
-  background-color: #007bff;
-  color: white;
+  background-color: #c7efe6;
+  color: #000;
+  font-weight: 700;
   border: none;
   border-radius: 5px;
   padding: 5px 10px;
@@ -53,7 +73,7 @@
 }
 
 .mark-as-read-button:hover {
-  background-color: #0056b3;
+  background-color: #78f3d8;
 }
 
 .notification-button {
@@ -66,13 +86,18 @@
 .notification-button-delete {
   margin-top: 5px;
   padding: 5px 10px;
-  background-color: gray;
-  color: #fff;
+  background-color: #ffcbc3;
+  color: #000;
+  font-weight: 700;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   /* margin-left: 10px; */
   font-size: 12px;
+}
+
+.notification-button-delete:hover {
+  background-color: #e99b8f;
 }
 
 .notification-button-accept {

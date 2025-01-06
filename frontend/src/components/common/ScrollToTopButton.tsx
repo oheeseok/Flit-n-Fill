@@ -1,7 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { gsap } from "gsap";
+import _ from "lodash";
 
 const ScrollToTopButton = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const toTopRef = useRef<HTMLDivElement>(null); // 버튼을 참조하는 useRef
 
   const handleScroll = () => {
     if (window.scrollY > 800) {
@@ -16,40 +19,49 @@ const ScrollToTopButton = () => {
   };
 
   useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
+    const throttledScroll = _.throttle(() => {
+      handleScroll();
+
+      if (window.scrollY > 800) {
+        // 버튼 보이기 애니메이션
+        gsap.to(toTopRef.current, { x: 0, duration: 0.5 });
+      } else {
+        // 버튼 숨기기 애니메이션
+        gsap.to(toTopRef.current, { x: 100, duration: 0.5 });
+      }
+    }, 300);
+
+    window.addEventListener("scroll", throttledScroll);
+
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("scroll", throttledScroll);
     };
   }, []);
 
   return (
-    <>
-      {isVisible && (
-        <button
-          onClick={scrollToTop}
-          style={{
-            width: "42px",
-            height: "42px",
-            backgroundColor: "#333",
-            color: "#fff",
-            border: "2px solid #fff",
-            borderRadius: "10px",
-            cursor: "pointer",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            position: "fixed",
-            bottom: "30px",
-            right: "30px",
-            zIndex: 9,
-            fontWeight: "bold",
-          }}
-          aria-label="Scroll to top"
-        >
-          ↑
-        </button>
-      )}
-    </>
+    <div
+      id="to-top"
+      ref={toTopRef}
+      style={{
+        position: "fixed",
+        bottom: "30px",
+        right: "30px",
+        width: "50px",
+        height: "50px",
+        backgroundColor: "#333",
+        border: "2px solid #fff",
+        color: "#fff",
+        display: isVisible ? "flex" : "none", // 버튼의 기본 표시 여부
+        alignItems: "center",
+        justifyContent: "center",
+        borderRadius: "50%",
+        cursor: "pointer",
+        transform: "translateX(100px)", // 초기 위치 (숨겨진 상태)
+      }}
+      onClick={scrollToTop}
+    >
+      ↑
+    </div>
   );
 };
 
