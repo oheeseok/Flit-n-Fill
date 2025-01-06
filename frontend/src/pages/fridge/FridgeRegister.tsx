@@ -315,7 +315,11 @@ const FridgeRegister = () => {
 
   const handleRequestRegister = (): void => {
     if (!requestContext) {
-      alert("요청할 재료 이름을 입력해주세요.");
+      Swal.fire({
+        icon: "error",
+        title: "요청 에러",
+        text: "요청할 재료 이름을 입력해주세요.",
+      });
       return;
     }
 

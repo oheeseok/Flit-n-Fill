@@ -198,7 +198,12 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     setAccessToken(null);
     localStorage.removeItem("accessToken");
     localStorage.removeItem("userEmail");
-    alert("로그아웃 되었습니다.");
+    Swal.fire({
+      icon: "success",
+      title: "로그아웃 성공",
+      text: "로그아웃에 성공했습니다.",
+      confirmButtonText: "확인",
+    });
   };
 
   return (

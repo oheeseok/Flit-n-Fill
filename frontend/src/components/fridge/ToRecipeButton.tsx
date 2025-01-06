@@ -4,6 +4,7 @@ import { useFridge } from "../../context/FridgeContext";
 import { useRecipe } from "../../context/RecipeContext";
 const apiUrl = import.meta.env.VITE_API_URL;
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const ToRecipeButton = () => {
   const { bucketItems } = useFridge();
@@ -44,7 +45,11 @@ const ToRecipeButton = () => {
       navigate(`/recipe/list?${queryParams.toString()}`);
     } catch (error) {
       console.error("Error fetching recipes:", error);
-      alert("Failed to fetch recipes. Please try again.");
+      Swal.fire({
+        icon: "error",
+        title: "로드 실패",
+        text: "레시피를 불러오는데 실패했습니다. 다시 시도해주세요."
+      })
     }
   };
 

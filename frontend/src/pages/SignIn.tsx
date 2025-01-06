@@ -2,6 +2,7 @@ import React, { useState, ChangeEvent, useEffect, KeyboardEvent, useRef } from "
 import axios from "axios";
 import "../styles/common/SignIn.css";
 import { useSSEContext } from "../context/SSEContext";
+import Swal from "sweetalert2";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 interface UserLoginResponse {
@@ -56,14 +57,24 @@ const SignIn: React.FC = () => {
           localStorage.setItem("fevel", response.data.userKindness.toString());
           localStorage.setItem("userNickname", response.data.userNickname);
 
-          alert("소셜 로그인 성공");
+          Swal.fire({
+            icon: "success",
+            title: "로그인 완료",
+            text: "소셜 로그인 성공",
+          });
+
           // 이후 대시보드로 리디렉션
           window.location.href = "/";
         })
         .catch((error) => {
           console.log(error);
-          alert("소셜 로그인 실패");
-        });
+
+            Swal.fire({
+              icon: "error",
+              title: "로그인 실패",
+              text: "소셜 로그인 실패",
+            });
+          });
     }
   }, [tokenFromRedirect]);
 
@@ -101,7 +112,6 @@ const SignIn: React.FC = () => {
         localStorage.setItem("balcklistExpiryDate", formattedDate);
       }
       console.log(response);
-      alert("로그인 성공"); // 로그인 성공 메시지
 
       const currentUserEmail = localStorage.getItem("userEmail");
       console.log("Current User Email:", currentUserEmail);
@@ -110,14 +120,28 @@ const SignIn: React.FC = () => {
         startSSE(`${apiUrl}/api/subscribe/${currentUserEmail}`);
       }
 
-      // 로그인 후 대시보드로 리디렉션
-      window.location.href = "/"; // 홈 페이지로 리디렉션
+      await Swal.fire({
+        icon: "success",
+        title: "로그인 완료",
+        text: "로그인 성공",
+      }).then(() => {
+          // 로그인 후 대시보드로 리디렉션
+          window.location.href = "/"; // 홈 페이지로 리디렉션
+    });
     } catch (error: any) {
       // 에러 처리
       if (error.response) {
-        alert(error.response.data); // 서버에서 받은 에러 메시지
+        Swal.fire({
+          icon: "error",
+          title: "로그인 실패",
+          text: error.response.data,
+        });
       } else {
-        alert("로그인 요청 중 오류가 발생했습니다.");
+        Swal.fire({
+          icon: "error",
+          title: "로그인 실패",
+          text: "로그인 요청 중 오류가 발생했습니다.",
+        });
       }
     }
   };
