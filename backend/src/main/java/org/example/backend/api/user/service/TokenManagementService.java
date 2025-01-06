@@ -10,6 +10,7 @@ import org.example.backend.exceptions.UnauthorizedException;
 import org.example.backend.exceptions.UserIdNullException;
 import org.example.backend.exceptions.UserNotFoundException;
 import org.example.backend.security.JwtTokenProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,9 @@ public class TokenManagementService {
     private final RedisTemplate<String, Long> redisTemplate;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
+
+    @Value("${server.host}")
+    private String host;
 
     public TokenManagementService(RedisTemplate<String, Long> redisTemplate, JwtTokenProvider jwtTokenProvider, UserRepository userRepository) {
         this.redisTemplate = redisTemplate;
@@ -109,7 +113,7 @@ public class TokenManagementService {
         Long expirationTime = ops.get("Blacklist:" + token);
 
         if (expirationTime != null) {
-            response.sendRedirect("/login");
+            response.sendRedirect("https://" + host);
             return null; // 로그아웃 된 토큰은 login으로 리다이렉팅
         }
 
@@ -119,7 +123,7 @@ public class TokenManagementService {
                 log.info("둘다 만료");
                 clearCookie(response, "accessToken");
                 clearCookie(response, "userEmail");
-                response.sendRedirect("/login");
+                response.sendRedirect("https://" + host);
                 return null;
             } else {
                 // refresh token 이 만료되지 않은 경우
