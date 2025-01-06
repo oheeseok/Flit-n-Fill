@@ -105,10 +105,11 @@ const MyPage: React.FC = () => {
       (validatePassword(password) || password === "") &&
         (validateConfirmPassword(password, confirmPassword) ||
           (password === "" && confirmPassword === "")) &&
-        (validatePhone(phone) || phone === user?.userPhone)
+        (validatePhone(phone) || phone === user?.userPhone) &&
+        selectedSubArea !== "시, 군, 구" // 시, 군, 구 선택 여부 추가
     );
     console.log("formvaild:", formValid);
-  }, [password, confirmPassword, phone]);
+  }, [password, confirmPassword, phone, selectedSubArea]);
 
   // 이벤트 핸들러
   const handleAreaChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -267,32 +268,32 @@ const MyPage: React.FC = () => {
           />
         </div>
         <div className="mypage-level">
+          <div className="mypage-level-header">
             <div className="mypage-level-header">
-              <div className="mypage-level-header">
-                <h3>My f-evel</h3>
-                <div className="mypage-fevel-container">
-                  <progress
-                    className="mypage-fevel"
-                    value={fevel}
-                    max="7"
-                  ></progress>
-                  <div className="mypage-level-steps">
-                    {[...Array(8)].map((_, index) => (
-                      <span
-                        key={index}
-                        className={`mypage-level-step ${
-                          index === fevel ? "active" : ""
-                        }
+              <h3>My f-evel</h3>
+              <div className="mypage-fevel-container">
+                <progress
+                  className="mypage-fevel"
+                  value={fevel}
+                  max="7"
+                ></progress>
+                <div className="mypage-level-steps">
+                  {[...Array(8)].map((_, index) => (
+                    <span
+                      key={index}
+                      className={`mypage-level-step ${
+                        index === fevel ? "active" : ""
+                      }
                          ${fevel === 0 ? "zero-step" : ""}`}
-                      >
-                        {index}
-                      </span>
-                    ))}
-                  </div>
+                    >
+                      {index}
+                    </span>
+                  ))}
                 </div>
               </div>
             </div>
           </div>
+        </div>
         <form className="mypage-form" onSubmit={handleEditProfile}>
           <div className="mypage-form-group">
             <label htmlFor="email">email</label>

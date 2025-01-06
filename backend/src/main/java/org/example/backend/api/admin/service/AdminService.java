@@ -135,7 +135,8 @@ public class AdminService {
             content.append("<h3>회원님께서 신고하신 내용이 처리되었습니다.</h3><br>" +
                     "신고 내용 : " + request.getRequestContent() +
                     "<br><br>운영 정책에 따라 적절히 조치하였습니다.<br>" +
-                    "처리 결과에 대한 문의는 고객센터를 통해 가능합니다.");
+                    "처리 결과에 대한 문의는 고객센터를 통해 가능합니다.<br>" +
+                    "문의 : kostaflitnfill@gmail.com");
             message = subject + "신고가 처리되었습니다.";
 
             // 신고 유저 처리
@@ -144,7 +145,9 @@ public class AdminService {
             content.append("<h3>회원님께서 신고하신 <strong>내용</strong>에 대한 처리 결과를 안내드립니다.</h3><br>" +
                     "신고 내용 : " + request.getRequestContent() +
                     "<br><br>아쉽게도 운영 정책에 따라 해당 내용은 조치 대상이 아니라고 판단되었습니다.<br>" +
-                    "관련하여 추가 문의 사항이 있으시면 고객센터로 문의해 주세요.");
+                    "<br>반려 사유: " + adminResponseDto.getResponseMessage() + "<br>" +
+                    "관련하여 추가 문의 사항이 있으시면 고객센터로 문의해 주세요. <br>" +
+                    "문의 : kostaflitnfill@gmail.com");
             message = subject + " 신고가 처리되지 않았습니다.";
         } else {
             throw new RequestNotFoundException("요청이 없거나 아직 대기상태입니다.");

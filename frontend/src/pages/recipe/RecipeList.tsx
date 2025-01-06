@@ -275,12 +275,48 @@ const RecipeList = () => {
       </div>
 
       {searchQueryString !== "" && searchQueryString.length > 0 && (
-        <button
-          style={{ background: "#d4efc7" }}
-          onClick={() => handleButtonClick(searchQueryString)}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "20px", // 부모 요소의 높이를 설정
+          }}
         >
-          더 많은 레시피 보러가기
-        </button>
+          <button
+            style={{
+              background: "#f0efefce",
+              borderRadius: "5px",
+              padding: "10px 20px",
+            }}
+            onClick={() => handleButtonClick(searchQueryString)}
+          >
+            더 많은 레시피 보러가기
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="14"
+              viewBox="0 0 35 24"
+              fill="none"
+            >
+              <g clip-path="url(#clip0_780_2318)">
+                <path
+                  d="M33.3829 3.74333C33.1871 3.01981 32.8052 2.36019 32.2752 1.83017C31.7452 1.30015 31.0856 0.918215 30.3621 0.7224C27.7133 0 17.0528 0 17.0528 0C17.0528 0 6.39171 0.0218666 3.74291 0.744267C3.01938 0.940093 2.35977 1.32205 1.82977 1.85209C1.29977 2.38214 0.917873 3.04178 0.72211 3.76533C-0.0790897 8.47173 -0.38989 15.6432 0.74411 20.1613C0.939893 20.8849 1.3218 21.5445 1.8518 22.0745C2.38179 22.6045 3.04139 22.9865 3.76491 23.1823C6.41371 23.9047 17.0745 23.9047 17.0745 23.9047C17.0745 23.9047 27.7352 23.9047 30.3838 23.1823C31.1074 22.9865 31.767 22.6045 32.297 22.0745C32.8271 21.5445 33.209 20.8849 33.4048 20.1613C34.2498 15.4483 34.5102 8.2812 33.3829 3.74333Z"
+                  fill="#FF0000"
+                />
+                <path
+                  d="M13.6597 17.0749L22.5034 11.9525L13.6597 6.83008V17.0749Z"
+                  fill="white"
+                />
+              </g>
+              <defs>
+                <clipPath id="clip0_780_2318">
+                  <rect width="34.14" height="24" fill="white" />
+                </clipPath>
+              </defs>
+            </svg>
+          </button>
+        </div>
       )}
 
       {/* 북마크 필터 */}
@@ -337,10 +373,10 @@ const RecipeList = () => {
                 ></div>
               </div>
               <div className="recipe-list-box-card-title">
-                {recipe.recipeTitle}
+                {recipe.recipeTitle.slice(0, 20)}
               </div>
               <div className="recipe-list-box-card-detail">
-                {recipe.recipeFoodDetails.slice(0, 30)}...
+                {recipe.recipeFoodDetails.slice(0, 26)}...
               </div>
               <div className="recipe-list-box-card-more">
                 <Link to={`/recipe/detail/${recipe.recipeId}`}>Read more</Link>
