@@ -28,19 +28,21 @@ const ScrollToTopButton = () => {
         <button
           onClick={scrollToTop}
           style={{
-            position: "fixed",
-            bottom: "20px",
-            right: "20px",
-            zIndex: 1000,
-            backgroundColor: "#ffffff",
-            color: "#000",
-            fontWeight: "bold",
-            border: "none",
-            borderRadius: "50%",
-            width: "50px",
-            height: "50px",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+            width: "42px",
+            height: "42px",
+            backgroundColor: "#333",
+            color: "#fff",
+            border: "2px solid #fff",
+            borderRadius: "10px",
             cursor: "pointer",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            position: "fixed",
+            bottom: "30px",
+            right: "30px",
+            zIndex: 9,
+            font: "bold",
           }}
           aria-label="Scroll to top"
         >

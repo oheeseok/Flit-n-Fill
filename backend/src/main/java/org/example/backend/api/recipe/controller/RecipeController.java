@@ -99,17 +99,49 @@ public class RecipeController {
                                                         @RequestPart("recipeUpdateDto") String recipeUpdateDtoJson,
                                                         @RequestPart(value = "recipeMainPhoto", required = false) MultipartFile mainPhoto,
                                                         @RequestPart(value = "recipeStepPhotos", required = false) List<MultipartFile> stepPhotos) throws IOException {
+        // userId 확인
         Long userId = (Long) request.getAttribute("userId");
         if (userId == null) {
             throw new UserIdNullException("userId not found");
         }
+        log.info("Received userId: {}", userId);
+
+        // recipeUpdateDto JSON 출력
+        log.info("Received recipeUpdateDto JSON: {}", recipeUpdateDtoJson);
+
+        // mainPhoto 출력
+        if (mainPhoto != null) {
+            log.info("Main photo filename: {}", mainPhoto.getOriginalFilename());
+            log.info("Main photo size: {}", mainPhoto.getSize());
+        } else {
+            log.info("No main photo received");
+        }
+
+        // stepPhotos 출력
+        if (stepPhotos != null && !stepPhotos.isEmpty()) {
+            for (int i = 0; i < stepPhotos.size(); i++) {
+                MultipartFile stepPhoto = stepPhotos.get(i);
+                log.info("Step photo {} filename: {}", i + 1, stepPhoto.getOriginalFilename());
+                log.info("Step photo {} size: {}", i + 1, stepPhoto.getSize());
+            }
+        } else {
+            log.info("No step photos received");
+        }
+
+        // JSON 문자열 -> DTO 변환 후 출력
         ObjectMapper objectMapper = new ObjectMapper();
         RecipeUpdateDto recipeUpdateDto = objectMapper.readValue(recipeUpdateDtoJson, RecipeUpdateDto.class);
+        log.info("Parsed RecipeUpdateDto: {}", recipeUpdateDto);
 
         // 레시피 업데이트 서비스 호출
         RecipeDetailDto updatedRecipe = recipeService.updateRecipe(userId, recipeId, recipeUpdateDto, mainPhoto, stepPhotos);
+
+        // 응답 데이터 출력
+        log.info("Updated Recipe: {}", updatedRecipe);
+
         return ResponseEntity.status(HttpStatus.OK).body(updatedRecipe);
     }
+
 
     @PatchMapping("/{recipeId}/visibility")
     public ResponseEntity<Void> changeRecipeVisibility(HttpServletRequest request,

@@ -1,37 +1,152 @@
 .footer {
   width: 100%;
   height: 100%;
+  background-color: #272727;
+  border-top: 1px solid #333;
+  padding: 40px 0 60px 0;
+}
+.footer ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.footer-menu {
   display: flex;
-  align-items: center;
-  background: rgba(199, 239, 230, 0.5);
+  justify-content: center;
 }
 
-.footertext {
+.footer-menu li {
+  position: relative;
+}
+
+.footer-menu li::before {
+  content: "";
+  width: 3px;
+  height: 3px;
+  background-color: #555;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: -1px;
+  margin: auto;
+}
+
+.footer-menu li:last-child::before {
+  display: none;
+}
+
+.footer-menu li a {
+  color: #ccc;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 15px;
+  display: block;
+  text-decoration: none;
+}
+
+.footer-menu .footer-color {
+  color: #d4efc7;
+}
+
+.footer-btn-group {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+.btn {
+  width: 130px;
+  padding: 6px;
+  border: 2px solid #333;
+  border-radius: 4px;
+  color: #333;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  box-sizing: border-box;
+  display: block;
+  transition: 0.4s;
+}
+
+.btn:hover {
+  color: #fff;
+  background-color: #333;
+}
+.btn.btn--reverse {
+  background-color: #333;
+  color: #fff;
+}
+.btn.btn--reverse:hover {
+  background-color: transparent;
+  color: #333;
+}
+.btn.btn--white {
+  color: #fff;
+  border-color: #fff;
+}
+.btn.btn--white:hover {
+  color: #333;
+  background-color: #fff;
+}
+
+.footer-btn .btn {
+  font-size: 12px;
+  margin-right: 10px;
+}
+
+.footer-btn .btn:last-child {
+  margin-right: 0;
+}
+
+.footer-info {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.footer-info span {
+  margin-right: 26px;
+  color: #999;
+  font-size: 14px;
+}
+
+.footer-info span:last-child {
+  margin-right: 0;
+}
+
+.footer-copyright {
+  color: #999;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 12px;
+}
+
+/* .footertext {
   width: 100%;
   height: 100%;
   margin: 67px;
-  color: var(--light-black, #3c3c3c);
+  color: #ccc;
   font-family: Ubuntu;
   font-size: 22px;
   font-style: normal;
   font-weight: 500;
   line-height: normal;
   text-align: left;
-}
+} */
 
 /* 반응형 디자인: 화면 크기 1024px 이하일 때 */
-@media (max-width: 1024px) {
+/* @media (max-width: 1024px) {
   .footer {
     display: flex;
-    flex-direction: column; /* 푸터를 세로로 정렬 */
+    flex-direction: column; 
     justify-content: center;
     align-items: center;
-    padding: 20px; /* 푸터 내 여백을 추가 */
+    padding: 20px; 
   }
 
   .footertext {
-    margin: 20px 0; /* 위/아래 margin을 적당히 줄임 */
-    font-size: 18px; /* 텍스트 크기를 줄임 */
-    text-align: center; /* 텍스트 중앙 정렬 */
+    margin: 20px 0; 
+    font-size: 18px; 
+    text-align: center; 
   }
-}
+} */
