@@ -106,7 +106,7 @@ jobs:
                 -e DB_PORT=3306 \
                 -e DB_USER=root \
                 -e DB_PASSWORD=1234 \
-                -e MONGODB_URI=mongodb://mongodb:27017/mydb2 \
+                -e MONGODB_URI=mongodb://mongodb:27017/flitnfill \
                 -e REDIS_HOST=redis-container \
                 -e OAUTH2_REDIRECT_HOST=www.flitnfill.kro.kr \
                 ckdgkim/backendproject:back-${{ env.TAG }}
