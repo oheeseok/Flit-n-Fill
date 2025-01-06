@@ -220,10 +220,10 @@ const SignUp = () => {
     <>
       <div className="signupbody">
         <div className="signup-container">
-          <div className="signup-title">Get Started Now</div>
+          <div className="signup-title">회원 가입</div>
 
           {/* Name 입력 */}
-          <div className="signup-text-name">Name</div>
+          <div className="signup-text-name">이름</div>
           <input
             type="text"
             className="signup-text-input"
@@ -233,7 +233,7 @@ const SignUp = () => {
           />
 
           {/* Email 입력 */}
-          <div className="signup-text-email">Email address</div>
+          <div className="signup-text-email">이메일</div>
           <input
             type="text"
             className="signup-text-input"
@@ -244,7 +244,7 @@ const SignUp = () => {
           {emailError && <div className="error-message">{emailError}</div>}
 
           {/* Password 입력 */}
-          <div className="signup-text-password">Password</div>
+          <div className="signup-text-password">비밀번호</div>
           <input
             type="password"
             className="signup-text-input"
@@ -257,7 +257,7 @@ const SignUp = () => {
           )}
 
           {/* Confirm Password 입력 */}
-          <div className="signup-text-password">Confirm Password</div>
+          <div className="signup-text-password">비밀번호 (확인)</div>
           <input
             type="password"
             className="signup-text-input"
@@ -270,7 +270,7 @@ const SignUp = () => {
           )}
 
           {/* Nickname 입력 */}
-          <div className="signup-text-nickname">Nickname</div>
+          <div className="signup-text-nickname">닉네임</div>
           <input
             type="text"
             className="signup-text-input"
@@ -280,7 +280,7 @@ const SignUp = () => {
           />
 
           {/* Phone 입력 */}
-          <div className="signup-text-phone">Phone</div>
+          <div className="signup-text-phone">전화번호</div>
           <input
             type="text"
             className="signup-text-input"
@@ -294,7 +294,7 @@ const SignUp = () => {
 
           {/* Address 입력 */}
           <div className="signup-container-address">
-          <div className="signup-text-address">Address</div>
+          <div className="signup-text-address">주소</div>
           <div className="select-container">
             <select
               ref={areaSelectRef}
@@ -329,7 +329,7 @@ const SignUp = () => {
           {/* Sign Up 버튼 */}
           <div className="signup-button-container">
             <button className="signup-button-login" onClick={handleSignUp}>
-              Sign Up
+              가입하기
             </button>
           </div>
           <div className="signup-button-or">or</div>
@@ -355,7 +355,7 @@ const SignUp = () => {
           </div>
           {/* 이미 계정이 있는 경우 로그인 링크 */}
           <div>
-            Have an account? <a href="/signin">Sign In</a>
+            계정이 이미 있다면? <a href="/signup">로그인</a>
           </div>
         </div>
 
