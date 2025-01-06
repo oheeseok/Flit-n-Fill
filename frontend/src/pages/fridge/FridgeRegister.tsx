@@ -7,6 +7,11 @@ const apiUrl = import.meta.env.VITE_API_URL;
 // import FridgeSearchBar from "../../components/fridge/FridgeSearchBar.tsx";
 
 const FridgeRegister = () => {
+  const getTodayDate = (): string => {
+    const today = new Date();
+    return today.toISOString().split("T")[0]; // YYYY-MM-DD 형식
+  };
+
   const { addFridgeItem, requestAddIngredient } = useFridge();
   const [selectedMainCategory, setSelectedMainCategory] = useState<string>("");
   const [selectedSubCategory, setSelectedSubCategory] = useState<string>("");
@@ -16,7 +21,7 @@ const FridgeRegister = () => {
   const [quantity, setQuantity] = useState<number | "">("");
   const [unit, setUnit] = useState<string>("PIECE");
   const [expirationDate, setExpirationDate] = useState<string>("");
-  const [manufactureDate, setManufactureDate] = useState<string>("");
+  const [manufactureDate, setManufactureDate] = useState<string>(getTodayDate);
   const [storageMethod, setStorageMethod] = useState<
     "REFRIGERATED" | "FROZEN" | "ROOM_TEMPERATURE"
   >("REFRIGERATED");
@@ -177,10 +182,20 @@ const FridgeRegister = () => {
   useEffect(() => {
     // 오늘 날짜를 구하고 YYYY-MM-DD 형식으로 변환
     const today = new Date();
-    const formattedDate = today.toISOString().split("T")[0]; // YYYY-MM-DD 형식
-    setExpirationDate(formattedDate); // 기본값으로 설정
-    setManufactureDate(formattedDate);
-  }, []);
+
+    let futureDate = new Date(today); // 오늘 날짜를 기반으로 새 날짜 생성
+    if (storageMethod === "REFRIGERATED") {
+      futureDate.setDate(today.getDate() + 7); // 7일 뒤
+    } else if (storageMethod === "FROZEN") {
+      futureDate.setFullYear(today.getFullYear() + 1); // 1년 뒤
+    } else if (storageMethod === "ROOM_TEMPERATURE") {
+      futureDate.setDate(today.getDate() + 2); // 2일 뒤
+    }
+
+    const formattedDate = futureDate.toISOString().split("T")[0]; // YYYY-MM-DD 형식으로 변환
+    setExpirationDate(formattedDate); // 만료일 업데이트
+  }, [storageMethod]); // storageMethod가 변경될 때마다 실행
+
 
   const handleRegister = (): void => {
     // 유효성 검사 함수
@@ -208,7 +223,7 @@ const FridgeRegister = () => {
           condition:
             new Date(expirationDate).setHours(0, 0, 0, 0) <
             new Date().setHours(0, 0, 0, 0),
-          message: "소비기한은 오늘 이후 날짜로 설정해야 합니다.",
+          message: "소비기한은 지난 날짜로 설정할 수 없습니다.",
         },
       ];
 
