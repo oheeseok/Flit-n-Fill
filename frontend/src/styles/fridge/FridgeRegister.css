@@ -124,7 +124,7 @@
 /* Buttons */
 .fridge-register-buttons {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 10px;
 }
 
@@ -142,6 +142,7 @@
   font-style: normal;
   font-weight: 700;
   line-height: 20px; /* 125% */
+  margin-right: 10px;
 }
 
 .fridge-register-cancel-button {
@@ -160,7 +161,109 @@
   line-height: 20px; /* 125% */
 }
 
+.fridge-register-button svg,
+.fridge-register-cancel-button svg {
+  width: 18px; /* 모든 버튼의 svg 크기를 동일하게 */
+  height: 18px; 
+}
+
 textarea {
   resize: none;
   height: 100px;
+}
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+  /* 버튼을 수직으로 정렬 */
+  .fridge-register-buttons {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* 버튼 크기 및 여백 조정 */
+  .fridge-register-button,
+  .fridge-register-cancel-button {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 14px;
+    margin-top: 10px;
+  }
+
+  /* 재료 등록 요청 버튼을 맨 아래로 배치 */
+  .fridge-register-button {
+    order: 1; /* 버튼을 다른 요소들보다 뒤로 보냄 */
+  }
+
+  .fridge-register-cancel-button {
+    order: 2; /* 취소 버튼을 먼저 표시 */
+  }
+  /* 프리징 등록 컨테이너 크기 조정 */
+  .fridge-register-container {
+    width: 90%;
+    padding: 15px;
+  }
+
+  /* 카테고리 그룹 간격 및 글꼴 크기 조정 */
+  .fridge-register-category-group {
+    font-size: 14px;
+    margin: 0 0 10px;
+  }
+
+  /* 드롭다운 간격 및 너비 조정 */
+  .fridge-register-dropdown-row {
+    flex-direction: column;
+  }
+
+  .fridge-register-dropdown {
+    margin: 0;
+    margin-bottom: 10px;
+  }
+
+  .fridge-register-dropdown select {
+    font-size: 12px;
+    padding: 6px;
+  }
+
+  /* 추가 필드 그리드 레이아웃 변경 */
+  .fridge-register-additional-fields {
+    grid-template-columns: 1fr; /* 한 열로 정렬 */
+  }
+
+  /* 아이콘 크기 조정 */
+  .fridge-register-icon img {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+/* 더 작은 화면 (모바일) */
+@media (max-width: 480px) {
+  /* 카테고리 그룹 글꼴 크기 줄이기 */
+  .fridge-register-category-group {
+    font-size: 12px;
+  }
+
+  /* 텍스트 입력 크기 줄이기 */
+  .fridge-register-form-group input,
+  .fridge-register-form-group textarea,
+  .fridge-register-form-group select {
+    font-size: 12px;
+  }
+
+  /* 추가 필드 간격 줄이기 */
+  .fridge-register-additional-fields {
+    gap: 15px;
+  }
+
+  /* 버튼 글꼴 크기 줄이기 */
+  .fridge-register-button,
+  .fridge-register-cancel-button {
+    font-size: 14px;
+    padding: 10px 12px;
+  }
+
+  /* 텍스트영역 크기 줄이기 */
+  textarea {
+    height: 80px;
+  }
 }
