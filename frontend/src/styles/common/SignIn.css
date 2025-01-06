@@ -43,7 +43,7 @@
 .signin-input {
   display: flex;
   max-width: 100%;
-  width: 100%;
+  width: 97.5%;
   font-size: 16px;
   border-radius: 5px;
   margin-bottom: 40px;
@@ -69,6 +69,7 @@
 }
 
 .signin-button-login {
+  margin-top: 30px;
   width: 100%;
   background: #c7efe6;
   margin-bottom: 40px;
@@ -115,7 +116,7 @@
   border-radius: 10px;
   padding: 0px;
   overflow: hidden;
-  background-color: #FEE500;
+  background-color: #fee500;
 }
 
 .signin-button-kakao img {

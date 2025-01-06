@@ -55,32 +55,38 @@ const SignUp = () => {
   const validatePhone = (phone: string) => {
     const regex = /^\d{3}-\d{4}-\d{4}$/;
     return regex.test(phone);
-  }
+  };
 
   // 실시간 유효성 검사
   useEffect(() => {
     setEmailError(
-      email === "" ? "" :
-      validateEmail(email) ? "" : "이메일 형식이 올바르지 않습니다."
+      email === ""
+        ? ""
+        : validateEmail(email)
+        ? ""
+        : "이메일 형식이 올바르지 않습니다."
     );
     setPasswordError(
-      password === "" ? "" :
-      validatePassword(password)
+      password === ""
+        ? ""
+        : validatePassword(password)
         ? ""
         : "비밀번호는 최소 8자 이상, 영문과 숫자를 포함해야 합니다."
     );
     setConfirmPasswordError(
-      confirmPassword === "" ? "" :
-      validateConfirmPassword(password, confirmPassword)
+      confirmPassword === ""
+        ? ""
+        : validateConfirmPassword(password, confirmPassword)
         ? ""
         : "비밀번호가 일치하지 않습니다."
     );
     setPhoneError(
-      phone === "" ? "" :
-      validatePhone(phone)
-      ? ""
-      : "전화번호는 000-0000-0000 형식으로 입력해주세요."
-    )
+      phone === ""
+        ? ""
+        : validatePhone(phone)
+        ? ""
+        : "전화번호는 000-0000-0000 형식으로 입력해주세요."
+    );
 
     // 폼이 모두 유효한지 체크
     setFormValid(
@@ -109,7 +115,7 @@ const SignUp = () => {
 
   // Sign Up 요청 처리 함수
   const handleSignUp = async () => {
-    if(!formValid) {
+    if (!formValid) {
       Swal.fire({
         title: "회원가입 실패",
         text: "입력하신 정보가 올바르지 않습니다.",
@@ -117,29 +123,29 @@ const SignUp = () => {
         confirmButtonColor: "#d33",
         confirmButtonText: "확인",
       });
-      return; 
+      return;
     }
 
     // 입력 값이 빈칸일 경우 가입 불가
-  if (
-    !name ||
-    !email ||
-    !password ||
-    !confirmPassword ||
-    !nickname ||
-    !phone ||
-    !selectedArea ||
-    !selectedSubArea
-  ) {
-    Swal.fire({
-      title: "회원가입 실패",
-      text: "모든 필드에 값을 입력해주세요.",
-      icon: "error",
-      confirmButtonColor: "#d33",
-      confirmButtonText: "확인",
-    });
-    return;
-  }
+    if (
+      !name ||
+      !email ||
+      !password ||
+      !confirmPassword ||
+      !nickname ||
+      !phone ||
+      !selectedArea ||
+      !selectedSubArea
+    ) {
+      Swal.fire({
+        title: "회원가입 실패",
+        text: "모든 필드에 값을 입력해주세요.",
+        icon: "error",
+        confirmButtonColor: "#d33",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
     try {
       const fullAddress = `${selectedArea} ${selectedSubArea}`;
       const response = await axios.post(`${apiUrl}/api/user/register`, {
@@ -288,43 +294,43 @@ const SignUp = () => {
             value={phone}
             onChange={handleChangePhone}
           />
-          {phoneError && (
-            <div className="error-message">{phoneError}</div>
-          )}
+          {phoneError && <div className="error-message">{phoneError}</div>}
 
           {/* Address 입력 */}
           <div className="signup-container-address">
-          <div className="signup-text-address">주소</div>
-          <div className="select-container">
-            <select
-              ref={areaSelectRef}
-              value={selectedArea}
-              onChange={handleAreaChange}
-              style={{ width: `${selectWidth}px` }} // 고정된 너비 적용
-            >
-              <option value="">지역</option>
-              {area.map((area) => (
-                <option key={area.name} value={area.name}>
-                  {area.name}
-                </option>
-              ))}
-            </select>
-
-            {selectedArea && (
+            <div className="signup-text-address">주소</div>
+            <div className="select-container">
               <select
-                value={selectedSubArea}
-                onChange={handleSubAreaChange}
-                style={{ width: `${selectWidth}px` }}
+                ref={areaSelectRef}
+                value={selectedArea}
+                onChange={handleAreaChange}
+                style={{ width: `${selectWidth}px` }} // 고정된 너비 적용
               >
-                <option value="">시, 군, 구</option>
-                {subAreas.map((subArea) => (
-                  <option key={subArea} value={subArea}>
-                    {subArea}
+                <option className="select-container-address" value="">
+                  지역
+                </option>
+                {area.map((area) => (
+                  <option key={area.name} value={area.name}>
+                    {area.name}
                   </option>
                 ))}
               </select>
-            )}
-          </div>
+
+              {selectedArea && (
+                <select
+                  value={selectedSubArea}
+                  onChange={handleSubAreaChange}
+                  style={{ width: `${selectWidth}px` }}
+                >
+                  <option value="">시, 군, 구</option>
+                  {subAreas.map((subArea) => (
+                    <option key={subArea} value={subArea}>
+                      {subArea}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
           </div>
           {/* Sign Up 버튼 */}
           <div className="signup-button-container">

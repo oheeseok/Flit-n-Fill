@@ -118,8 +118,8 @@
 
 .signup-text-input {
   display: flex;
-  max-width: 600px;
-  width: 100%;
+  max-width: 100%;
+  width: 97.5%;
   font-size: 16px;
   border-radius: 5px;
   margin-bottom: 10px;
@@ -148,7 +148,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  width: 99%;
+  width: 100%;
 }
 .signup-button-login {
   width: 100%;
@@ -194,34 +194,6 @@
   right: 0;
 }
 
-.signup-container-address {
-  display: flex;
-  align-items: center; /* Align Address and select boxes vertically */
-  gap: 20px; /* Add spacing between Address and select boxes */
-}
-
-/* Add these styles to your SignUp.css file */
-.select-container {
-  display: inline-flex;
-  flex-direction: row; /* Arrange the select boxes horizontally */
-  /* justify-content: flex-start; Ensure space between them */
-  align-items: center; /* Align them vertically in the center */
-  gap: 20px; /* Space between select elements */
-}
-
-.select-container select {
-  flex:1;
-  font-size: 18px;
-  padding: 8px 12px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  /* width: 45%; Adjust width for a balanced layout */
-  max-width: 300px;
-  box-sizing: border-box;
-  background-color: #f8f8f8;
-  transition: border-color 0.3s;
-}
-
 .select-container select:focus {
   border-color: #71c9fc; /* Blue border on focus */
   outline: none;
@@ -229,11 +201,45 @@
 
 .select-container option {
   font-size: 18px;
+  padding-right: -20px;
 }
 
 /* Optional: Add some spacing between the title and the select boxes */
 .signup-text-address {
-  margin-bottom: 20px;
+  width: 20%;
+  display: flex;
+}
+
+.signup-container-address {
+  margin: 10px 0;
+  width: 80%;
+  max-width: 80%;
+  display: flex;
+  align-items: start; /* Align Address and select boxes vertically */
+  gap: 6%; /* Add spacing between Address and select boxes */
+}
+
+/* Add these styles to your SignUp.css file */
+.select-container {
+  display: flex;
+  width: 100%;
+  flex-direction: row; /* Arrange the select boxes horizontally */
+  /* justify-content: flex-start; Ensure space between them */
+  align-items: center; /* Align them vertically in the center */
+  gap: 20px; /* Space between select elements */
+}
+
+.select-container select {
+  flex: 1;
+  font-size: 18px;
+  padding: 8px 12px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  /* width: 45%; Adjust width for a balanced layout */
+  max-width: 63.6%;
+  box-sizing: border-box;
+  background-color: #f8f8f8;
+  transition: border-color 0.3s;
 }
 
 .error-message {
