@@ -17,6 +17,7 @@
 }
 
 .recipe-detail-title {
+  width: 94%;
   color: #000;
   text-align: start;
   font-family: Ubuntu;
@@ -34,8 +35,8 @@
 }
 
 .recipe-detail-image img {
-  width: 686px;
-  height: 600px;
+  width: 92.2%;
+  height: 638px;
   border-radius: 30px;
   object-fit: cover;
   cursor: pointer;
