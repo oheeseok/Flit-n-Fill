@@ -36,7 +36,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @Transactional
-@EnableScheduling
 public class EmailService {
     private final JavaMailSender mailSender;
     private final UserRepository userRepository;
