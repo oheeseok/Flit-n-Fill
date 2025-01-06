@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AdminContext } from "../../context/AdminProvider"; // AdminContext 가져오기
 import "../../styles/admin/AdminPage.css"; // AdminPage.css 파일을 임포트
+import { format } from "date-fns";
 import axios from "axios"; // axios 임포트
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -90,7 +91,7 @@ const AdminPage = () => {
         prevRequests.map((request) =>
           request.requestId === requestId
             ? { ...request, isOpen: !request.isOpen } // 클릭 시 상세 정보 토글
-            : { ...request, isOpen: false}
+            : { ...request, isOpen: false }
         )
       );
     } catch (error) {
@@ -107,6 +108,10 @@ const AdminPage = () => {
     const data: AdminResponseDto = { responseStatus, responseMessage };
 
     try {
+      console.log(
+        "handleUpdateRequestStatus() => responseStatus: ",
+        responseStatus
+      );
       await axios.patch(`${apiUrl}/api/admin/requests/${requestId}`, data, {
         withCredentials: true,
         headers: {
@@ -130,125 +135,183 @@ const AdminPage = () => {
   }
 
   return (
-    <div className="admin-page-container">
+    <div className="chatroom-list-container">
       <h1>Admin Page</h1>
-      <p>Welcome to the Admin Page. Only accessible by admin users.</p>
 
       {/* 요청 목록 */}
-      <div className="requests-list">
-        <h2>Request List</h2>
-        <ul style={{ listStyleType: "none", padding: 0 }}>
-          {requests.map((request) => (
-            <li
+      <div className="chatroom-list">
+        <h2>요청 목록</h2>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+            <tr>
+              <th>요청 ID</th>
+              <th>요청 분류</th>
+              <th>요청 내용</th>
+              <th>처리 상태</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {requests.map((request) => (
+              <tr
+                key={request.requestId}
+                onClick={() => fetchRequestDetail(request.requestId)} // 표 행 클릭 시 상세 정보 토글
+                style={{ cursor: "pointer" }}
+              >
+                <td>{request.requestId}</td>
+                <td>{request.requestType}</td>
+                <td>{request.requestContent}</td>
+                <td>
+                  <span
+                    style={{
+                      backgroundColor:
+                        request.responseStatus === "PENDING"
+                          ? "#FFD700"
+                          : "#555", // pending -> yellow / 그 외 짙은 회색
+                      color: "#fff", // 흰색 글씨
+                      padding: "5px 10px",
+                      borderRadius: "5px", // 둥근 모서리
+                      fontSize: "0.9rem", // 적당한 크기
+                    }}
+                  >
+                    {request.responseStatus}
+                  </span>
+                </td>
+                <td>
+                  {request.isOpen ? (
+                    <span>▼</span> // 열려있는 경우 ▼ 표시
+                  ) : (
+                    <span>▶</span> // 닫혀있는 경우 ▶ 표시
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* 요청 상세 정보 */}
+      {requests.map(
+        (request) =>
+          request.isOpen && (
+            <div
               key={request.requestId}
+              className="request-detail"
               style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
+                backgroundColor: "#fff",
+                borderRadius: "5px", // 둥근 모서리
+                marginTop: "20px",
+                padding: "20px",
               }}
             >
-              <div>
-                <button onClick={() => fetchRequestDetail(request.requestId)}>
-                  {request.requestId}. [ {request.requestType} ] :{" "}
-                  {request.requestContent}
-                </button>
-                <span
-                  style={{
-                    backgroundColor:
-                      request.responseStatus === "PENDING" ? "#FFD700" : "#555", // pending -> yellow / 그 외 짙은 회색
-                    color: "#fff", // 흰색 글씨
-                    padding: "5px 10px",
-                    borderRadius: "5px", // 둥근 모서리
-                    fontSize: "0.9rem", // 적당한 크기
-                  }}
-                >
-                  {request.responseStatus}
-                </span>
-              </div>
+              {/* 요청 상세 정보 표 */}
+              <table
+                style={{
+                  width: "100%",
+                  borderCollapse: "collapse",
+                  marginTop: "20px", // 위쪽에 여백을 추가
+                }}
+              >
+                <thead>
+                  <tr>
+                    <th>요청 ID</th>
+                    <th>요청한 회원 ID</th>
+                    <th>요청 분류</th>
+                    <th>요청 내용</th>
+                    <th>신고한 회원 ID</th>
+                    <th>요청한 날짜</th>
+                    <th>처리 상태</th>
+                    <th>관리자 메시지</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{request.requestId}</td>
+                    <td>{request.requestUserId}</td>
+                    <td>{request.requestType}</td>
+                    <td>
+                      <span
+                        style={{
+                          display: "block", // 텍스트가 블록 요소로 처리되어 줄 바꿈을 할 수 있도록
+                          wordWrap: "break-word", // 긴 단어가 자동으로 줄 바꿈되도록
+                          whiteSpace: "normal", // 텍스트가 공백을 기준으로 줄 바꿈되도록
+                        }}
+                      >
+                        {request.requestContent}
+                      </span>
+                    </td>
+                    <td>{request.reportedUserId}</td>
+                    <td>
+                      {format(
+                        new Date(request.requestDate),
+                        "yyyy-MM-dd HH:mm:ss"
+                      )}
+                    </td>
+                    <td>{request.responseStatus}</td>
+                    <td>{request.responseMessage}</td>
+                  </tr>
+                </tbody>
+              </table>
 
-              {/* 요청 상세 정보 토글 */}
-              {request.isOpen && (
-                <div
-                  className="request-detail"
+              {/* 수락/거절 메시지 입력란 */}
+              <div style={{ marginTop: "20px" }}>
+                <h4>관리자 메시지 입력란</h4>
+                <input
+                  type="text"
+                  value={responseMessage}
+                  onChange={handleMessageChange}
+                  placeholder="응답 메세지를 입력해주세요."
                   style={{
-                    backgroundColor: "#fff",
-                    borderRadius: "5px", // 둥근 모서리
-                    marginRight: "50px",
-                    width: "500px",
+                    width: "100%",
+                    padding: "8px",
+                    borderRadius: "5px",
+                    marginBottom: "10px",
+                    border: "1px solid #ccc",
                   }}
-                >
-                  <p>
-                    <strong>Request ID:</strong> {request.requestId}
-                  </p>
-                  <p>
-                    <strong>User ID:</strong> {request.requestUserId}
-                  </p>
-                  <p>
-                    <strong>Request Type:</strong> {request.requestType}
-                  </p>
-                  <p>
-                    <strong>Request Content:</strong>
-                    <span
-                      style={{
-                        display: "block", // 텍스트가 블록 요소로 처리되어 줄 바꿈을 할 수 있도록
-                        wordWrap: "break-word", // 긴 단어가 자동으로 줄 바꿈되도록
-                        whiteSpace: "normal", // 텍스트가 공백을 기준으로 줄 바꿈되도록
-                      }}
-                    >
-                      {request.requestContent}
-                    </span>
-                  </p>
-                  <p>
-                    <strong>Reported User ID:</strong> {request.reportedUserId}
-                  </p>
-                  <p>
-                    <strong>Request Date:</strong> {request.requestDate}
-                  </p>
-                  <p>
-                    <strong>Response Status:</strong> {request.responseStatus}
-                  </p>
-                  <p>
-                    <strong>Response Message:</strong> {request.responseMessage}
-                  </p>
-
-                  {/* 수락/거절 메시지 입력란 */}
-                  <div>
-                    <h4>Respond to Request</h4>
-                    <input
-                      type="text"
-                      value={responseMessage}
-                      onChange={handleMessageChange}
-                      placeholder="응답 메세지를 입력해주세요."
-                    />
-                    <button
-                      onClick={() =>
-                        handleUpdateRequestStatus(
-                          request.requestId,
-                          "ACCEPTED",
-                          responseMessage
-                        )
-                      }
-                    >
-                      Accept
-                    </button>
-                    <button
-                      onClick={() =>
-                        handleUpdateRequestStatus(
-                          request.requestId,
-                          "DENIED",
-                          responseMessage
-                        )
-                      }
-                    >
-                      Reject
-                    </button>
-                  </div>
+                />
+                <div>
+                  <button
+                    onClick={() =>
+                      handleUpdateRequestStatus(
+                        request.requestId,
+                        "ACCEPTED",
+                        responseMessage
+                      )
+                    }
+                    style={{
+                      padding: "8px 16px",
+                      backgroundColor: "#4CAF50",
+                      color: "#fff",
+                      borderRadius: "5px",
+                      border: "none",
+                      marginRight: "10px",
+                    }}
+                  >
+                    Accept
+                  </button>
+                  <button
+                    onClick={() =>
+                      handleUpdateRequestStatus(
+                        request.requestId,
+                        "DENIED",
+                        responseMessage
+                      )
+                    }
+                    style={{
+                      padding: "8px 16px",
+                      backgroundColor: "#f44336",
+                      color: "#fff",
+                      borderRadius: "5px",
+                      border: "none",
+                    }}
+                  >
+                    Reject
+                  </button>
                 </div>
-              )}
-            </li>
-          ))}
-        </ul>
-      </div>
+              </div>
+            </div>
+          )
+      )}
     </div>
   );
 };
