@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import "../styles/MyPosts.css";
 
-interface PostSimpleDto {
+interface PostDetailDto {
   postId: number;
   postTitle: string;
   postPhoto1: string;
@@ -15,11 +15,13 @@ interface PostSimpleDto {
   progress: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "CANCELED";
   postContent: string;
   userEmail: string;
+  writerFoodName: string;
+  proposerFoodName: string;
 }
 
 const MyPosts = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
-  const [posts, setPosts] = useState<PostSimpleDto[]>([]);
+  const [posts, setPosts] = useState<PostDetailDto[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,7 +40,7 @@ const MyPosts = () => {
 
         const currentUserEmail = localStorage.getItem("userEmail")
         const myPosts = response.data.filter(
-          (post: PostSimpleDto) =>
+          (post: PostDetailDto) =>
             post.userEmail === currentUserEmail
         );
         setPosts(myPosts);
@@ -72,6 +74,8 @@ const MyPosts = () => {
             <div className="recipe-list-box-name-title">
               [{post.tradeType === "EXCHANGE" ? "교환" : "나눔"}]
             </div>
+            <div className="recipe-list-box-card-title">나의 재료 : {post.writerFoodName}</div>
+            <div className="recipe-list-box-card-title">{post.tradeType === "EXCHANGE" ? `원하는 재료 : ${post.proposerFoodName}` : "-"}</div>
             <div className="recipe-list-box-card">
               <div className="recipe-list-box-card-img-container">
                 {post.postPhoto1 ? (
@@ -86,7 +90,7 @@ const MyPosts = () => {
                   <p>이미지가 없습니다.</p>
                 )}
               </div>
-              <div className="recipe-list-box-card-title">{post.postTitle}</div>
+              {/* <div className="recipe-list-box-card-title">{post.postTitle}</div> */}
               <div className="recipe-list-box-card-detail">
                 {post.userProfile ? (
                     <img
@@ -108,9 +112,9 @@ const MyPosts = () => {
                   hour12: false,
                 })}
               </div>
-              <div className="recipe-list-box-card-more">
+              {/* <div className="recipe-list-box-card-more">
                 <Link to={`/community/detail/${post.postId}`}>Read more</Link>
-              </div>
+              </div> */}
             </div>
           </div>
         ))}

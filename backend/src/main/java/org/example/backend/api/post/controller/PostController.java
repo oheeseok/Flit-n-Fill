@@ -28,9 +28,9 @@ public class PostController {
     private final PostService postService;
 
     @GetMapping
-    public ResponseEntity<List<PostSimpleDto>> getAllPosts(HttpServletRequest request,
+    public ResponseEntity<List<PostDetailDto>> getAllPosts(HttpServletRequest request,
                                                            @RequestParam(value = "search-query", required = false) String keyword) {
-        List<PostSimpleDto> posts = new ArrayList<>();
+        List<PostDetailDto> posts = new ArrayList<>();
         if (keyword != null && !keyword.isEmpty()) {
             posts = postService.searchPost(keyword);
         } else {

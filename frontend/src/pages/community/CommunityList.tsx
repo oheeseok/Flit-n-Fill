@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "../../styles/community/CommunityList.css";
 
-interface PostSimpleDto {
+interface PostDetailDto {
   postId: number;
   postTitle: string;
   postPhoto1: string;
@@ -14,6 +14,8 @@ interface PostSimpleDto {
   address: string;
   progress: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "CANCELED";
   postContent: string;
+  writerFoodName: string;
+  proposerFoodName: string;
 }
 
 interface CommunityListProps {
@@ -22,7 +24,7 @@ interface CommunityListProps {
 
 const CommunityList: React.FC<CommunityListProps> = ({ filter }) => {
   const apiUrl = import.meta.env.VITE_API_URL;
-  const [posts, setPosts] = useState<PostSimpleDto[]>([]); // 상태로 게시글 목록 관리
+  const [posts, setPosts] = useState<PostDetailDto[]>([]); // 상태로 게시글 목록 관리
   const [loading, setLoading] = useState<boolean>(true); // 로딩 상태 관리
   const [error, setError] = useState<string | null>(null); // 에러 메시지 관리
 
@@ -77,7 +79,8 @@ const CommunityList: React.FC<CommunityListProps> = ({ filter }) => {
             <div className="recipe-list-box-name-title">
               [{post.tradeType === "EXCHANGE" ? "교환" : "나눔"} / {post.address}]
             </div>
-            <div className="recipe-list-box-card-title">{post.postTitle}</div>
+            <div className="recipe-list-box-card-title">작성자의 재료 : {post.writerFoodName}</div>
+            <div className="recipe-list-box-card-title">{post.tradeType === "EXCHANGE" ? `원하는 재료 : ${post.proposerFoodName}` : "-"}</div>
             <div className="recipe-list-box-card">
               <div className="recipe-list-box-card-img-container">
                 {post.postPhoto1 ? (
@@ -113,9 +116,9 @@ const CommunityList: React.FC<CommunityListProps> = ({ filter }) => {
                   hour12: false,
                 })}
               </div>
-              <div className="recipe-list-box-card-more">
+              {/* <div className="recipe-list-box-card-more">
                 <Link to={`/community/detail/${post.postId}`}>Read more</Link>
-              </div>
+              </div> */}
             </div>
           </div>
         ))}
