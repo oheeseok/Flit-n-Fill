@@ -15,9 +15,12 @@
   justify-content: center;
   margin-left: 40px;
 }
-
+.recipe-detial-title-date-container {
+  display: flex;
+  flex-direction: row; /* 수직 방향으로 배치 */
+}
 .recipe-detail-title {
-  width: 94%;
+  width: 50%;
   color: #000;
   text-align: start;
   font-family: Ubuntu;
@@ -25,7 +28,18 @@
   font-style: normal;
   font-weight: 700;
   line-height: normal;
-  text-align: center;
+  text-align: start;
+  margin-left: 10px;
+}
+.recipe-detail-date {
+  width: 40%;
+  font-family: Ubuntu;
+  font-size: 20px;
+  font-weight: 600;
+  display: flex;
+  justify-content: end;
+  align-items: end;
+  text-align: end;
 }
 
 .recipe-detail-image {
