@@ -207,10 +207,10 @@ public class RecipeService {
       if (newPhoto != null && !newPhoto.isEmpty()) {
         String newPhotoUrl = s3Service.uploadFile(newPhoto, "recipes/steps");
         newStep.setPhoto(newPhotoUrl);
-//        log.info("새 사진 업로드 완료: {}", newPhotoUrl);
-      } else {
-//        newStep.setPhoto(RECIPE_STEP_DEFAULT_IMG_URL);
+      } else if (backupPhotoUrl != null && !backupPhotoUrl.isEmpty()) {
         newStep.setPhoto(backupPhotoUrl);
+      } else {
+        newStep.setPhoto(RECIPE_STEP_DEFAULT_IMG_URL); // 기본 이미지 설정
       }
     }
 
@@ -219,10 +219,10 @@ public class RecipeService {
         RecipeStepDto oldStep = oldRecipeSteps.get(i);
         String oldPhotoUrl = oldStep.getPhoto();
 
-        if (oldPhotoUrl != null && !oldPhotoUrl.isEmpty() && !oldPhotoUrl.equals(RECIPE_STEP_DEFAULT_IMG_URL)) {
-//          log.info("초과된 기존 사진 삭제: {}", oldPhotoUrl);
-          s3Service.deleteFile(oldPhotoUrl);
-        }
+//        if (oldPhotoUrl != null && !oldPhotoUrl.isEmpty() && !oldPhotoUrl.equals(RECIPE_STEP_DEFAULT_IMG_URL)) {
+////          log.info("초과된 기존 사진 삭제: {}", oldPhotoUrl);
+//          s3Service.deleteFile(oldPhotoUrl);
+//        }
       }
     }
 
