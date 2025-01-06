@@ -1,5 +1,6 @@
 package org.example.backend.api.notification.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +10,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.util.Arrays;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/subscribe")
@@ -20,9 +24,18 @@ public class PushNotificationController {
 
   // SSE 연결을 시작하는 엔드포인트
   @GetMapping(value = "/{userEmail}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-  public SseEmitter subscribe(@PathVariable("userEmail") String userEmail, HttpServletResponse response) {
+  public SseEmitter subscribe(@PathVariable("userEmail") String userEmail,
+                              HttpServletRequest request,
+                              HttpServletResponse response) {
 
-    response.setHeader("Access-Control-Allow-Origin", "http://" + origin);
+//    response.setHeader("Access-Control-Allow-Origin", "https://" + origin);
+    String requestOrigin = request.getHeader("Origin");
+
+    // Origin을 동적으로 설정
+    if (requestOrigin != null && (requestOrigin.equals("https://" + origin) || requestOrigin.equals("http://" + origin))) {
+      response.setHeader("Access-Control-Allow-Origin", requestOrigin);
+    }
+
     return pushNotificationService.subscribe(userEmail);
   }
 

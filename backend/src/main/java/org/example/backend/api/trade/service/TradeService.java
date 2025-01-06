@@ -54,9 +54,6 @@ public class TradeService {
   @Value("${server.host}")
   private String host;
 
-  @Value("${server.port}")
-  private String port;
-
   public List<TradeRoomSimpleDto> getAllTrades(Long userId) {
     List<TradeRoom> tradeRoomList = tradeRoomRepository.findByWriterIdOrProposerId(userId, userId);
     List<TradeRoomSimpleDto> tradeRoomDtos = new ArrayList<>();
@@ -266,10 +263,10 @@ public class TradeService {
     if (tradeRequest.getTradeTaskStatus().equals(TaskStatus.DENIED)) {  // 거절
       // email 전송(#54)
       content.append("<h3>회원님께서 요청하신 " + stat + "이 상대방에 의해 거절되었습니다.</h3><br>" +
-          stat + "한 게시글 : " + "<strong><a href=\"http://" + host + "/api/community/" + postId + "\">게시글 보러가기</a></strong><br><br>");
+          stat + "한 게시글 : " + "<strong><a href=\"https://" + host + "/api/community/" + postId + "\">게시글 보러가기</a></strong><br><br>");
       content.append("아쉽게도 요청이 거절되었지만, 재요청 하시거나 다른 거래를 시도해 보실 수 있습니다.<br>" +
           "다른 게시글에도 교환 요청을 보내보세요!<br>" +
-          "<strong><a href=\"http://" + host + "/api/community\">게시글 둘러보기</a></strong>");
+          "<strong><a href=\"https://" + host + "/api/community\">게시글 둘러보기</a></strong>");
 
       emailService.sendEmail(proposer.getUserEmail(), subject, content.toString());
       // push 알림(#55)
@@ -303,9 +300,9 @@ public class TradeService {
     } else if (tradeRequest.getTradeTaskStatus().equals(TaskStatus.ACCEPTED)) {    // 수락
       // email 전송(#54)
       content.append("<h3>회원님께서 요청하신 " + stat + "이 수락되었습니다!</h3><br>" +
-          stat + "한 게시글 : " + "<strong><a href=\"http://" + host + "/api/community/detail/" + postId + "\">게시글 보러가기</a></strong>");
+          stat + "한 게시글 : " + "<strong><a href=\"https://" + host + "/api/community/detail/" + postId + "\">게시글 보러가기</a></strong>");
       content.append("<br>지금 거래방에서 대화를 나눠보세요!" +
-          "<br><strong><a href=\"http://" + host + "/api/chatroom/" + notification.getTradeRoomId() + "\">거래방 바로가기</a></strong>");
+          "<br><strong><a href=\"https://" + host + "/api/chatroom/" + notification.getTradeRoomId() + "\">거래방 바로가기</a></strong>");
 
       emailService.sendEmail(proposer.getUserEmail(), subject, content.toString());
       // push 알림(#55)
@@ -368,10 +365,10 @@ public class TradeService {
 
         // email 전송
         content.append("<h3>회원님께서 요청하신 " + stat + " 요청이 상대방에 의해 거절되었습니다.</h3><br>" +
-            stat + "한 게시글 : " + "<strong><a href=\"http://" + host + "/api/community/detail/" + postId + "\">게시글 보러가기</a></strong><br><br>");
+            stat + "한 게시글 : " + "<strong><a href=\"https://" + host + "/api/community/detail/" + postId + "\">게시글 보러가기</a></strong><br><br>");
         content.append("아쉽게도 요청이 거절되었지만, 재요청 하시거나 다른 거래를 시도해 보실 수 있습니다.<br>" +
             "다른 게시글에도 교환 요청을 보내보세요!<br>" +
-            "<strong><a href=\"http://" + host + "/api/community\">게시글 둘러보기</a></strong>");
+            "<strong><a href=\"https://" + host + "/api/community\">게시글 둘러보기</a></strong>");
         emailService.sendEmail(user.getUserEmail(), subject, content.toString());
 
         // push 알림
