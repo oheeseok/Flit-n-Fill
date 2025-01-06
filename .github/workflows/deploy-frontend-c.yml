@@ -1,4 +1,4 @@
-name: Deploy Frontend to EC2-a
+name: Deploy Frontend to EC2-c
 
 on:
   push:
