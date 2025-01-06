@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: row;
   justify-content: end;
-  margin-right: 20px;
+  margin-right: 40px;
 }
 
 .fridgetoregister {
@@ -322,9 +322,8 @@
   height: 60%; /* 원 크기를 아이템보다 작게 설정 */
   /* border: 2px solid #ecef29; 선택된 아이템 테두리 */
   border-radius: 90%; /* 동그라미 모양 */
-  box-shadow: 
-      0 0 20px 10px rgba(193, 255, 234, 0.7), /* 부드럽고 확장된 바깥쪽 그림자 */
-      inset 0 0 30px rgba(188, 255, 234, 0.6); /* 부드럽고 자연스러운 안쪽 그림자 */
+  box-shadow: 0 0 20px 10px rgba(193, 255, 234, 0.7),
+    /* 부드럽고 확장된 바깥쪽 그림자 */ inset 0 0 30px rgba(188, 255, 234, 0.6); /* 부드럽고 자연스러운 안쪽 그림자 */
   pointer-events: none; /* 클릭 이벤트가 가상 요소에 전달되지 않도록 설정 */
 }
 
@@ -452,7 +451,7 @@
     height: auto;
     border-radius: 30px 30px 0px 0px;
   }
-  
+
   .cold-back {
     width: 90%;
     gap: 10px;
@@ -492,7 +491,7 @@
   .fridgebody {
     flex-direction: column;
   }
-  
+
   .fridge-container {
     width: 100%;
     margin: 20px auto;

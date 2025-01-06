@@ -4,18 +4,28 @@
 
 .recipe-list-option-container {
   display: flex;
-  gap: 20px;
+}
+.recipe-list-option-container-bookmark {
+  font-family: Ubuntu;
+  margin-bottom: 24px;
+  margin-right: -10px;
+}
+.recipe-list-option-container-bookmark-text {
   font-family: Ubuntu;
   justify-content: end;
-  margin-right: 40px;
+  margin-right: 80px;
+  margin-bottom: 20px;
+  font-size: 16px;
+  font-weight: 700;
 }
 
 .recipelistbody {
   width: 100%;
+  max-width: 1541.74px;
   margin: 0 auto; /* 가운데 정렬 */
   display: flex;
   flex-wrap: wrap; /* 너비 초과 시 다음 줄로 이동 */
-  gap: 10px; /* 각 아이템 간 간격 */
+  gap: 20px; /* 각 아이템 간 간격 */
   justify-content: start; /* 가로 가운데 정렬 */
   margin-bottom: 80px;
 }
@@ -42,6 +52,9 @@
   font-weight: 700;
   line-height: normal;
   margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .recipe-list-box-card {
   display: flex;

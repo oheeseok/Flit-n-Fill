@@ -6,8 +6,8 @@ import "../../styles/community/CommunityList.css";
 import CommunityList from "./CommunityList";
 
 const Community = () => {
-  const [filter, setFilter] = useState<string>("ALL")   // 상태 관리: 'ALL', 'EXCHANGE', 'SHARING'
-  const [query, setQuery] = useState<string>("")  // 검색어 관리
+  const [filter, setFilter] = useState<string>("ALL"); // 상태 관리: 'ALL', 'EXCHANGE', 'SHARING'
+  const [query, setQuery] = useState<string>(""); // 검색어 관리
 
   // const [searchParams, setSearchParams] = useSearchParams();
 
@@ -55,32 +55,35 @@ const Community = () => {
             </div>
           </div> */}
           <div className="community-searchbar">
-            <SearchBar query={query} onQueryChange={handleQueryChange}/>
+            <SearchBar query={query} onQueryChange={handleQueryChange} />
           </div>
 
           <div className="community-button-group">
-            <button className="community-button"
-            onClick={() => setFilter("ALL")}
+            <button
+              className="community-button"
+              onClick={() => setFilter("ALL")}
             >
               전체
             </button>
-            <button className="community-button"
+            <button
+              className="community-button"
               onClick={() => setFilter("EXCHANGE")}
             >
               교환
             </button>
-            <button className="community-button"
+            <button
+              className="community-button"
               onClick={() => setFilter("SHARING")}
             >
               나눔
             </button>
           </div>
-          
+
           <div className="community-toregister-button">
             <CommunityRegisterButton />
           </div>
-          {/*  */}
-          <CommunityList filter={filter}/>
+
+          <CommunityList filter={filter} />
         </div>
       </div>
     </div>

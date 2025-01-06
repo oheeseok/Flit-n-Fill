@@ -119,6 +119,8 @@
   font-weight: 400;
   line-height: 165%; /* 26.4px */
   margin-top: 10px;
+  display: flex;
+  align-items: center;
 }
 
 .recipe-list-box-card-profile-img {
