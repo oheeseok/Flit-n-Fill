@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.backend.api.user.service.TokenManagementService;
 import org.example.backend.security.service.CustomUserDetailsService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,6 +27,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
     private final TokenManagementService tokenManagementService;
     private final CustomUserDetailsService customUserDetailsService;
+    @Value("${server.host}")
+    private String host;
 
 
     @Override
@@ -104,7 +107,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             } catch (ExpiredJwtException e) {
                 log.error("[JwtAuthenticationFilter] Expired JWT token", e);
-                response.sendRedirect("/login"); // 로그인 페이지로 리다이렉션
+                response.sendRedirect("https://" + host); // 메인 페이지로 리다이렉션
                 return;
             } catch (Exception e) {
                 log.error("[JwtAuthenticationFilter] Token validation error", e);
