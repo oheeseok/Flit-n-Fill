@@ -7,7 +7,7 @@ on:
 
 
 jobs:
-  frontend-a:
+  frontend-c:
     runs-on: ubuntu-latest
 
     steps:

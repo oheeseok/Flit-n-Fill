@@ -8,7 +8,7 @@ on:
 
 
 jobs:
-  backend-a:
+  backend-c:
     runs-on: ubuntu-latest  # 실행 환경을 Ubuntu로 설정 (Windows 환경에서 Java 17을 설치하는 방법도 있지만, Ubuntu에서 설정하는 방법이 더 일반적입니다)
 
     steps:
