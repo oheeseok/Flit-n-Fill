@@ -17,6 +17,8 @@ const Header = () => {
   const [showNotification, setShowNotification] = useState<boolean>(false);
   const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [userNickname, setUserNickname] = useState<string | null>(null);
+  const [userFevel, setUserFevel] = useState<string | null>(null);
 
   const handleLogout = async () => {  // handleLogout을 async 함수로 선언
     Swal.fire({
@@ -88,6 +90,8 @@ const Header = () => {
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
     const userProfile = localStorage.getItem("userProfile");
+    const nickname = localStorage.getItem("userNickname");
+    const fevel = localStorage.getItem("fevel");
 
     if (token) {
       setIsLoggedIn(true);
@@ -105,6 +109,9 @@ const Header = () => {
     } else {
       setIsAdmin(false);
     }
+
+    setUserNickname(nickname);
+    setUserFevel(fevel);
   }, []);
 
   const toggleNotification = () => {
@@ -150,6 +157,12 @@ const Header = () => {
             {/* 사용자 메뉴창 */}
             {showUserMenu && (
               <div className="header-user-menu" ref={menuRef}>
+                {/* 사용자 정보 표시 */}
+                <div className="header-user-info">
+                  <p className="user-nickname">{userNickname}</p>
+                  <p className="user-fevel">{userFevel} f-evel </p>
+                  </div> 
+            
                 <ul>
                   <li>
                     <Link to="/mypage" onClick={() => {
@@ -195,8 +208,10 @@ const Header = () => {
           </>
         ) : (
           <>
-            <Link to="/signin">sign in</Link>
-            <Link to="/signup">sign up</Link>
+            <Link to="/signin"><img src="/assets/login.png" alt="Sign In" style={{ width: "20px", height: "20px", verticalAlign: "middle", marginRight: "8px" }}></img>
+            <span style={{ verticalAlign: "middle" }}>sign in</span></Link>
+            <Link to="/signup"><img src="/assets/signup.png" alt="Sign Up" style={{ width: "30px", height: "30px", verticalAlign: "middle", marginRight: "8px" }}></img>
+            <span style={{ verticalAlign: "middle" }}>sign up</span></Link>
           </>
         )}
       </ul>

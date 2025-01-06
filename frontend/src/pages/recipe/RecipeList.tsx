@@ -298,7 +298,7 @@ const RecipeList = () => {
         {displayedRecipes.map((recipe) => (
           <div className="recipe-list-container" key={recipe.recipeId}>
             <div className="recipe-list-box-name-title">
-              {recipe.userNickname}의 {recipe.recipeTitle}
+              {recipe.userNickname || "[탈퇴한 회원]"}의 {recipe.recipeTitle}
             </div>
             <div className="recipe-list-box-card">
               <div className="recipe-list-box-card-img-container">
@@ -324,7 +324,7 @@ const RecipeList = () => {
                   }}
                 ></div>
                 <div className="recipe-list-box-card-profile-container-name">
-                  {recipe.userNickname || "Unknown User"}
+                  {recipe.userNickname || "탈퇴한 회원"}
                 </div>
                 <div
                   className={`recipe-list-box-card-profile-container-star ${

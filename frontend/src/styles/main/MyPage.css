@@ -134,3 +134,67 @@
   color: red;
   text-align: left;
 }
+
+.mypage-level {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.mypage-level-header {
+  display: flex;
+  align-items: center;
+  gap: 20px; /* 텍스트와 progress 간격 */
+  font-size: 14px;
+  color:#4caf50;
+}
+
+.mypage-fevel-container {
+  flex: 1; /* 남은 공간을 차지하도록 설정 */
+  width: 100%;
+}
+
+.mypage-fevel {
+  flex: 1; /* 남은 공간을 차지하도록 설정 */
+  height: 10px;
+  appearance: none; /* 기본 스타일 제거 */
+  width: 300px;
+}
+
+.mypage-fevel::-webkit-progress-bar {
+  background-color: #f0f0f0; /* 바탕색 */
+  border-radius: 5px;
+}
+
+.mypage-fevel::-webkit-progress-value {
+  background: linear-gradient(to left, #4caf50 0%, #d8ffda 70%); /* 그라데이션 색상 */
+  border-radius: 5px;
+}
+
+.mypage-fevel::-moz-progress-bar {
+  background: linear-gradient(to left, #4caf50 0%, #d8ffda 70%); /* 그라데이션 */
+  border-radius: 5px;
+}
+
+.mypage-level-steps {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.mypage-level-step {
+  font-size: 12px;
+  color: #aaa;
+}
+
+.mypage-level-step.active {
+  color: #4caf50;
+  font-weight: bold;
+}
+
+.mypage-level-step.zero-step {
+  color: #000; /* 0일 때 블랙으로 표시 */
+  font-weight: bold;
+}
