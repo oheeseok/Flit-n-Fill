@@ -144,6 +144,16 @@ public class RecipeService {
     return recipeDetailDto;
   }
 
+  public RecipeDetailDto getRecipeDetail(String recipeId) {
+    Recipe recipe = recipeRepository.findById(recipeId)
+        .orElseThrow(() -> new RecipeNotFoundException("레시피를 찾을 수 없습니다."));
+
+    User user = recipe.getUserId() != null ? userRepository.findById(recipe.getUserId()).orElse(null) : null;
+    RecipeDetailDto recipeDetailDto = RecipeDetailDto.of(recipe, user);
+    recipeDetailDto.setRecipeIsBookmarked(false);
+    return recipeDetailDto;
+  }
+
   public RecipeDetailDto addRecipe(Long userId, RecipeRegisterDto dto, MultipartFile mainPhoto, List<MultipartFile> stepPhotos) throws IOException {
     User user = userRepository.findById(userId)
             .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));

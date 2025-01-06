@@ -78,11 +78,13 @@ public class RecipeController {
     @GetMapping("/{recipeId}")
     public ResponseEntity<RecipeDetailDto> getRecipeDetail(HttpServletRequest request, @PathVariable("recipeId") String recipeId) {
         Long userId = (Long) request.getAttribute("userId");
+        RecipeDetailDto recipe = new RecipeDetailDto();
         if (userId == null) {
-            throw new UserIdNullException("userId not found");
+            // 프론트에서 로그인 안한 상태로 요청 들어왔을 때
+            recipe = recipeService.getRecipeDetail(recipeId);
+        } else {
+            recipe = recipeService.getRecipeDetail(userId, recipeId);
         }
-
-        RecipeDetailDto recipe = recipeService.getRecipeDetail(userId, recipeId);
         return ResponseEntity.status(HttpStatus.OK).body(recipe);
     }
 
