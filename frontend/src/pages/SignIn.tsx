@@ -133,12 +133,12 @@ const SignIn: React.FC = () => {
     <>
       <div className="signinbody">
         <div className="signin-container">
-          <div className="signin-title">Welcome back!</div>
-          <div className="signin-title-2">
+          <div className="signin-title">로그인</div>
+          {/* <div className="signin-title-2">
             Enter your credentials to access your account
-          </div>
+          </div> */}
 
-          <div className="signin-text">Email address</div>
+          <div className="signin-text">이메일</div>
           <input
             type="text"
             className="signin-input"
@@ -147,7 +147,7 @@ const SignIn: React.FC = () => {
             onChange={handleChangeEmail}
           />
 
-          <div className="signin-text">Password</div>
+          <div className="signin-text">비밀번호</div>
           <input
             type="password"
             className="signin-input"
@@ -157,7 +157,7 @@ const SignIn: React.FC = () => {
           />
 
           <button className="signin-button-login" onClick={handleLogin}>
-            Log In
+            로그인
           </button>
 
           <div className="signup-button-or">or</div>
@@ -186,7 +186,7 @@ const SignIn: React.FC = () => {
           </div>
 
           <div>
-            Don't have an account? <a href="/signUp">Sign Up</a>
+            계정이 없다면? <a href="/signUp">회원가입</a>
           </div>
         </div>
 

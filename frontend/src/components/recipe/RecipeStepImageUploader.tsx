@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import profileImg from "../../assets/images/samplerecipemethod.jpg";
 
@@ -28,6 +28,9 @@ const StepImage = styled.img`
   margin-right: 20px;
 `;
 
+const RECIPE_STEP_DEFAULT_IMG_URL =
+  "https://flitnfill.s3.ap-northeast-2.amazonaws.com/default-img/recipe-step-default-img.png";
+
 interface RecipeStepImageUploaderProps {
   stepIndex: number;
   uploadedImage: string | null; // 미리보기 이미지 URL
@@ -39,25 +42,26 @@ function RecipeStepImageUploader({
   uploadedImage,
   onImageChange,
 }: RecipeStepImageUploaderProps) {
-  const [preview, setPreview] = useState<string | null>(uploadedImage);
-
   const onChangeFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const previewURL = URL.createObjectURL(file);
-      setPreview(previewURL); // 미리보기 URL 업데이트
       onImageChange(stepIndex, file); // 파일 객체 전달
+
+      // 이전 URL 해제
+      if (uploadedImage && uploadedImage.startsWith("blob:")) {
+        URL.revokeObjectURL(uploadedImage);
+      }
     } else {
-      // 파일이 없을 경우 null을 처리
-      setPreview(null); // 미리보기 이미지도 null로 처리
-      onImageChange(stepIndex, null); // null을 전달
+      onImageChange(stepIndex, null); // null 전달
     }
   };
+
+  
 
   return (
     <StepContainer>
       <StepImage
-        src={preview || uploadedImage || profileImg} // 우선순위: 미리보기 > 업로드된 이미지 > 기본 이미지
+        src={uploadedImage || profileImg || RECIPE_STEP_DEFAULT_IMG_URL} // 우선순위: 미리보기 > 업로드된 이미지 > 기본 이미지
         alt={`Step ${stepIndex + 1} 이미지`}
         onClick={() =>
           document.getElementById(`step-image-input-${stepIndex}`)?.click()

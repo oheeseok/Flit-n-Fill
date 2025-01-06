@@ -198,6 +198,7 @@ const MyPage: React.FC = () => {
         setUser(updatedUser);
         localStorage.setItem("userProfile", updatedUser.userProfile);
         navigate("/mypage");
+        window.location.reload();
       });
       // setProfileImage(updatedUser.userProfile); // 상태 갱신
     } catch (error) {

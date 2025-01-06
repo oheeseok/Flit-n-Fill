@@ -95,7 +95,7 @@ public class EmailService {
                     content.append("<br>");
                 }
             }
-            content.append("<strong><a href=\"http://" + host + "/recipe\">추천 레시피 보러가기</a></strong>");
+            content.append("<strong><a href=\"https://" + host + "/recipe\">추천 레시피 보러가기</a></strong>");
 
             if (!foodList.isEmpty()) {
                 sendEmail(user.getUserEmail(), "[소비기한 임박 알림]", content.toString());
@@ -135,7 +135,7 @@ public class EmailService {
             content.append("<h3>회원님의 게시글에 대해 나눔 요청이 접수되었습니다.</h3>" +
                     "<h3>자세한 내용은 아래 정보를 확인해 주세요!</h3><br>");
         }
-        content.append("<strong><a href=\"http://" + host + "/community/detail/" + postId + "\">게시글 보러가기</a></strong>");
+        content.append("<strong><a href=\"https://" + host + "/community/detail/" + postId + "\">게시글 보러가기</a></strong>");
         content.append("<br>요청자 : " + proposer.getUserNickname() + "님");
 
         sendEmail(writer.getUserEmail(), subject, content.toString());

@@ -3,8 +3,11 @@ import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import RecipeSearchBar from "../../components/recipe/RecipeSearchBar";
 import "../../styles/recipe/RecipeList.css";
-import axios from "axios";
+
 const apiUrl = import.meta.env.VITE_API_URL;
+import axios from "axios";
+import { RecipeSimpleDto } from "../../context/RecipeContext";
+
 
 const RecipeList = () => {
   const { toggleBookmark, searchQuery, fetchRecipes } = useRecipe();
@@ -15,6 +18,52 @@ const RecipeList = () => {
   const [searchQueryString, setSearchQueryString] = useState<string>("");
   const [hasMore, setHasMore] = useState(true);
   const [showBookmarksOnly, setShowBookmarksOnly] = useState(false);
+  // const [isMultuSearch, setIsMultiSearch] = useState(false);
+  // const [recipes, setRecipes] = useState<RecipeSimpleDto[]>([]); // RecipeSimpleDto 타입의 배열
+
+
+  const fetchMultiSearchRecipes = async (
+    food1: string,
+    food2: string,
+    food3: string
+  ) => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get<RecipeSimpleDto[]>(`${apiUrl}/api/recipes`, {
+        params: { food1, food2, food3 },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          userEmail: localStorage.getItem("userEmail"),
+        },
+        withCredentials: true,
+      });
+  
+      console.log("Fetched multi-search recipes:", response.data);
+  
+      setDisplayedRecipes(response.data); // 다중 검색 결과를 displayedRecipes로 설정
+    } catch (error) {
+      console.error("Failed to fetch multi-search recipes:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  // 다중 검색 파라미터 감지
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const food1 = urlParams.get("food1") || "";
+    const food2 = urlParams.get("food2") || "";
+    const food3 = urlParams.get("food3") || "";
+  
+    // 유효한 값이 없으면 함수 호출 중단
+    if (!food1 && !food2 && !food3) {
+      console.warn("No food parameters provided for multi-search.");
+      return;
+    }
+  
+    fetchMultiSearchRecipes(food1, food2, food3);
+  }, [location.search]);
+  
 
   const PAGE_SIZE = 18;
 
@@ -55,37 +104,109 @@ const RecipeList = () => {
     if (isLoading || !hasMore) return;
 
     setIsLoading(true);
-    try {
-      const params = {
-        page: currentPage + 1,
-        size: PAGE_SIZE,
-        search: searchQuery.trim() || undefined,
-      };
 
-      const response = await fetchRecipes(params);
-      setDisplayedRecipes((prev) => [...prev, ...(response.content || [])]);
+    try {
+      let additionalRecipes: any[] = [];
+
+      // URL에서 food1, food2, food3 확인
+      const urlParams = new URLSearchParams(window.location.search);
+      const food1 = urlParams.get("food1");
+      const food2 = urlParams.get("food2");
+      const food3 = urlParams.get("food3");
+
+      if (food1 || food2 || food3) {
+        // 다중 검색 로직
+        console.log("Loading more for multi-search");
+        const response = await fetchMultiSearchRecipes(
+          food1 || "",
+          food2 || "",
+          food3 || ""
+        );
+
+        if (Array.isArray(response)) {
+          additionalRecipes = response;
+        } else {
+          console.error("Unexpected response for multi-search:", response);
+        }
+      } else {
+        // 단일 검색 로직
+        console.log("Loading more for single search");
+        const params = {
+          page: currentPage + 1,
+          size: PAGE_SIZE,
+          search: searchQuery.trim() || undefined,
+        };
+
+        const response = await fetchRecipes(params);
+
+        if (response?.content) {
+          additionalRecipes = showBookmarksOnly
+            ? response.content.filter((recipe) => recipe.recipeIsBookmarked)
+            : response.content;
+          setHasMore(response.content.length === PAGE_SIZE);
+        } else {
+          console.error("Unexpected response for single search:", response);
+        }
+      }
+
+      // 새로운 레시피 추가
+      setDisplayedRecipes((prev) => [...prev, ...additionalRecipes]);
       setCurrentPage((prev) => prev + 1);
-      setHasMore(response.content.length === PAGE_SIZE);
     } catch (error) {
       console.error("Failed to load more recipes:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, hasMore, currentPage, fetchRecipes, searchQuery]);
+  }, [
+    isLoading,
+    hasMore,
+    currentPage,
+    fetchRecipes,
+    fetchMultiSearchRecipes,
+    searchQuery,
+    showBookmarksOnly,
+  ]);
 
   useEffect(() => {
+    let isFetching = false; // 데이터 로드 상태 플래그
+
     const handleScroll = () => {
-      if (
-        window.innerHeight + document.documentElement.scrollTop >=
-        document.documentElement.offsetHeight - 200
-      ) {
-        loadMoreRecipes();
+      if (isFetching) return; // 이미 데이터 로드 중이면 실행하지 않음
+
+      const scrollPosition =
+        window.innerHeight + document.documentElement.scrollTop;
+      const offsetHeight = document.documentElement.offsetHeight;
+
+      if (scrollPosition >= offsetHeight - 100) {
+        if (
+          !isLoading &&
+          hasMore &&
+          (!showBookmarksOnly || displayedRecipes.length >= PAGE_SIZE)
+        ) {
+          isFetching = true; // 플래그 설정
+          const currentScrollY = window.scrollY;
+
+          loadMoreRecipes().then(() => {
+            setTimeout(() => {
+              window.scrollTo(0, currentScrollY - 200);
+            }, 0);
+          });
+        }
       }
     };
 
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [loadMoreRecipes]);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [
+    loadMoreRecipes,
+    isLoading,
+    hasMore,
+    showBookmarksOnly,
+    displayedRecipes.length,
+  ]);
 
   // 북마크 클릭 핸들러 (즉시 반영)
   const handleBookmarkClick = async (recipeId: string) => {
@@ -102,6 +223,9 @@ const RecipeList = () => {
 
     setDisplayedRecipes(filteredRecipes);
 
+    if (showBookmarksOnly) {
+      setHasMore(filteredRecipes.length >= PAGE_SIZE);
+    }
     try {
       await toggleBookmark(recipeId);
     } catch (error) {
@@ -174,7 +298,7 @@ const RecipeList = () => {
         {displayedRecipes.map((recipe) => (
           <div className="recipe-list-container" key={recipe.recipeId}>
             <div className="recipe-list-box-name-title">
-              {recipe.userNickname}의 {recipe.recipeTitle}
+              {recipe.userNickname || "[탈퇴한 회원]"}의 {recipe.recipeTitle}
             </div>
             <div className="recipe-list-box-card">
               <div className="recipe-list-box-card-img-container">
@@ -200,7 +324,7 @@ const RecipeList = () => {
                   }}
                 ></div>
                 <div className="recipe-list-box-card-profile-container-name">
-                  {recipe.userNickname || "Unknown User"}
+                  {recipe.userNickname || "탈퇴한 회원"}
                 </div>
                 <div
                   className={`recipe-list-box-card-profile-container-star ${
@@ -223,14 +347,6 @@ const RecipeList = () => {
           </div>
         ))}
       </div>
-
-      {/* 무한 스크롤 로드 버튼 */}
-      {hasMore && !isLoading && (
-        <div className="load-more-container">
-          <button onClick={loadMoreRecipes}>Load More</button>
-        </div>
-      )}
-      {isLoading && <div>Loading...</div>}
     </>
   );
 };

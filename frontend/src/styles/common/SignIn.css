@@ -26,8 +26,9 @@
   font-family: Ubuntu;
   font-size: 32px;
   font-style: normal;
-  font-weight: 400;
+  font-weight: 700;
   line-height: normal;
+  margin-bottom: 10px;
 }
 .signin-title-2 {
   color: #000;
