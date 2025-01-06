@@ -51,22 +51,22 @@ public class PostService {
   private final NotificationRepository notificationRepository;
   private final S3Service s3Service;
 
-  public List<PostSimpleDto> getAllPosts() {
+  public List<PostDetailDto> getAllPosts() {
     List<Post> posts = postRepository.findAllByOrderByPostCreatedDateDesc();
     return posts.stream()
         .map(post -> {
           User user = userRepository.findById(post.getUser().getUserId()).orElse(null);
-          return PostSimpleDto.of(post, user);
+          return PostDetailDto.of(post, user);
         })
         .collect(Collectors.toList());
   }
 
-  public List<PostSimpleDto> searchPost(String keyword) {
+  public List<PostDetailDto> searchPost(String keyword) {
     List<Post> posts = postRepository.findByKeyword(keyword);
     return posts.stream()
         .map(post -> {
           User user = userRepository.findById(post.getUser().getUserId()).orElse(null);
-          return PostSimpleDto.of(post, user);
+          return PostDetailDto.of(post, user);
         })
         .collect(Collectors.toList());
   }
