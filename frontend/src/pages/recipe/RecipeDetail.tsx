@@ -3,6 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import "../../styles/recipe/RecipeDetail.css";
 import Swal from "sweetalert2";
 import axios from "axios";
+import { format } from "date-fns";
+
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const RecipeDetail = () => {
@@ -137,7 +139,13 @@ const RecipeDetail = () => {
   return (
     <div className="recipe-detail-body">
       <div className="recipe-detail-title-container">
-        <div className="recipe-detail-title">{recipe.recipeTitle}</div>
+        <div className="recipe-detial-title-date-container">
+          <div className="recipe-detail-title">{recipe.recipeTitle}</div>
+          <div className="recipe-detail-date">
+            📅 작성일 :{" "}
+            {format(new Date(recipe.recipeCreatedDate), "yyyy-MM-dd HH:mm")}
+          </div>
+        </div>
         {recipe.recipeMainPhoto && (
           <div className="recipe-detail-image">
             <img src={recipe.recipeMainPhoto} alt={recipe.recipeTitle} />
