@@ -273,7 +273,7 @@ const RecipeEdit = () => {
     <div className="recipeeditbody">
       <div className="recipe-edit-title-container">
         <div className="recipe-edit-title">
-          <div className="recipe-edit-title-text">Title</div>
+          <div className="recipe-edit-title-text">요리 이름</div>
           <div className="recipe-edit-isvisibility">
             <input
               type="checkbox"
@@ -303,7 +303,7 @@ const RecipeEdit = () => {
         </div>
       </div>
       <div className="recipe-edit-ingredients-container">
-        <div className="recipe-edit-ingredients-title">Ingredients</div>
+        <div className="recipe-edit-ingredients-title">재료</div>
         <textarea
           className="recipe-edit-ingredients-textbox"
           placeholder="재료를 입력해 주세요."
@@ -312,7 +312,7 @@ const RecipeEdit = () => {
         ></textarea>
       </div>
       <div className="recipe-edit-method-container">
-        <div className="recipe-edit-method-title">Recipe Steps</div>
+        <div className="recipe-edit-method-title">조리 순서</div>
         {recipeMethods.map((method, seq) => (
           <div key={method.seq} className="recipe-edit-method-box">
             <div className="recipe-edit-method-box-num">{method.seq}</div>
