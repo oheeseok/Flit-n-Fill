@@ -3,8 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import "../../styles/recipe/RecipeDetail.css";
 import Swal from "sweetalert2";
 import axios from "axios";
-
 const apiUrl = import.meta.env.VITE_API_URL;
+
 const RecipeDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
