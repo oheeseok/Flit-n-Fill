@@ -90,7 +90,7 @@
   background-image: url("../../assets/images/main2.jpg");
   background-size: cover;
   background-position: center;
-  width: 980px;
+  width: 1000px;
   height: 653.333px;
   grid-column: 1 / 2; /* 이미지 왼쪽쪽 위치 */
   position: relative; /* 텍스트가 이미지 위에 오도록 하기 위해 position 설정 */
@@ -100,7 +100,7 @@
 .maincommunitytextbox {
   position: absolute;
   margin-top: 150px;
-  margin-left: 1100px;
+  margin-left: 1200px;
   display: flex;
   flex-direction: column;
   justify-content: center;

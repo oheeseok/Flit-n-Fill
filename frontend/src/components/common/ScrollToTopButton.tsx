@@ -42,7 +42,7 @@ const ScrollToTopButton = () => {
             bottom: "30px",
             right: "30px",
             zIndex: 9,
-            font: "bold",
+            fontWeight: "bold",
           }}
           aria-label="Scroll to top"
         >

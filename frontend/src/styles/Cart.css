@@ -48,11 +48,11 @@
   color: #666; /* bullet 색상 */
   font-size: 12px; /* bullet 크기 */
   margin-right: 8px; /* bullet과 텍스트 간격 */
+  margin-left: 10px;
 }
 
 .line-text {
-  font-size: 23
-  px;
+  font-size: 23 px;
   margin-right: 8px; /* 텍스트와 버튼 간격 */
 }
 
@@ -84,30 +84,32 @@
 .add-button {
   margin-left: 10px;
   padding: 10px 15px;
-  background-color: #007bff;
-  color: #fff;
+  background-color: #c7efe6;
+  color: #000;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-weight: 700;
 }
 
 .add-button:hover {
-  background-color: #0056b3;
+  background-color: #93f3de;
 }
 
 .save-cart-button {
   margin-top: 10px;
   padding: 10px 15px;
-  background-color: #28a745;
-  color: #fff;
+  background-color: #d4efc7;
+  color: #000;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   margin-left: 10px;
+  font-weight: 700;
 }
 
 .save-cart-button:hover {
-  background-color: #218838;
+  background-color: #98e273;
 }
 
 .cart-text {
