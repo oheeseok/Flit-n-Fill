@@ -186,7 +186,10 @@ const ChatRoom: React.FC = () => {
   };
 
   const reportUser = async () => {
-    if (reportMessage.trim() === "") return;
+    // if (reportMessage.trim() === "") {
+    //   console.log("reportUser() reportMessage.trim() return");
+    //   return;
+    // }
 
     // 이스케이프된 문자를 처리
     const encodedMessage = reportMessage.replace(/\\"/g, '"'); // 문자열 내의 이스케이프된 문자 제거
@@ -440,8 +443,11 @@ const ChatRoom: React.FC = () => {
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder="댓글을 남겨 보세요."
         />
-        <button className="chatroom-send-button" onClick={handleSendMessage}
-        style={{ backgroundColor: "#85b573", color: "white" }}>
+        <button
+          className="chatroom-send-button"
+          onClick={handleSendMessage}
+          style={{ backgroundColor: "#85b573", color: "white" }}
+        >
           입력하기
         </button>
       </div>
