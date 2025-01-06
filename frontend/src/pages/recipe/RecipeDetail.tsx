@@ -147,14 +147,14 @@ const RecipeDetail = () => {
       </div>
 
       <div className="recipe-detail-ingredients-container">
-        <div className="recipe-detail-ingredients-title">Ingredients</div>
+        <div className="recipe-detail-ingredients-title">재료</div>
         <div className="recipe-detail-ingredients-text">
           {recipe.recipeFoodDetails}
         </div>
       </div>
 
       <div className="recipe-detail-steps-container">
-        <div className="recipe-detail-steps-title">Recipe Steps</div>
+        <div className="recipe-detail-steps-title">조리 순서</div>
         {recipe.recipeSteps.map((step: any) => (
           <div key={step.seq} className="recipe-detail-step-box">
             <div className="recipe-detail-step-num">Step {step.seq}</div>
