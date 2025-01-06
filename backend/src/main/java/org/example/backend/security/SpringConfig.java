@@ -46,10 +46,10 @@ public class SpringConfig {
     // 인증 요청 페이지 설정
     http
         .authorizeHttpRequests(authorize -> authorize
-            .requestMatchers("/api/user/register", "/api/user/login", "api/user/login/social", "/oauth2/**", "/api/subscribe/**", "/api/auth/**",
-                "/api/admin/login", "/swagger-ui/**", "/v3/api-docs/**", "/api/user/recipes", "/api/user/recipes/").permitAll()
-            .requestMatchers("/api/user/recipes/{recipeId}")
-            .permitAll() // GET /api/user/recipes/{recipeId} 허용
+            .requestMatchers("/api/user/register", "/api/user/login", "/api/user/login/social", "/oauth2/**", "/api/subscribe/**", "/api/auth/**",
+                "/api/admin/login", "/swagger-ui/**", "/v3/api-docs/**", "/api/recipes", "/api/recipes/todays-recipe").permitAll()
+            .requestMatchers("/api/recipes/{recipeId}")
+            .permitAll() // GET /api/recipes/{recipeId} 허용
             .requestMatchers("/api/admin/**").hasRole("ADMIN")
             .requestMatchers("/api/**").authenticated()
             .anyRequest().permitAll())

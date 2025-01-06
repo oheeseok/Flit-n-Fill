@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,31 +36,42 @@ public class RecipeController {
                                                 @RequestParam(value = "size", defaultValue = "18") int size) {
         log.info("Received search query: {}", keyword); // 검색어 로그
         Long userId = (Long) request.getAttribute("userId");
-        if (userId == null) {
-            throw new UserIdNullException("userId not found");
-        }
-
         Object result;
 
-        List<String> foods = Arrays.asList(food1, food2, food3)
-            .stream()
-            .filter(food -> food != null && !food.isEmpty())
-            .toList();
-
-        // food1 ~ food5가 포함된 경우 처리
-        if (!foods.isEmpty()) {
-            result = recipeService.searchRecipesByFoods(userId, foods);
-        }
-        else if (keyword != null && ! keyword.isEmpty()) {
-            // src이 null이 아니면 src와 keyword를 모두 사용하여 검색
-            if ("youtube".equals(src)) {
-                result = recipeService.searchYoutubeRecipes(keyword);
+        if (userId == null) {
+            // 프론트에서 로그인 안한 상태로 요청 들어왔을 때
+            if (keyword != null && ! keyword.isEmpty()) {
+                // src이 null이 아니면 src와 keyword를 모두 사용하여 검색
+                if ("youtube".equals(src)) {
+                    result = recipeService.searchYoutubeRecipes(keyword);
+                } else {
+                    result = recipeService.searchRecipes(keyword); // keyword만 사용하여 검색
+                }
             } else {
-                result = recipeService.searchRecipes(userId, keyword); // keyword만 사용하여 검색
+                result = recipeService.getAllRecipes(page, size); // 모든 레시피 조회
             }
         } else {
-            result = recipeService.getAllRecipes(userId, page, size); // 모든 레시피 조회
+            List<String> foods = Arrays.asList(food1, food2, food3)
+                .stream()
+                .filter(food -> food != null && !food.isEmpty())
+                .toList();
+
+            // food1 ~ food5가 포함된 경우 처리
+            if (!foods.isEmpty()) {
+                result = recipeService.searchRecipesByFoods(userId, foods);
+            }
+            else if (keyword != null && ! keyword.isEmpty()) {
+                // src이 null이 아니면 src와 keyword를 모두 사용하여 검색
+                if ("youtube".equals(src)) {
+                    result = recipeService.searchYoutubeRecipes(keyword);
+                } else {
+                    result = recipeService.searchRecipes(userId, keyword); // keyword만 사용하여 검색
+                }
+            } else {
+                result = recipeService.getAllRecipes(userId, page, size); // 모든 레시피 조회
+            }
         }
+
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
@@ -181,12 +193,15 @@ public class RecipeController {
 
     @GetMapping("/todays-recipe")
     public ResponseEntity<List<RecipeSimpleDto>> getTodaysRecipe(HttpServletRequest request) {
-        Long userId = (Long) request.getAttribute("userId");
-        if (userId == null) {
-            throw new UserIdNullException("userId not found");
-        }
 
-        List<RecipeSimpleDto> todaysRecipe = recipeService.getTodaysRecipe(userId);
+        Long userId = (Long) request.getAttribute("userId");
+        List<RecipeSimpleDto> todaysRecipe = new ArrayList<>();
+        if (userId == null) {
+            // 프론트에서 로그인 안한 상태로 요청 들어왔을 때
+            todaysRecipe = recipeService.getTodaysRecipe();
+        } else {
+            todaysRecipe = recipeService.getTodaysRecipe(userId);
+        }
         return ResponseEntity.status(HttpStatus.OK).body(todaysRecipe);
     }
 
