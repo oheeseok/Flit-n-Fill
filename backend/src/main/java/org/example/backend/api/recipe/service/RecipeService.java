@@ -72,6 +72,18 @@ public class RecipeService {
         });
   }
 
+  public Page<RecipeSimpleDto> getAllRecipes(int page, int size) {
+    Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "recipeCreatedDate"));
+    Page<Recipe> recipePage = recipeRepository.findAll(pageable);
+    return recipePage.map(recipe -> {
+      User user = recipe.getUserId() != null ? userRepository.findById(recipe.getUserId()).orElse(null) : null;
+      // Recipe -> RecipeSimpleDto로 변환
+      RecipeSimpleDto recipeSimpleDto = RecipeSimpleDto.of(recipe, user);
+      recipeSimpleDto.setRecipeIsBookmarked(false);
+      return recipeSimpleDto;
+    });
+  }
+
   /**
    * @param keyword
    * @return recipeTitle이나 recipeFoodDetails에 keyword가 포함된 레시피
@@ -86,6 +98,20 @@ public class RecipeService {
           User user = recipe.getUserId() != null ? userRepository.findById(recipe.getUserId()).orElse(null) : null;
           RecipeSimpleDto recipeSimpleDto = RecipeSimpleDto.of(recipe, user);
           recipeSimpleDto.setRecipeIsBookmarked(bookmarkedRecipeIds.contains(recipeSimpleDto.getRecipeId()));
+          return recipeSimpleDto;
+        })
+        .collect(Collectors.toList());
+  }
+
+  public List<RecipeSimpleDto> searchRecipes(String keyword) {
+    log.info("Executing search for keyword: {}", keyword);
+    List<Recipe> recipes = recipeRepository.findByRecipeTitleContainingIgnoreCaseOrRecipeFoodDetailsContainingIgnoreCase(keyword, keyword, Sort.by(Sort.Direction.DESC, "recipeCreatedDate"));
+    log.info("Number of recipes found: {}", recipes.size()); // 검색된 레시피 수 로그
+    return recipes.stream()
+        .map(recipe -> {
+          User user = recipe.getUserId() != null ? userRepository.findById(recipe.getUserId()).orElse(null) : null;
+          RecipeSimpleDto recipeSimpleDto = RecipeSimpleDto.of(recipe, user);
+          recipeSimpleDto.setRecipeIsBookmarked(false);
           return recipeSimpleDto;
         })
         .collect(Collectors.toList());
@@ -339,6 +365,30 @@ public class RecipeService {
           User user = recipe.getUserId() != null ? userRepository.findById(recipe.getUserId()).orElse(null) : null;
           RecipeSimpleDto recipeSimpleDto = RecipeSimpleDto.of(recipe, user);
           recipeSimpleDto.setRecipeIsBookmarked(bookmarkedRecipeIds.contains(recipeSimpleDto.getRecipeId()));
+          return recipeSimpleDto;
+        })
+        .collect(Collectors.toList());
+  }
+
+  public List<RecipeSimpleDto> getTodaysRecipe() {
+    List<Recipe> allRecipes = recipeRepository.findAll();
+
+    // 레시피가 없는 경우
+    if (allRecipes.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    Collections.shuffle(allRecipes);
+
+    List<Recipe> selectedRecipes = allRecipes.size() > 5
+        ? allRecipes.subList(0, 5)
+        : allRecipes;
+
+    return selectedRecipes.stream()
+        .map(recipe -> {
+          User user = recipe.getUserId() != null ? userRepository.findById(recipe.getUserId()).orElse(null) : null;
+          RecipeSimpleDto recipeSimpleDto = RecipeSimpleDto.of(recipe, user);
+          recipeSimpleDto.setRecipeIsBookmarked(false);
           return recipeSimpleDto;
         })
         .collect(Collectors.toList());
