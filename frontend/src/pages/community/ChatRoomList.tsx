@@ -24,18 +24,26 @@ const ChatRoomList: React.FC = () => {
             className="chatroom-item"
             onClick={() => navigate(`/chatroom/${room.tradeRoomId}`)}
           >
-            <div className="chatroom-content">
-              <img
-                src={room.otherUserProfile}
-                alt={room.otherUserNickname}
-                className="chatroom-profile-image"
-              />
-              <div className="chatroom-details">
-                <div className="chatroom-title">{room.postTitle}</div>
-                <div className="chatroom-author">{room.otherUserNickname}</div>
-              </div>
-              <div className="chatroom-time">
-                {format(new Date(room.lastMessageTime), "yyyy-MM-dd HH:mm:ss")}
+            <div className="chatroom-content" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div className="chatroom-title" style={{ flex: "1" }}>{room.postTitle}</div>
+              <div className="chatroom-info" style={{ flex: "1", display: "flex", alignItems: "center" }}>
+                <div className="chatroom-details"  style={{ display: "flex", alignItems: "center" }}>
+                  <img
+                    src={room.otherUserProfile}
+                    alt={room.otherUserNickname}
+                    className="chatroom-profile-image"
+                    style={{
+                      width: "40px", // 원하는 이미지 크기 설정
+                      height: "40px", // 원하는 이미지 크기 설정
+                      borderRadius: "50%", // 동그란 이미지
+                      marginRight: "10px", // 닉네임과 간격
+                    }}
+                  />
+                  <div className="chatroom-author"><strong>{room.otherUserNickname}</strong></div>
+                </div>
+                <div className="chatroom-time" style={{ textAlign: "right" }}>
+                  {format(new Date(room.lastMessageTime), "yyyy-MM-dd HH:mm:ss")}
+                </div>
               </div>
             </div>
           </li>
