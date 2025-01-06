@@ -13,8 +13,8 @@ const HiddenInput = styled.input`
 `;
 
 const MyProfileImg = styled.img`
-  width: 686px;
-  height: 600px;
+  width: 92.2%;
+  height: 564px;
   border-radius: 30px;
   object-fit: cover;
   cursor: pointer;
@@ -53,7 +53,7 @@ function RecipeImageUploader({
       });
       setPreview(previewUrl);
       onChangeImage(file);
-  
+
       return () => URL.revokeObjectURL(previewUrl);
     } else {
       console.log("File selection canceled.");

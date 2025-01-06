@@ -13,7 +13,7 @@
   border-bottom: 5px solid var(--light-sky, #c7efe6);
   border-left: 1px solid var(--light-sky, #c7efe6);
   background: rgba(199, 239, 230, 0.3);
-  margin: 50px;
+  margin: 50px auto;
 }
 
 .cart-title {
