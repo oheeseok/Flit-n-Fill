@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @Transactional
+@EnableScheduling
 public class EmailService {
     private final JavaMailSender mailSender;
     private final UserRepository userRepository;
@@ -62,7 +63,7 @@ public class EmailService {
         }
     }
 
-    @Scheduled(cron = "0 0 6 * * *")
+    @Scheduled(cron = "0 30 0 * * *")
     public void sendExpirationEmail() {
         List<User> userList = userRepository.findAll();
 
@@ -94,7 +95,7 @@ public class EmailService {
                     content.append("<br>");
                 }
             }
-            content.append("<strong><a href=\"https://" + host + "/recipe\">추천 레시피 보러가기</a></strong>");
+            content.append("<strong><a href=\"https://www.flitnfill.kro.kr/recipe\">추천 레시피 보러가기</a></strong>");
 
             if (!foodList.isEmpty()) {
                 sendEmail(user.getUserEmail(), "[소비기한 임박 알림]", content.toString());
