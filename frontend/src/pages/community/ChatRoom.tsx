@@ -29,7 +29,7 @@ const ChatRoom: React.FC = () => {
   const [postInfo, setPostInfo] = useState<PostSimpleDto | null>(null);
 
   const [visibleInfoIndex, setVisibleInfoIndex] = useState<number | null>(null); // 하나의 인덱스를 저장
-
+  const [feedbackVisible, setFeedbackVisible] = useState<boolean>(false);
   const [reportMessage, setReportMessage] = useState<string>("");
 
   const { user, fetchUserData } = useUser();
@@ -58,6 +58,12 @@ const ChatRoom: React.FC = () => {
             setMyInfo(tradeRoomDetail.myInfo);
             setOtherUserInfo(tradeRoomDetail.otherUserInfo);
             setPostInfo(tradeRoomDetail.postInfo);
+            // 완료된 상태면 피드백링크 버튼 보이게
+            {
+              tradeRoomDetail.tradeProgress === "COMPLETED"
+                ? setFeedbackVisible(true)
+                : setFeedbackVisible(false);
+            }
           }
         } catch (error) {
           console.error("Error fetching trade room detail:", error);
@@ -164,6 +170,8 @@ const ChatRoom: React.FC = () => {
           icon: "error",
           title: "실패",
           text: `${response.data}`,
+        }).then(() => {
+          navigate(`/chatroomlist`); // 확인 버튼 클릭 후 네비게이트 실행
         });
       }
     } catch (error: unknown) {
@@ -173,7 +181,7 @@ const ChatRoom: React.FC = () => {
           icon: "error",
           text: `${error.response?.data}`,
         }).then(() => {
-          navigate(`/community/list`); // 확인 버튼 클릭 후 네비게이트 실행
+          navigate(`/chatroomlist`); // 확인 버튼 클릭 후 네비게이트 실행
         });
       } else {
         console.error("An unknown error occurred:", error);
@@ -334,6 +342,18 @@ const ChatRoom: React.FC = () => {
             </div>
           </div>
           <div className="button-group">
+            {feedbackVisible === true ? (
+              <button
+                className="chatroom-send-button"
+                onClick={() => navigate(`/feedback/${tradeRoomId}`)}
+                style={{ backgroundColor: "lightgreen", color: "black" }}
+              >
+                만족도 평가
+              </button>
+            ) : (
+              ""
+            )}
+
             <button
               className="chatroom-send-button"
               onClick={() => handleTrade(TRADE_COMPLETE)}
