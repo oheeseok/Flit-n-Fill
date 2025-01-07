@@ -27,7 +27,7 @@
 
 .search-icon-button {
   position: absolute;
-  right: 150px;
+  right: 9%;
   top: 50%;
   transform: translateY(-50%);
 }
