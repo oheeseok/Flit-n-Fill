@@ -59,6 +59,7 @@ const RecipeList = () => {
     // 유효한 값이 없으면 함수 호출 중단
     if (!food1 && !food2 && !food3) {
       console.warn("No food parameters provided for multi-search.");
+
       return;
     }
 
@@ -125,12 +126,20 @@ const RecipeList = () => {
 
         if (Array.isArray(response)) {
           additionalRecipes = response;
+
+          if (response.length < PAGE_SIZE) {
+            setHasMore(false);
+          } else {
+            setHasMore(true);
+          }
         } else {
           console.error("Unexpected response for multi-search:", response);
+          setHasMore(false); // 예기치 않은 응답 형식일 경우 무한 스크롤 중단
         }
       } else {
         // 단일 검색 로직
         console.log("Loading more for single search");
+
         const params = {
           page: currentPage + 1,
           size: PAGE_SIZE,
@@ -139,13 +148,25 @@ const RecipeList = () => {
 
         const response = await fetchRecipes(params);
 
-        if (response?.content) {
+        // 응답 데이터가 배열인지, content 필드가 있는지 확인
+        if (Array.isArray(response)) {
+          // 응답이 배열일 경우 바로 처리
+          additionalRecipes = showBookmarksOnly
+            ? response.filter((recipe) => recipe.recipeIsBookmarked)
+            : response;
+
+          // 데이터가 PAGE_SIZE보다 적으면 더 이상 로드할 데이터가 없다고 설정
+          setHasMore(response.length === PAGE_SIZE);
+        } else if (response?.content) {
+          // 응답에 content 필드가 있을 경우 처리
           additionalRecipes = showBookmarksOnly
             ? response.content.filter((recipe) => recipe.recipeIsBookmarked)
             : response.content;
+
           setHasMore(response.content.length === PAGE_SIZE);
         } else {
           console.error("Unexpected response for single search:", response);
+          setHasMore(false); // 예기치 않은 응답 형식일 경우 무한 스크롤 중단
         }
       }
 

@@ -108,6 +108,7 @@ export const RecipeProvider = ({ children }: { children: React.ReactNode }) => {
             src: params?.src || "", // src를 설정할 수 있음, 기본적으로 비어있음
             page: params?.page || 1, // 기본 페이지 0
             size: params?.size || 18, // 기본 사이즈 18
+            sort: "recipeCreatedDate,desc",
           },
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -131,18 +132,21 @@ export const RecipeProvider = ({ children }: { children: React.ReactNode }) => {
     food3?: string;
   }): Promise<RecipeSimpleDto[]> => {
     try {
-      const response = await axios.get<RecipeSimpleDto[]>(`${apiUrl}/api/recipes`, {
-        params: {
-          food1: params?.food1 || "",
-          food2: params?.food2 || "",
-          food3: params?.food3 || "",
-        },
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          userEmail: localStorage.getItem("userEmail"),
-        },
-        withCredentials: true,
-      });
+      const response = await axios.get<RecipeSimpleDto[]>(
+        `${apiUrl}/api/recipes`,
+        {
+          params: {
+            food1: params?.food1 || "",
+            food2: params?.food2 || "",
+            food3: params?.food3 || "",
+          },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            userEmail: localStorage.getItem("userEmail"),
+          },
+          withCredentials: true,
+        }
+      );
       console.log("Fetched multi-search recipes:", response.data);
       return response.data;
     } catch (error) {
